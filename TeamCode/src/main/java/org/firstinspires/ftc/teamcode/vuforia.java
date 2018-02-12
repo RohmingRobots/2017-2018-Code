@@ -26,7 +26,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 /********** ^^ copy this ^^ **********/
 
 //naming the teleop thing
-@TeleOp(name="vuforia", group="Drive")
+@TeleOp(name="Vuforia Test", group="Test")
 public class vuforia extends LinearOpMode {
 
     /********** vv copy this 2/6 vv **********/
