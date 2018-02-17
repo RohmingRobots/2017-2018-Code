@@ -171,7 +171,7 @@ public class teleop extends LinearOpMode {
             }
             if (egamepad2.dpad_left.pressed) {
                 robot.LowerArm.MoveToPosition(0.0);
-                robot.UpperArm.MoveToPosition(0.2);
+                robot.UpperArm.MoveToPosition(0.3);
             }
             if (egamepad2.dpad_right.pressed) {
                 robot.LowerArm.MoveToPosition(0.3);

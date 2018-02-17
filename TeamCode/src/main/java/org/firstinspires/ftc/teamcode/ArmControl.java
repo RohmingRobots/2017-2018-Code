@@ -59,6 +59,7 @@ public class ArmControl {
         UpperLower = upper_lower;
 
         if (UpperLower) {
+            //UPPER
             // Define and Initialize Motors
             LeftMotor = hwMap.dcMotor.get("UL");
             RightMotor = hwMap.dcMotor.get("UR");
@@ -82,8 +83,7 @@ public class ArmControl {
             RightMotor.setDirection(DcMotor.Direction.REVERSE);
 
             // Define and initialize switch
-//AJB            Limit = hwMap.digitalChannel.get("lower limit");
-            Limit = hwMap.digitalChannel.get("upper limit");
+            Limit = hwMap.digitalChannel.get("lower limit");
             Limit.setMode(DigitalChannel.Mode.INPUT);           // false = pressed
 
             // Define and initialize potentiometers
@@ -91,7 +91,7 @@ public class ArmControl {
 
             // Set power values
             MAX_POS_POWER = 0.8;
-            MAX_NEG_POWER = 0.2;
+            MAX_NEG_POWER = 0.15;
         }
         // Set all motors to zero power
         LeftMotor.setPower(0);
