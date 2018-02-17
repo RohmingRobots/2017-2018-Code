@@ -329,7 +329,12 @@ public class AllAuto extends LinearOpMode {
 
                 /* backup 24 inches */
                 case 1:
-                    drive(24, false);
+                    robot.MoveBackward(MOVE_SPEED);
+                    if (now > 0.9) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
                     break;
 
                 /* turn left to -45 (red) */
@@ -354,12 +359,22 @@ public class AllAuto extends LinearOpMode {
 
                 /* move forward 50.9 inches (FI) */
                 case 30:
-                    drive(50.9, true);
+                    robot.MoveForward(MOVE_SPEED);
+                    if (now > 1.5) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
                     break;
 
                 /* move forward 33.9 inches (BI) */
                 case 31:
-                    drive(33.9, true);
+                    robot.MoveForward(MOVE_SPEED);
+                    if (now > 1.1) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
                     break;
 
                 /* turn right to 0 (RAFI) */
@@ -374,9 +389,8 @@ public class AllAuto extends LinearOpMode {
 
                 /* turn left to -90 (RABI) */
                 case 41:
-                    targetAngle = -45;
-                    robot.RotateLeft(ROTATE_SPEED * (turnAngle - targetAngle) / (Math.abs(targetAngle) * Math.abs(targetAngle)));
-                    if (turnAngle < targetAngle+5) {
+                    robot.RotateLeft(ROTATE_SPEED);
+                    if (turnAngle < -40) {
                         mode++;
                         resetClock();
                         robot.RotateRight(ROTATE_SPEED);
@@ -459,12 +473,22 @@ public class AllAuto extends LinearOpMode {
 
                 /* move forward 10 inches into cryptobox */
                 case 7:
-                    drive(10, true);
+                    robot.MoveForward(MOVE_SPEED);
+                    if (now > 0.55) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
                     break;
 
                 /* move backward 10 inches */
                 case 8:
-                    drive(10, false);
+                    robot.MoveBackward(MOVE_SPEED);
+                    if (now > 0.5) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
                     break;
 
                 /* straffe back */
@@ -524,12 +548,22 @@ public class AllAuto extends LinearOpMode {
 
                 /* drive into glyph pit */
                 case 95:
-                    drive(50, true);
+                    robot.MoveForward(MOVE_SPEED);
+                    if (now > 1.7) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
                     break;
 
                 /* drive back to cryptobox */
                 case 96:
-                    drive(48, false);
+                    robot.MoveBackward(MOVE_SPEED);
+                    if (now > 1.65) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
                     break;
 
                 /* straffe to column */
