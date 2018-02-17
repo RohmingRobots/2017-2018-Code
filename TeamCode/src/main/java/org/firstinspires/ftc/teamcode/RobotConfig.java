@@ -112,29 +112,13 @@ public class RobotConfig
         GGR.setPosition(GRABBER_RIGHT[0]);
         Claw.setPosition(CLAW[0]);
 
-<<<<<<< HEAD
         // **** Color sensors ****
         // Define and Initialize color sensors
         left_color = hwMap.colorSensor.get("left_color");
         right_color = hwMap.colorSensor.get("right_color");
 
-        // **** Arm Switch ****
-        // Define and initialize switch
-        ArmSwitch = hwMap.digitalChannel.get("touch sensor");
-        // set the digital channel to input.
-        ArmSwitch.setMode(DigitalChannel.Mode.INPUT);
-        // false = pressed
-
-        // **** Arm Potentiometers ****
-        // Define and initialize potentiometers
-        UpperArmPot = hwMap.analogInput.get("upper pot");
-
-        // **** Initialize arm control
-        Arm.init();
-=======
         LowerArm.init(hwMap,false);
         UpperArm.init(hwMap,true);
->>>>>>> master
     }
 
     /* forward is positive speed, backward is negative speed */
