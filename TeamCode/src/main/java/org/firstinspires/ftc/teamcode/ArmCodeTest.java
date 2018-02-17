@@ -32,7 +32,9 @@ public class ArmCodeTest extends LinearOpMode {
         egamepad2 = new GamepadEdge(gamepad2);
 
         //adds a lil' version thing to the telemetry so you know you're using the right version
-        telemetry.addData("Version", "3.0");
+        telemetry.addData("Version", "Dual 2.0");
+        telemetry.addLine("gamepad 2");
+        telemetry.addLine("dpad - set positions");
         telemetry.update();
 
         //waits for that giant PLAY button to be pressed on RC
@@ -40,34 +42,34 @@ public class ArmCodeTest extends LinearOpMode {
 
         //telling the code to run until you press that giant STOP button on RC
         while (opModeIsActive()) {
-            //and now, the fun stuff
 
             /* Update extended gamepad */
             egamepad1.UpdateEdge();
             egamepad2.UpdateEdge();
 
             /* TeleOp code */
-            if (gamepad2.dpad_down) {
-                robot.Arm.MoveHome();
+            if (egamepad2.dpad_down.pressed) {
+                robot.LowerArm.MoveHome();
+                robot.UpperArm.MoveHome();
             }
-            if (gamepad2.dpad_left) {
-                robot.Arm.MoveToPosition(0.20);
+            if (egamepad2.dpad_left.pressed) {
+                robot.LowerArm.MoveToPosition(0.0);
+                robot.UpperArm.MoveToPosition(0.2);
             }
-            if (gamepad2.dpad_right) {
-                robot.Arm.MoveToPosition(0.30);
+            if (egamepad2.dpad_right.pressed) {
+                robot.LowerArm.MoveToPosition(0.3);
+                robot.UpperArm.MoveToPosition(0.5);
             }
-            if (gamepad2.dpad_up) {
-                robot.Arm.MoveToPosition(0.40);
-            }
-            if (gamepad2.x) {
-                robot.Arm.MoveUp();
-            }
-            if (gamepad2.y) {
-                robot.Arm.MoveDown();
+            if (egamepad2.dpad_up.pressed) {
+                robot.LowerArm.MoveToPosition(0.5);
+                robot.UpperArm.MoveToPosition(0.8);
             }
 
-            robot.Arm.Update(this);
+            robot.LowerArm.Update(this);
+            robot.UpperArm.Update(this);
 
+            telemetry.addData("Lower ", "%.2f %.2f", robot.LowerArm.CurrentPosition,robot.LowerArm.Power);
+            telemetry.addData("Upper ", "%.2f %.2f", robot.UpperArm.CurrentPosition,robot.UpperArm.Power);
             telemetry.update();
 
             //let the robot have a little rest, sleep is healthy
