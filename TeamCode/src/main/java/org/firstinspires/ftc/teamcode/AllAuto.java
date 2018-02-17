@@ -87,14 +87,14 @@ public class AllAuto extends LinearOpMode {
     //mode 'stuff'
     //modes lists which steps and in what order to accomplish them
     int mode = 0;
-    int [] modesRAFI = {-3, -20, -1, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0, -21, 7, 0, 8, 0, 90,
-                        0, 95, -20, 96, 0, 40, 0, 5, 0, 97, 0, -21, 7, 0, 8, 100};
-    int [] modesRABI = {-3, -20,-1, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0, -21, 7, 0, 8, 0, 91,
-                        0, 95, -20, 96, 0, 41, 0, 5, 0, 97, 0, -21, 7, 0, 8, 100};
-    int [] modesBAFI = {-3, -20, -1, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0, -21, 7, 0, 8, 0, 90,
-                        0, 95, -20, 96, 0, 42, 0, 5, 0, 97, 0, -21, 7, 0, 8, 100};
-    int [] modesBABI = {/*-3, -20, -1, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0, -21, 7, 0, 8, 0, 92,
-                        0, 95, -20, 96, 0, 43, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/41, 0, 100};
+    int [] modesRAFI = {-3, -20, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0, -21, 7, 0, 8, /*0, 90,
+                        0, 95, -20, 96, 0, 40, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesRABI = {-3, -20, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0, -21, 7, 0, 8, /*0, 91,
+                        0, 95, -20, 96, 0, 41, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesBAFI = {-3, -20, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0, -21, 7, 0, 8, /*0, 90,
+                        0, 95, -20, 96, 0, 42, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesBABI = {-3, -20, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0, -21, 7, 0, 8, /*0, 92,
+                        0, 95, -20, 96, 0, 43, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
     int[] modes = {};
     //-3 : Check Vumark
     //-20: Grab glyph
@@ -165,7 +165,7 @@ public class AllAuto extends LinearOpMode {
 
         MOVE_SPEED = 0.5 + ((13.2-voltage)/12);
         STRAFFE_SPEED = 0.75 + ((13.2-voltage)/12);
-        ROTATE_SPEED = 0.5 + ((13.2-voltage)/12);
+        ROTATE_SPEED = 0.4 + ((13.2-voltage)/12);
 
         robot.left_color.enableLed(false);
         robot.right_color.enableLed(false);
@@ -230,20 +230,28 @@ public class AllAuto extends LinearOpMode {
             //keeps now up to date
             now = runtime.seconds() - lastReset;
 
-            if (robot.left_color.red() > 20 && redteam) {
+            telemetry.addData("left_color red", robot.left_color.red());
+            telemetry.addData("left_color blue", robot.left_color.blue());
+            telemetry.addData("right_color red", robot.right_color.red());
+            telemetry.addData("right_color blue", robot.right_color.blue());
+            telemetry.addData("leftcolor", leftcolor);
+            telemetry.addData("rightcolor", rightcolor);
+            telemetry.update();
+
+            if (robot.left_color.red() > 14 && redteam) {
                 leftcolor = true;
             }
-            else if (robot.left_color.blue() > 20 && !redteam) {
+            else if (robot.left_color.blue() > 14 && !redteam) {
                 leftcolor = true;
             }
             else {
                 leftcolor = false;
             }
 
-            if (robot.right_color.red() > 20 && redteam) {
+            if (robot.right_color.red() > 12 && redteam) {
                 rightcolor = true;
             }
-            else if (robot.right_color.blue() > 20 && !redteam) {
+            else if (robot.right_color.blue() > 9 && !redteam) {
                 rightcolor = true;
             }
             else {
@@ -320,7 +328,7 @@ public class AllAuto extends LinearOpMode {
                 case 0:
                     robot.left_color.enableLed(false);
                     robot.right_color.enableLed(false);
-                    if (now > 20.0) {
+                    if (now > 1.0) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -330,7 +338,7 @@ public class AllAuto extends LinearOpMode {
                 /* backup 24 inches */
                 case 1:
                     robot.MoveBackward(MOVE_SPEED);
-                    if (now > 0.9) {
+                    if (now > 0.7) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -360,7 +368,7 @@ public class AllAuto extends LinearOpMode {
                 /* move forward 50.9 inches (FI) */
                 case 30:
                     robot.MoveForward(MOVE_SPEED);
-                    if (now > 1.5) {
+                    if (now > 1.3) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -370,7 +378,7 @@ public class AllAuto extends LinearOpMode {
                 /* move forward 33.9 inches (BI) */
                 case 31:
                     robot.MoveForward(MOVE_SPEED);
-                    if (now > 1.1) {
+                    if (now > 0.9) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -418,38 +426,39 @@ public class AllAuto extends LinearOpMode {
                     }
                     break;
 
+                /* tirangulate */
                 case 5:
                     robot.left_color.enableLed(true);
                     robot.right_color.enableLed(true);
-
-                    if (leftcolor) {
-                        robot.FL.setPower(0);
-                        robot.BR.setPower(0);
-                    }
-                    else {
-                        robot.FL.setPower(STRAFFE_SPEED);
-                        robot.BR.setPower(STRAFFE_SPEED);
-                    }
-
-                    if (rightcolor) {
-                        robot.BL.setPower(0);
-                        robot.FR.setPower(0);
-                    }
-                    else {
-                        robot.BL.setPower(STRAFFE_SPEED);
-                        robot.FR.setPower(STRAFFE_SPEED);
-                    }
 
                     if (leftcolor && rightcolor) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
                     }
+                    else if (leftcolor && !rightcolor) {
+                        robot.FL.setPower(-MOVE_SPEED/1.5);
+                        robot.BR.setPower(-MOVE_SPEED/1.5);
+
+                        robot.BL.setPower(MOVE_SPEED*1.2);
+                        robot.FR.setPower(MOVE_SPEED*1.2);
+                    }
+                    else if (!leftcolor && rightcolor){
+                        robot.FL.setPower(MOVE_SPEED*1.2);
+                        robot.BR.setPower(MOVE_SPEED*1.2);
+
+                        robot.BL.setPower(-MOVE_SPEED/1.5);
+                        robot.FR.setPower(-MOVE_SPEED/1.5);
+                    }
+                    else {
+                        robot.MoveForward(MOVE_SPEED/2.4);
+                    }
+                    break;
 
                 /* straffe to column */
                 case 6:
                     if (vuMark == RelicRecoveryVuMark.LEFT){
-                        robot.MoveLeft(STRAFFE_SPEED);
+                        robot.MoveLeft(STRAFFE_SPEED/1.5);
                         if (now > 1 && rightcolor) {
                             mode++;
                             resetClock();
@@ -457,7 +466,7 @@ public class AllAuto extends LinearOpMode {
                         }
                     }
                     else if (vuMark == RelicRecoveryVuMark.RIGHT){
-                        robot.MoveRight(STRAFFE_SPEED);
+                        robot.MoveRight(STRAFFE_SPEED/1.5);
                         if (now > 1 && leftcolor) {
                             mode++;
                             resetClock();
@@ -484,7 +493,7 @@ public class AllAuto extends LinearOpMode {
                 /* move backward 10 inches */
                 case 8:
                     robot.MoveBackward(MOVE_SPEED);
-                    if (now > 0.5) {
+                    if (now > 0.4) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
