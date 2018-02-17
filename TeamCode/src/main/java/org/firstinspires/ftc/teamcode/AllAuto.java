@@ -9,6 +9,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -32,6 +33,12 @@ public class AllAuto extends LinearOpMode {
     VuforiaLocalizer vuforia;
     RobotConfig robot = new RobotConfig();
     private ElapsedTime runtime = new ElapsedTime();
+
+    ColorSensor left_color;
+    ColorSensor right_color;
+
+    boolean leftcolor;
+    boolean rightcolor;
 
     public boolean inputTeamColor() {
         //input the team color
@@ -78,16 +85,16 @@ public class AllAuto extends LinearOpMode {
 
 
     //declaring all my variables in one place for my sake
-    final double MOVE_SPEED = 0.5 + ((13.2-voltage)/10);
-    final double STRAFFE_SPEED = 0.75 + ((13.2-voltage)/10);
-    final double ROTATE_SPEED = 0.5 + ((13.2-voltage)/10);
-    double          turnAngle;
-    double          currentAngle;
+    final double MOVE_SPEED = 0.5 + ((13.2-voltage)/12);
+    final double STRAFFE_SPEED = 0.75 + ((13.2-voltage)/12);
+    final double ROTATE_SPEED = 0.5 + ((13.2-voltage)/12);
+    double       turnAngle;
+    double       currentAngle;
 
     public void drive(double distance, boolean forwards){
         if (forwards){
             robot.MoveForward(MOVE_SPEED);
-            if (currentDistance > distance) {
+            if (currentDistance > (distance * 0.95 - 5)) {
                 mode++;
                 resetClock();
                 resetEncoders();
@@ -96,7 +103,7 @@ public class AllAuto extends LinearOpMode {
         }
         if (!forwards){
             robot.MoveBackward(MOVE_SPEED);
-            if (currentDistance < -distance) {
+            if (currentDistance < -(distance * .95 - 5)) {
                 mode++;
                 resetClock();
                 resetEncoders();
@@ -108,10 +115,14 @@ public class AllAuto extends LinearOpMode {
     //mode 'stuff'
     //modes lists which steps and in what order to accomplish them
     int mode = 0;
-    int [] modesRAFI = {-3, 0, -20, -1, 0, 1, 0, 20, 0, 30, 0, 40, 0, 50, 0, -21, 0, 6, 0, 7, 0, 100};
-    int [] modesRABI = {-3, 0, -20, -1, 0, 1, 0, 20, 0, 31, 0, 41, 0, 51, 0, -21, 0, 6, 0, 7, 0, 100};
-    int [] modesBAFI = {-3, 0, -20, -1, 0, 1, 0, 21, 0, 30, 0, 42, 0, 50, 0, -21, 0, 6, 0, 7, 0, 100};
-    int [] modesBABI = {-3, 0, -20, -1, 0, 1, 0, 21, 0, 31, 0, 43, 0, 52, 0, -21, 0, 6, 0, 7, 0, 100};
+    int [] modesRAFI = {-3, -20, -1, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0, -21, 7, 0, 8, 0, 90,
+                        0, 95, -20, 96, 0, 40, 0, 5, 0, 97, 0, -21, 7, 0, 8, 100};
+    int [] modesRABI = {-3, -20, -1, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0, -21, 7, 0, 8, 0, 91,
+                        0, 95, -20, 96, 0, 41, 0, 5, 0, 97, 0, -21, 7, 0, 8, 100};
+    int [] modesBAFI = {-3, -20, -1, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0, -21, 7, 0, 8, 0, 90,
+                        0, 95, -20, 96, 0, 42, 0, 5, 0, 97, 0, -21, 7, 0, 8, 100};
+    int [] modesBABI = {-3, -20, -1, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0, -21, 7, 0, 8, 0, 92,
+                        0, 95, -20, 96, 0, 43, 0, 5, 0, 97, 0, -21, 7, 0, 8, 100};
     int[] modes = {};
     //-3 : Check Vumark
     //-20: Grab glyph
@@ -127,23 +138,16 @@ public class AllAuto extends LinearOpMode {
     // 41: Turn left to -90
     // 42: Turn left to 0
     // 43: Turn right to 90
-    // 50: Turn to column FI
-    // 51: Turn to column RABI
-    // 52: Turn to column BABI
-    // 6 : Drive into cryptobox
-    // 7 : Back up from cryptobox
-    // 80: Turn to 180 (FI)
-    // 81: Turn left to 140 (RABI)
-    // 82: Turn right to -140 (BABI)
-
-    // 90: Drive into glyph pit
-    // 91: Back up from glyph pit
-    // 92: Turn 180
-    // 93: Raise arm to glyph 2 pos
-    // 94: Drive Forward
-    // 95: Drive Back
-    // 96: Lower Arm
-
+    // 5 : Triangulate position
+    // 6 : Straffe to column
+    // 7 : Drive into cryptobox
+    // 8 : Back up from cryptobox
+    // 90: Turn to 180 (FI)
+    // 91: Turn left to 140 (RABI)
+    // 92: Turn right to -140 (BABI)
+    // 95: Drive into glyph pit
+    // 96: Drive back to cryptobox
+    // 97: Straffe to column
     //100: End
 
     public void chooseModes() {
@@ -191,6 +195,9 @@ public class AllAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Voltage", voltage);
         telemetry.update();
+
+        left_color.enableLed(false);
+        right_color.enableLed(false);
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
@@ -268,6 +275,26 @@ public class AllAuto extends LinearOpMode {
             telemetry.addData("currentDistance", currentDistance);
             telemetry.update();
 
+            if (left_color.red() > 20 && redteam) {
+                leftcolor = true;
+            }
+            else if (left_color.blue() > 20 && !redteam) {
+                leftcolor = true;
+            }
+            else {
+                leftcolor = false;
+            }
+
+            if (right_color.red() > 20 && redteam) {
+                rightcolor = true;
+            }
+            else if (right_color.blue() > 20 && !redteam) {
+                rightcolor = true;
+            }
+            else {
+                rightcolor = false;
+            }
+
             switch (modes[mode]) {
 
                 default:
@@ -336,6 +363,8 @@ public class AllAuto extends LinearOpMode {
 
                 /* wait one second */
                 case 0:
+                    left_color.enableLed(false);
+                    right_color.enableLed(false);
                     if (now > 1.0) {
                         mode++;
                         resetClock();
@@ -418,114 +447,88 @@ public class AllAuto extends LinearOpMode {
                     }
                     break;
 
-                /* turn to column FI */
-                case 50:
-                    if (vuMark == RelicRecoveryVuMark.LEFT){
-                        robot.RotateLeft(ROTATE_SPEED);
-                        if (turnAngle < -10) {
-                            mode++;
-                            resetClock();
-                            robot.MoveStop();
-                        }
-                    }
-                    else if (vuMark == RelicRecoveryVuMark.CENTER){
-                        if (now < 1) {
-                            robot.MoveLeft(STRAFFE_SPEED);
-                        }
-                        else {
-                            robot.RotateRight(ROTATE_SPEED);
-                            if (turnAngle > 10) {
-                                mode++;
-                                resetClock();
-                                robot.MoveStop();
-                            }
-                        }
-                    }
-                    else /* (vuMark == RelicRecoveryVuMark.RIGHT) */{
-                        robot.RotateRight(ROTATE_SPEED);
-                        if (turnAngle > 10) {
-                            mode++;
-                            resetClock();
-                            robot.MoveStop();
-                        }
-                    }
-                    break;
+                case 5:
+                    left_color.enableLed(true);
+                    right_color.enableLed(true);
 
-                /* turn to column RABI */
-                case 51:
-                    if (vuMark == RelicRecoveryVuMark.LEFT){
-                        robot.RotateLeft(ROTATE_SPEED);
-                        if (turnAngle < -100) {
-                            mode++;
-                            resetClock();
-                            robot.MoveStop();
-                        }
+                    if (leftcolor) {
+                        robot.FL.setPower(0);
+                        robot.BR.setPower(0);
                     }
-                    else if (vuMark == RelicRecoveryVuMark.CENTER){
-                        if (now < 1) {
-                            robot.MoveLeft(STRAFFE_SPEED);
-                        }
-                        else {
-                            robot.RotateRight(ROTATE_SPEED);
-                            if (turnAngle > -80) {
-                                mode++;
-                                resetClock();
-                                robot.MoveStop();
-                            }
-                        }
+                    else {
+                        robot.FL.setPower(STRAFFE_SPEED);
+                        robot.BR.setPower(STRAFFE_SPEED);
                     }
-                    else /* (vuMark == RelicRecoveryVuMark.RIGHT) */{
-                        robot.RotateRight(ROTATE_SPEED);
-                        if (turnAngle > -80) {
-                            mode++;
-                            resetClock();
-                            robot.MoveStop();
-                        }
-                    }
-                    break;
 
-                /* turn to column BABI */
-                case 52:
-                    if (vuMark == RelicRecoveryVuMark.LEFT){
-                        robot.RotateLeft(ROTATE_SPEED);
-                        if (turnAngle < 80) {
-                            mode++;
-                            resetClock();
-                            robot.MoveStop();
-                        }
+                    if (rightcolor) {
+                        robot.BL.setPower(0);
+                        robot.FR.setPower(0);
                     }
-                    else if (vuMark == RelicRecoveryVuMark.CENTER){
-                        if (now < 1) {
-                            robot.MoveLeft(STRAFFE_SPEED);
-                        }
-                        else {
-                            robot.RotateRight(ROTATE_SPEED);
-                            if (turnAngle > 100) {
-                                mode++;
-                                resetClock();
-                                robot.MoveStop();
-                            }
-                        }
+                    else {
+                        robot.BL.setPower(STRAFFE_SPEED);
+                        robot.FR.setPower(STRAFFE_SPEED);
                     }
-                    else /* (vuMark == RelicRecoveryVuMark.RIGHT) */{
-                        robot.RotateRight(ROTATE_SPEED);
-                        if (turnAngle > 100) {
-                            mode++;
-                            resetClock();
-                            robot.MoveStop();
-                        }
-                    }
-                    break;
 
-                /* move forward 12 inches into cryptobox */
+                    if (leftcolor && rightcolor) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+
+                /* straffe to column */
                 case 6:
-                    drive(12, true);
+                    if (vuMark == RelicRecoveryVuMark.LEFT){
+                        robot.MoveLeft(STRAFFE_SPEED);
+                        if (now > 1 && rightcolor) {
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                    }
+                    else if (vuMark == RelicRecoveryVuMark.RIGHT){
+                        robot.MoveRight(STRAFFE_SPEED);
+                        if (now > 1 && leftcolor) {
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                    }
+                    else {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
                     break;
 
-                /* move backward 12 inches */
+                /* move forward 10 inches into cryptobox */
                 case 7:
-                    robot.MoveBackward(MOVE_SPEED);
-                    if (now > 0.25) {
+                    drive(10, true);
+                    break;
+
+                /* move backward 10 inches */
+                case 8:
+                    drive(10, false);
+                    break;
+
+                /* straffe back */
+                case 85:
+                    if (vuMark == RelicRecoveryVuMark.LEFT){
+                        robot.MoveRight(STRAFFE_SPEED);
+                        if (now > 1 && rightcolor) {
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                    }
+                    else if (vuMark == RelicRecoveryVuMark.RIGHT){
+                        robot.MoveLeft(STRAFFE_SPEED);
+                        if (now > 1 && leftcolor) {
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                    }
+                    else {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -533,7 +536,7 @@ public class AllAuto extends LinearOpMode {
                     break;
 
                 /* turn to 180 (FI) */
-                case 80:
+                case 90:
                     robot.RotateRight(ROTATE_SPEED);
                     if (turnAngle > 175) {
                         mode++;
@@ -543,7 +546,7 @@ public class AllAuto extends LinearOpMode {
                     break;
 
                 /* turn left to 140 (RABI) */
-                case 81:
+                case 91:
                     robot.RotateRight(ROTATE_SPEED);
                     if (turnAngle > 135) {
                         mode++;
@@ -553,12 +556,44 @@ public class AllAuto extends LinearOpMode {
                     break;
 
                 /* turn right to -140 (BABI) */
-                case 82:
+                case 92:
                     robot.RotateLeft(ROTATE_SPEED);
                     if (turnAngle < -135) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
+                    }
+                    break;
+
+                /* drive into glyph pit */
+                case 95:
+                    drive(50, true);
+                    break;
+
+                /* drive back to cryptobox */
+                case 96:
+                    drive(48, false);
+                    break;
+
+                /* straffe to column */
+                case 97:
+                    if (vuMark == RelicRecoveryVuMark.LEFT){
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    else if (vuMark == RelicRecoveryVuMark.RIGHT){
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    else {
+                        robot.MoveLeft(STRAFFE_SPEED);
+                        if (now > 1 && rightcolor) {
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
                     }
                     break;
 

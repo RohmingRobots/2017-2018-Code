@@ -64,7 +64,7 @@ public class EncoderDriveTest extends LinearOpMode {
         telemetry.addData("Voltage", voltage);
 
         //declaring all my variables in one place for my sake
-        final double MOVE_SPEED = 0.4 + ((13.2-voltage)/12);
+        final double MOVE_SPEED = 0.5 + ((13.2-voltage)/12);
         final double STRAFFE_SPEED = 0.75 + ((13.2-voltage)/12);
         final double ROTATE_SPEED = 0.4 + ((13.2-voltage)/12);
 
