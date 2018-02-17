@@ -34,11 +34,8 @@ public class AllAuto extends LinearOpMode {
     RobotConfig robot = new RobotConfig();
     private ElapsedTime runtime = new ElapsedTime();
 
-    ColorSensor left_color;
-    ColorSensor right_color;
-
-    boolean leftcolor;
-    boolean rightcolor;
+    boolean leftcolor = false;
+    boolean rightcolor = false;
 
     public boolean inputTeamColor() {
         //input the team color
@@ -80,49 +77,24 @@ public class AllAuto extends LinearOpMode {
         telemetry.update();
     }
 
-    VoltageSensor vs = hardwareMap.voltageSensor.get("Lower hub 2");
-    double voltage = vs.getVoltage();
-
-
     //declaring all my variables in one place for my sake
-    final double MOVE_SPEED = 0.5 + ((13.2-voltage)/12);
-    final double STRAFFE_SPEED = 0.75 + ((13.2-voltage)/12);
-    final double ROTATE_SPEED = 0.5 + ((13.2-voltage)/12);
-    double       turnAngle;
-    double       currentAngle;
-
-    public void drive(double distance, boolean forwards){
-        if (forwards){
-            robot.MoveForward(MOVE_SPEED);
-            if (currentDistance > (distance * 0.95 - 5)) {
-                mode++;
-                resetClock();
-                resetEncoders();
-                robot.MoveStop();
-            }
-        }
-        if (!forwards){
-            robot.MoveBackward(MOVE_SPEED);
-            if (currentDistance < -(distance * .95 - 5)) {
-                mode++;
-                resetClock();
-                resetEncoders();
-                robot.MoveStop();
-            }
-        }
-    }
+    double MOVE_SPEED = 0.5;
+    double STRAFFE_SPEED = 0.75;
+    double ROTATE_SPEED = 0.5;
+    double turnAngle;
+    double currentAngle;
 
     //mode 'stuff'
     //modes lists which steps and in what order to accomplish them
     int mode = 0;
     int [] modesRAFI = {-3, -20, -1, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0, -21, 7, 0, 8, 0, 90,
                         0, 95, -20, 96, 0, 40, 0, 5, 0, 97, 0, -21, 7, 0, 8, 100};
-    int [] modesRABI = {-3, -20, -1, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0, -21, 7, 0, 8, 0, 91,
+    int [] modesRABI = {-3, -20,-1, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0, -21, 7, 0, 8, 0, 91,
                         0, 95, -20, 96, 0, 41, 0, 5, 0, 97, 0, -21, 7, 0, 8, 100};
     int [] modesBAFI = {-3, -20, -1, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0, -21, 7, 0, 8, 0, 90,
                         0, 95, -20, 96, 0, 42, 0, 5, 0, 97, 0, -21, 7, 0, 8, 100};
-    int [] modesBABI = {-3, -20, -1, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0, -21, 7, 0, 8, 0, 92,
-                        0, 95, -20, 96, 0, 43, 0, 5, 0, 97, 0, -21, 7, 0, 8, 100};
+    int [] modesBABI = {/*-3, -20, -1, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0, -21, 7, 0, 8, 0, 92,
+                        0, 95, -20, 96, 0, 43, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/41, 0, 100};
     int[] modes = {};
     //-3 : Check Vumark
     //-20: Grab glyph
@@ -168,46 +140,35 @@ public class AllAuto extends LinearOpMode {
     //time based variables
     double lastReset = 0;
     double now = 0;
-    double currentDistance = 0;
 
     /* IMU objects */
     BNO055IMU imu;
     Orientation angles;
-    double startAngle;
+    double startAngle = -176;
 
     //clock reseter
     public void resetClock() {
         lastReset = runtime.seconds();
     }
 
-    public void resetEncoders() {
-        robot.FL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.BL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.FR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.BR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.FL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.BR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.BL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.addData("Voltage", voltage);
-        telemetry.update();
-
-        left_color.enableLed(false);
-        right_color.enableLed(false);
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
 
-        robot.FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.FR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        VoltageSensor vs = hardwareMap.voltageSensor.get("Lower hub 2");
+        double voltage = vs.getVoltage();
+        telemetry.addData("Voltage", voltage);
+
+        MOVE_SPEED = 0.5 + ((13.2-voltage)/12);
+        STRAFFE_SPEED = 0.75 + ((13.2-voltage)/12);
+        ROTATE_SPEED = 0.5 + ((13.2-voltage)/12);
+
+        robot.left_color.enableLed(false);
+        robot.right_color.enableLed(false);
 
         /* initialize IMU */
         // Send telemetry message to signify robot waiting;
@@ -249,7 +210,7 @@ public class AllAuto extends LinearOpMode {
         waitForStart();
 
         resetClock();
-        resetEncoders();
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         startAngle = angles.firstAngle;
 
         // telling the code to run until you press that giant STOP button on RC
@@ -269,26 +230,20 @@ public class AllAuto extends LinearOpMode {
             //keeps now up to date
             now = runtime.seconds() - lastReset;
 
-            currentDistance = -(robot.FL.getCurrentPosition() + robot.BL.getCurrentPosition() +
-                                robot.FR.getCurrentPosition() + robot.BR.getCurrentPosition())/360;
-
-            telemetry.addData("currentDistance", currentDistance);
-            telemetry.update();
-
-            if (left_color.red() > 20 && redteam) {
+            if (robot.left_color.red() > 20 && redteam) {
                 leftcolor = true;
             }
-            else if (left_color.blue() > 20 && !redteam) {
+            else if (robot.left_color.blue() > 20 && !redteam) {
                 leftcolor = true;
             }
             else {
                 leftcolor = false;
             }
 
-            if (right_color.red() > 20 && redteam) {
+            if (robot.right_color.red() > 20 && redteam) {
                 rightcolor = true;
             }
-            else if (right_color.blue() > 20 && !redteam) {
+            else if (robot.right_color.blue() > 20 && !redteam) {
                 rightcolor = true;
             }
             else {
@@ -363,9 +318,9 @@ public class AllAuto extends LinearOpMode {
 
                 /* wait one second */
                 case 0:
-                    left_color.enableLed(false);
-                    right_color.enableLed(false);
-                    if (now > 1.0) {
+                    robot.left_color.enableLed(false);
+                    robot.right_color.enableLed(false);
+                    if (now > 20.0) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -419,10 +374,12 @@ public class AllAuto extends LinearOpMode {
 
                 /* turn left to -90 (RABI) */
                 case 41:
-                    robot.RotateLeft(ROTATE_SPEED);
-                    if (turnAngle < -85) {
+                    targetAngle = -45;
+                    robot.RotateLeft(ROTATE_SPEED * (turnAngle - targetAngle) / (Math.abs(targetAngle) * Math.abs(targetAngle)));
+                    if (turnAngle < targetAngle+5) {
                         mode++;
                         resetClock();
+                        robot.RotateRight(ROTATE_SPEED);
                         robot.MoveStop();
                     }
                     break;
@@ -448,8 +405,8 @@ public class AllAuto extends LinearOpMode {
                     break;
 
                 case 5:
-                    left_color.enableLed(true);
-                    right_color.enableLed(true);
+                    robot.left_color.enableLed(true);
+                    robot.right_color.enableLed(true);
 
                     if (leftcolor) {
                         robot.FL.setPower(0);
