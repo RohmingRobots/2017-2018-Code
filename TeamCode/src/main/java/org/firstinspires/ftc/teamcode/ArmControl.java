@@ -103,8 +103,8 @@ public class ArmControl {
         LeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         RightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Set motors to brake on zero power
-        LeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        RightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        LeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        RightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // record default home position
         HomePosition = Potentiometer.getVoltage();
