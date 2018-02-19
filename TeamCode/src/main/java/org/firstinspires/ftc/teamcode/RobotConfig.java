@@ -59,6 +59,11 @@ public class RobotConfig
     public double[] GRABBER_RIGHT = {0.44, .89, .765};
     public double[] CLAW = {0.9, 0.15};
 
+    public ColorSensor left_color = null;
+    public ColorSensor right_color = null;
+    public ColorSensor left_ampere = null;
+    public ColorSensor right_ampere = null;
+
     /* Public
     * arm control class
     */
@@ -108,6 +113,13 @@ public class RobotConfig
         GGL.setPosition(GRABBER_LEFT[0]);
         GGR.setPosition(GRABBER_RIGHT[0]);
         Claw.setPosition(CLAW[0]);
+
+        // **** Color sensors ****
+        // Define and Initialize color sensors
+        left_color = hwMap.colorSensor.get("left_color");
+        right_color = hwMap.colorSensor.get("right_color");
+        left_ampere = hwMap.colorSensor.get("left_ampere");
+        right_ampere = hwMap.colorSensor.get("right_ampere");
 
         LowerArm.init(hwMap,false);
         UpperArm.init(hwMap,true);

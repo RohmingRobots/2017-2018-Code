@@ -9,6 +9,8 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -31,6 +33,16 @@ public class AllAuto extends LinearOpMode {
     VuforiaLocalizer vuforia;
     RobotConfig robot = new RobotConfig();
     private ElapsedTime runtime = new ElapsedTime();
+
+    boolean leftcolor = false;
+    boolean rightcolor = false;
+    boolean leftampere;
+    boolean rightampere;
+
+    int leftamperered;
+    int leftampereblue;
+    int rightamperered;
+    int rightampereblue;
 
     public boolean inputTeamColor() {
         //input the team color
@@ -72,15 +84,27 @@ public class AllAuto extends LinearOpMode {
         telemetry.update();
     }
 
+    //declaring all my variables in one place for my sake
+    double MOVE_SPEED = 0.5;
+    double STRAFFE_SPEED = 0.75;
+    double ROTATE_SPEED = 0.5;
+    double turnAngle;
+    double currentAngle;
+
     //mode 'stuff'
     //modes lists which steps and in what order to accomplish them
     int mode = 0;
-    int [] modesRAFI = {-3, 0, -20, -1, 0, 1, 0, 20, 0, 30, 0, 40, 0, 50, 0, -21, 0, 6, 0, 7, 0, 100};
-    int [] modesRABI = {-3, 0, -20, -1, 0, 1, 0, 20, 0, 31, 0, 41, 0, 51, 0, -21, 0, 6, 0, 7, 0, 100};
-    int [] modesBAFI = {-3, 0, -20, -1, 0, 1, 0, 21, 0, 30, 0, 42, 0, 50, 0, -21, 0, 6, 0, 7, 0, 100};
-    int [] modesBABI = {-3, 0, -20, -1, 0, 1, 0, 21, 0, 31, 0, 43, 0, 52, 0, -21, 0, 6, 0, 7, 0, 100};
+    int [] modesRAFI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0,
+            -21, 7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 40, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesRABI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0,
+            -21, 7, 0, 8, /*0, 91, 0, 95, -20, 96, 0, 41, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesBAFI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0,
+            -21, 7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 42, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesBABI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0,
+            -21, 7, 0, 8, /*0, 92, 0, 95, -20, 96, 0, 43, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
     int[] modes = {};
-    //-3 : Check Vumark
+    //-4 : Check Vumark
+    //-30-34 Score jewel
     //-20: Grab glyph
     //-21: Release glyph
     //-1 : Raise arm
@@ -94,23 +118,16 @@ public class AllAuto extends LinearOpMode {
     // 41: Turn left to -90
     // 42: Turn left to 0
     // 43: Turn right to 90
-    // 50: Turn to column FI
-    // 51: Turn to column RABI
-    // 52: Turn to column BABI
-    // 6 : Drive into cryptobox
-    // 7 : Back up from cryptobox
-    // 80: Turn to 180 (FI)
-    // 81: Turn left to 140 (RABI)
-    // 82: Turn right to -140 (BABI)
-
-    // 90: Drive into glyph pit
-    // 91: Back up from glyph pit
-    // 92: Turn 180
-    // 93: Raise arm to glyph 2 pos
-    // 94: Drive Forward
-    // 95: Drive Back
-    // 96: Lower Arm
-
+    // 5 : Triangulate position
+    // 6 : Straffe to column
+    // 7 : Drive into cryptobox
+    // 8 : Back up from cryptobox
+    // 90: Turn to 180 (FI)
+    // 91: Turn left to 140 (RABI)
+    // 92: Turn right to -140 (BABI)
+    // 95: Drive into glyph pit
+    // 96: Drive back to cryptobox
+    // 97: Straffe to column
     //100: End
 
     public void chooseModes() {
@@ -135,7 +152,7 @@ public class AllAuto extends LinearOpMode {
     /* IMU objects */
     BNO055IMU imu;
     Orientation angles;
-    double startAngle;
+    double startAngle = -176;
 
     //clock reseter
     public void resetClock() {
@@ -144,24 +161,24 @@ public class AllAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        VoltageSensor vs = hardwareMap.voltageSensor.get("Lower hub 2");
-        double voltage = vs.getVoltage();
-        telemetry.addData("Voltage", voltage);
-
-        //declaring all my variables in one place for my sake
-        final double MOVE_SPEED = 0.5 + ((13.2-voltage)/10);
-        final double STRAFFE_SPEED = 0.75 + ((13.2-voltage)/10);
-        final double ROTATE_SPEED = 0.5 + ((13.2-voltage)/10);
-        double          turnAngle;
-        double          currentAngle;
-
-        // Send telemetry message to signify robot waiting;
-        telemetry.addLine("RA_FI");    //
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
+
+        VoltageSensor vs = hardwareMap.voltageSensor.get("Lower hub 2");
+        double voltage = vs.getVoltage();
+        telemetry.addData("Voltage", voltage);
+
+        MOVE_SPEED = 0.5 + ((13.2-voltage)/12);
+        STRAFFE_SPEED = 0.75 + ((13.2-voltage)/12);
+        ROTATE_SPEED = 0.4 + ((13.2-voltage)/12);
+
+        robot.left_color.enableLed(false);
+        robot.right_color.enableLed(false);
+        robot.left_ampere.enableLed(false);
+        robot.right_ampere.enableLed(false);
 
         /* initialize IMU */
         // Send telemetry message to signify robot waiting;
@@ -203,6 +220,7 @@ public class AllAuto extends LinearOpMode {
         waitForStart();
 
         resetClock();
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         startAngle = angles.firstAngle;
 
         // telling the code to run until you press that giant STOP button on RC
@@ -222,6 +240,34 @@ public class AllAuto extends LinearOpMode {
             //keeps now up to date
             now = runtime.seconds() - lastReset;
 
+            telemetry.addData("left_color red", robot.left_color.red());
+            telemetry.addData("left_color blue", robot.left_color.blue());
+            telemetry.addData("right_color red", robot.right_color.red());
+            telemetry.addData("right_color blue", robot.right_color.blue());
+            telemetry.addData("leftcolor", leftcolor);
+            telemetry.addData("rightcolor", rightcolor);
+            telemetry.update();
+
+            if (robot.left_color.red() > 14 && redteam) {
+                leftcolor = true;
+            }
+            else if (robot.left_color.blue() > 14 && !redteam) {
+                leftcolor = true;
+            }
+            else {
+                leftcolor = false;
+            }
+
+            if (robot.right_color.red() > 12 && redteam) {
+                rightcolor = true;
+            }
+            else if (robot.right_color.blue() > 9 && !redteam) {
+                rightcolor = true;
+            }
+            else {
+                rightcolor = false;
+            }
+
             switch (modes[mode]) {
 
                 default:
@@ -230,7 +276,7 @@ public class AllAuto extends LinearOpMode {
                     break;
 
                 /* wait for vuMark detection */
-                case -3:
+                case -4:
                     /* VuForia update code */
                     vuMark = RelicRecoveryVuMark.from(relicTemplate);
 
@@ -250,6 +296,90 @@ public class AllAuto extends LinearOpMode {
                         mode++;
                         resetClock();
                         startAngle = angles.firstAngle;
+                        robot.MoveStop();
+                    }
+                    break;
+
+                /* jewel scoring steps */
+                case -30:
+                    //move servos
+                    if (now > 5) {
+                        leftamperered = robot.left_ampere.red();
+                        leftampereblue = robot.left_ampere.blue();
+                        rightamperered = robot.right_ampere.red();
+                        rightampereblue = robot.right_ampere.blue();
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    break;
+
+                case -31:
+                    //change servos positions
+                    if (3 < ((robot.left_ampere.red() - leftamperered) -
+                             (robot.right_ampere.red()-rightamperered))) {
+                        leftampere = true;
+                    }
+                    if (-3 > ((robot.left_ampere.red() - leftamperered) -
+                              (robot.right_ampere.red()-rightamperered))) {
+                        rightampere = true;
+                    }
+                    if (3 < ((robot.left_ampere.blue() - leftampereblue) -
+                            (robot.right_ampere.blue()-rightampereblue))) {
+                        leftampere = false;
+                    }
+                    if (-3 > ((robot.left_ampere.red() - leftamperered) -
+                             (robot.right_ampere.red()-rightamperered))) {
+                        rightampere = false;
+                    }
+                    break;
+
+                case -32:
+                    if (leftampere && !rightampere && redteam) {
+                        //change left servo pos
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    if (leftampere && !rightampere && !redteam) {
+                        //change right servo pos
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    if (!leftampere && rightampere && redteam) {
+                        //change right servo pos
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    if (!leftampere && rightampere && !redteam) {
+                        //change left servo pos
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    else {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    break;
+
+                case -33:
+                    //change servos pos
+                    if (now > 2) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    break;
+
+                case -34:
+                    //move servos backward
+                    if (now > 5) {
+                        mode++;
+                        resetClock();
                         robot.MoveStop();
                     }
                     break;
@@ -290,6 +420,8 @@ public class AllAuto extends LinearOpMode {
 
                 /* wait one second */
                 case 0:
+                    robot.left_color.enableLed(false);
+                    robot.right_color.enableLed(false);
                     if (now > 1.0) {
                         mode++;
                         resetClock();
@@ -300,7 +432,7 @@ public class AllAuto extends LinearOpMode {
                 /* backup 24 inches */
                 case 1:
                     robot.MoveBackward(MOVE_SPEED);
-                    if (now > 0.9) {
+                    if (now > 0.7) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -330,7 +462,7 @@ public class AllAuto extends LinearOpMode {
                 /* move forward 50.9 inches (FI) */
                 case 30:
                     robot.MoveForward(MOVE_SPEED);
-                    if (now > 1.5) {
+                    if (now > 1.3) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -340,7 +472,7 @@ public class AllAuto extends LinearOpMode {
                 /* move forward 33.9 inches (BI) */
                 case 31:
                     robot.MoveForward(MOVE_SPEED);
-                    if (now > 1.1) {
+                    if (now > 0.9) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -360,9 +492,10 @@ public class AllAuto extends LinearOpMode {
                 /* turn left to -90 (RABI) */
                 case 41:
                     robot.RotateLeft(ROTATE_SPEED);
-                    if (turnAngle < -85) {
+                    if (turnAngle < -40) {
                         mode++;
                         resetClock();
+                        robot.RotateRight(ROTATE_SPEED);
                         robot.MoveStop();
                     }
                     break;
@@ -387,119 +520,99 @@ public class AllAuto extends LinearOpMode {
                     }
                     break;
 
-                /* turn to column FI */
-                case 50:
-                    if (vuMark == RelicRecoveryVuMark.LEFT){
-                        robot.RotateLeft(ROTATE_SPEED);
-                        if (turnAngle < -10) {
-                            mode++;
-                            resetClock();
-                            robot.MoveStop();
-                        }
+                /* tirangulate */
+                case 5:
+                    robot.left_color.enableLed(true);
+                    robot.right_color.enableLed(true);
+
+                    if (leftcolor && rightcolor) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
                     }
-                    else if (vuMark == RelicRecoveryVuMark.CENTER){
-                        if (now < 1) {
-                            robot.MoveLeft(STRAFFE_SPEED);
-                        }
-                        else {
-                            robot.RotateRight(ROTATE_SPEED);
-                            if (turnAngle > 10) {
-                                mode++;
-                                resetClock();
-                                robot.MoveStop();
-                            }
-                        }
+                    else if (leftcolor && !rightcolor) {
+                        robot.FL.setPower(-MOVE_SPEED/1.5);
+                        robot.BR.setPower(-MOVE_SPEED/1.5);
+
+                        robot.BL.setPower(MOVE_SPEED*1.2);
+                        robot.FR.setPower(MOVE_SPEED*1.2);
                     }
-                    else /* (vuMark == RelicRecoveryVuMark.RIGHT) */{
-                        robot.RotateRight(ROTATE_SPEED);
-                        if (turnAngle > 10) {
-                            mode++;
-                            resetClock();
-                            robot.MoveStop();
-                        }
+                    else if (!leftcolor && rightcolor){
+                        robot.FL.setPower(MOVE_SPEED*1.2);
+                        robot.BR.setPower(MOVE_SPEED*1.2);
+
+                        robot.BL.setPower(-MOVE_SPEED/1.5);
+                        robot.FR.setPower(-MOVE_SPEED/1.5);
+                    }
+                    else {
+                        robot.MoveForward(MOVE_SPEED/2.4);
                     }
                     break;
 
-                /* turn to column RABI */
-                case 51:
-                    if (vuMark == RelicRecoveryVuMark.LEFT){
-                        robot.RotateLeft(ROTATE_SPEED);
-                        if (turnAngle < -100) {
-                            mode++;
-                            resetClock();
-                            robot.MoveStop();
-                        }
-                    }
-                    else if (vuMark == RelicRecoveryVuMark.CENTER){
-                        if (now < 1) {
-                            robot.MoveLeft(STRAFFE_SPEED);
-                        }
-                        else {
-                            robot.RotateRight(ROTATE_SPEED);
-                            if (turnAngle > -80) {
-                                mode++;
-                                resetClock();
-                                robot.MoveStop();
-                            }
-                        }
-                    }
-                    else /* (vuMark == RelicRecoveryVuMark.RIGHT) */{
-                        robot.RotateRight(ROTATE_SPEED);
-                        if (turnAngle > -80) {
-                            mode++;
-                            resetClock();
-                            robot.MoveStop();
-                        }
-                    }
-                    break;
-
-                /* turn to column BABI */
-                case 52:
-                    if (vuMark == RelicRecoveryVuMark.LEFT){
-                        robot.RotateLeft(ROTATE_SPEED);
-                        if (turnAngle < 80) {
-                            mode++;
-                            resetClock();
-                            robot.MoveStop();
-                        }
-                    }
-                    else if (vuMark == RelicRecoveryVuMark.CENTER){
-                        if (now < 1) {
-                            robot.MoveLeft(STRAFFE_SPEED);
-                        }
-                        else {
-                            robot.RotateRight(ROTATE_SPEED);
-                            if (turnAngle > 100) {
-                                mode++;
-                                resetClock();
-                                robot.MoveStop();
-                            }
-                        }
-                    }
-                    else /* (vuMark == RelicRecoveryVuMark.RIGHT) */{
-                        robot.RotateRight(ROTATE_SPEED);
-                        if (turnAngle > 100) {
-                            mode++;
-                            resetClock();
-                            robot.MoveStop();
-                        }
-                    }
-                    break;
-
-                /* move forward 12 inches into cryptobox */
+                /* straffe to column */
                 case 6:
-                    robot.MoveForward(MOVE_SPEED);
-                    if (now > 0.65) {
+                    if (vuMark == RelicRecoveryVuMark.LEFT){
+                        robot.MoveLeft(STRAFFE_SPEED/1.5);
+                        if (now > 1 && rightcolor) {
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                    }
+                    else if (vuMark == RelicRecoveryVuMark.RIGHT){
+                        robot.MoveRight(STRAFFE_SPEED/1.5);
+                        if (now > 1 && leftcolor) {
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                    }
+                    else {
                         mode++;
                         resetClock();
                         robot.MoveStop();
                     }
                     break;
 
-                /* move backward 12 inches */
+                /* move forward 10 inches into cryptobox */
                 case 7:
+                    robot.MoveForward(MOVE_SPEED);
+                    if (now > 0.55) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    break;
+
+                /* move backward 10 inches */
+                case 8:
                     robot.MoveBackward(MOVE_SPEED);
-                    if (now > 0.25) {
+                    if (now > 0.4) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    break;
+
+                /* straffe back */
+                case 85:
+                    if (vuMark == RelicRecoveryVuMark.LEFT){
+                        robot.MoveRight(STRAFFE_SPEED);
+                        if (now > 1 && rightcolor) {
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                    }
+                    else if (vuMark == RelicRecoveryVuMark.RIGHT){
+                        robot.MoveLeft(STRAFFE_SPEED);
+                        if (now > 1 && leftcolor) {
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                    }
+                    else {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -507,7 +620,7 @@ public class AllAuto extends LinearOpMode {
                     break;
 
                 /* turn to 180 (FI) */
-                case 80:
+                case 90:
                     robot.RotateRight(ROTATE_SPEED);
                     if (turnAngle > 175) {
                         mode++;
@@ -517,7 +630,7 @@ public class AllAuto extends LinearOpMode {
                     break;
 
                 /* turn left to 140 (RABI) */
-                case 81:
+                case 91:
                     robot.RotateRight(ROTATE_SPEED);
                     if (turnAngle > 135) {
                         mode++;
@@ -527,12 +640,54 @@ public class AllAuto extends LinearOpMode {
                     break;
 
                 /* turn right to -140 (BABI) */
-                case 82:
+                case 92:
                     robot.RotateLeft(ROTATE_SPEED);
                     if (turnAngle < -135) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
+                    }
+                    break;
+
+                /* drive into glyph pit */
+                case 95:
+                    robot.MoveForward(MOVE_SPEED);
+                    if (now > 1.7) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    break;
+
+                /* drive back to cryptobox */
+                case 96:
+                    robot.MoveBackward(MOVE_SPEED);
+                    if (now > 1.65) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    break;
+
+                /* straffe to column */
+                case 97:
+                    if (vuMark == RelicRecoveryVuMark.LEFT){
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    else if (vuMark == RelicRecoveryVuMark.RIGHT){
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    else {
+                        robot.MoveLeft(STRAFFE_SPEED);
+                        if (now > 1 && rightcolor) {
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
                     }
                     break;
 
