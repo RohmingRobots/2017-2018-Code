@@ -34,24 +34,17 @@ public class AllAuto extends LinearOpMode {
     RobotConfig robot = new RobotConfig();
     private ElapsedTime runtime = new ElapsedTime();
 
-    boolean leftcolor = false;
-    boolean rightcolor = false;
-    boolean leftampere;
-    boolean rightampere;
-
-    int leftamperered;
-    int leftampereblue;
-    int rightamperered;
-    int rightampereblue;
-
+    /* Arrays */
     public boolean inputTeamColor() {
         //input the team color
         telemetry.addData("Input: ", "Select Team Color");
         telemetry.update();
 
+        //waits for x or b to be pressed
         while (!gamepad1.x && !gamepad1.b) {
-
         }
+
+        //color selection
         if (gamepad1.x)
             return false;
         return true;
@@ -62,16 +55,18 @@ public class AllAuto extends LinearOpMode {
         telemetry.addData("Input: ", "Select Position");
         telemetry.update();
 
+        //waits for left or right dpad to be pressed
         while (!gamepad1.dpad_left && !gamepad1.dpad_right) {
-
         }
-        //delay selection
+
+        //position selection
         if ((gamepad1.dpad_left && redteam) || (gamepad1.dpad_right && !redteam))
             return true;
         return false;
     }
 
     public void displaySelections() {
+        //displays the selected color and position
         telemetry.addData("Status", "Initialized");
         if (FI)
             telemetry.addData("Position", "FI");
@@ -84,53 +79,8 @@ public class AllAuto extends LinearOpMode {
         telemetry.update();
     }
 
-    //declaring all my variables in one place for my sake
-    double MOVE_SPEED = 0.5;
-    double STRAFFE_SPEED = 0.75;
-    double ROTATE_SPEED = 0.5;
-    double turnAngle;
-    double currentAngle;
-
-    //mode 'stuff'
-    //modes lists which steps and in what order to accomplish them
-    int mode = 0;
-    int [] modesRAFI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0,
-            -21, 7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 40, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesRABI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0,
-            -21, 7, 0, 8, /*0, 91, 0, 95, -20, 96, 0, 41, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesBAFI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0,
-            -21, 7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 42, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesBABI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0,
-            -21, 7, 0, 8, /*0, 92, 0, 95, -20, 96, 0, 43, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int[] modes = {};
-    //-4 : Check Vumark
-    //-30-34 Score jewel
-    //-20: Grab glyph
-    //-21: Release glyph
-    //-1 : Raise arm
-    // 0 : Wait 1 sec
-    // 1 : Back off balancing stone
-    // 20: Turn left to -45 (red)
-    // 21: Turn right to 45 (blue)
-    // 30: Drive 1.5 diagonal tile (FI)
-    // 31: Drive 1 diagonal tiles (BI)
-    // 40: Turn right to 0
-    // 41: Turn left to -90
-    // 42: Turn left to 0
-    // 43: Turn right to 90
-    // 5 : Triangulate position
-    // 6 : Straffe to column
-    // 7 : Drive into cryptobox
-    // 8 : Back up from cryptobox
-    // 90: Turn to 180 (FI)
-    // 91: Turn left to 140 (RABI)
-    // 92: Turn right to -140 (BABI)
-    // 95: Drive into glyph pit
-    // 96: Drive back to cryptobox
-    // 97: Straffe to column
-    //100: End
-
     public void chooseModes() {
+        //chooses modes based on inputted color and position
         if (FI && redteam)
             modes = modesRAFI;
         if (!FI && redteam)
@@ -141,6 +91,13 @@ public class AllAuto extends LinearOpMode {
             modes = modesBABI;
     }
 
+    public void resetClock() {
+        //resets the clock
+        lastReset = runtime.seconds();
+    }
+
+    /* Variables: declaring all my variables in one place for my sake */
+
     //start position variables
     boolean FI;
     boolean redteam;
@@ -149,15 +106,75 @@ public class AllAuto extends LinearOpMode {
     double lastReset = 0;
     double now = 0;
 
+    //speed variables
+    double MOVE_SPEED = 0.5;
+    double STRAFFE_SPEED = 0.75;
+    double ROTATE_SPEED = 0.5;
+
+    //turning variables
+    double startAngle;
+    double currentAngle;
+    double turnAngle;       //actual angle relative to where we started used for turning
+
+    //navigation color sensor variables
+    boolean leftcolor = false;
+    boolean rightcolor = false;
+
+    //ampere color sensor variables
+    int leftamperered;
+    int leftampereblue;
+    int rightamperered;
+    int rightampereblue;
+    boolean leftampere;
+    boolean rightampere;
+
     /* IMU objects */
     BNO055IMU imu;
     Orientation angles;
-    double startAngle = -176;
 
-    //clock reseter
-    public void resetClock() {
-        lastReset = runtime.seconds();
-    }
+    /* Mode 'stuff' */
+    //modes lists which steps and in what order to accomplish them
+    //modes is set based on inputted color and position
+    int mode = 0;
+    int [] modesRAFI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0,
+            -21, 7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 40, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesRABI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0,
+            -21, 7, 0, 8, /*0, 91, 0, 95, -20, 96, 0, 41, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesBAFI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0,
+            -21, 7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 42, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesBABI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0,
+            -21, 7, 0, 8, /*0, 92, 0, 95, -20, 96, 0, 43, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int[] modes = {};
+    /* List of what the mode numbers do so you don't have to hunt them down elsewhere */
+    /* except for the jewel scoring and 95-97, the first number is the step number and the second
+       number is which version of the step for when it varies based on location
+    -4 : Check Vumark
+    -30-34 Score jewel
+    -20: Grab glyph
+    -21: Release glyph
+    -1 : Raise arm
+     0 : Wait 1 sec
+     1 : Back off balancing stone
+     20: Turn left to -45 (red)
+     21: Turn right to 45 (blue)
+     30: Drive 1.5 diagonal tile (FI)
+     31: Drive 1 diagonal tiles (BI)
+     40: Turn right to 0
+     41: Turn left to -90
+     42: Turn left to 0
+     43: Turn right to 90
+     5 : Triangulate position
+     6 : Straffe to column
+     7 : Drive into cryptobox
+     8 : Back up from cryptobox
+     90: Turn to 180 (FI)
+     91: Turn left to 140 (RABI)
+     92: Turn right to -140 (BABI)
+     95: Drive into glyph pit
+     96: Drive back to cryptobox
+     97: Straffe to column
+    100: End
+    */
 
     @Override
     public void runOpMode() throws InterruptedException {
