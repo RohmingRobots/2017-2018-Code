@@ -36,6 +36,13 @@ public class AllAuto extends LinearOpMode {
 
     boolean leftcolor = false;
     boolean rightcolor = false;
+    boolean leftampere;
+    boolean rightampere;
+
+    int leftamperered;
+    int leftampereblue;
+    int rightamperered;
+    int rightampereblue;
 
     public boolean inputTeamColor() {
         //input the team color
@@ -87,16 +94,17 @@ public class AllAuto extends LinearOpMode {
     //mode 'stuff'
     //modes lists which steps and in what order to accomplish them
     int mode = 0;
-    int [] modesRAFI = {-3, -20, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0, -21, 7, 0, 8, /*0, 90,
-                        0, 95, -20, 96, 0, 40, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesRABI = {-3, -20, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0, -21, 7, 0, 8, /*0, 91,
-                        0, 95, -20, 96, 0, 41, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesBAFI = {-3, -20, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0, -21, 7, 0, 8, /*0, 90,
-                        0, 95, -20, 96, 0, 42, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesBABI = {-3, -20, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0, -21, 7, 0, 8, /*0, 92,
-                        0, 95, -20, 96, 0, 43, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesRAFI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0,
+            -21, 7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 40, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesRABI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0,
+            -21, 7, 0, 8, /*0, 91, 0, 95, -20, 96, 0, 41, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesBAFI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0,
+            -21, 7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 42, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesBABI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0,
+            -21, 7, 0, 8, /*0, 92, 0, 95, -20, 96, 0, 43, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
     int[] modes = {};
-    //-3 : Check Vumark
+    //-4 : Check Vumark
+    //-30-34 Score jewel
     //-20: Grab glyph
     //-21: Release glyph
     //-1 : Raise arm
@@ -169,6 +177,8 @@ public class AllAuto extends LinearOpMode {
 
         robot.left_color.enableLed(false);
         robot.right_color.enableLed(false);
+        robot.left_ampere.enableLed(false);
+        robot.right_ampere.enableLed(false);
 
         /* initialize IMU */
         // Send telemetry message to signify robot waiting;
@@ -266,7 +276,7 @@ public class AllAuto extends LinearOpMode {
                     break;
 
                 /* wait for vuMark detection */
-                case -3:
+                case -4:
                     /* VuForia update code */
                     vuMark = RelicRecoveryVuMark.from(relicTemplate);
 
@@ -286,6 +296,90 @@ public class AllAuto extends LinearOpMode {
                         mode++;
                         resetClock();
                         startAngle = angles.firstAngle;
+                        robot.MoveStop();
+                    }
+                    break;
+
+                /* jewel scoring steps */
+                case -30:
+                    //move servos
+                    if (now > 5) {
+                        leftamperered = robot.left_ampere.red();
+                        leftampereblue = robot.left_ampere.blue();
+                        rightamperered = robot.right_ampere.red();
+                        rightampereblue = robot.right_ampere.blue();
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    break;
+
+                case -31:
+                    //change servos positions
+                    if (3 < ((robot.left_ampere.red() - leftamperered) -
+                             (robot.right_ampere.red()-rightamperered))) {
+                        leftampere = true;
+                    }
+                    if (-3 > ((robot.left_ampere.red() - leftamperered) -
+                              (robot.right_ampere.red()-rightamperered))) {
+                        rightampere = true;
+                    }
+                    if (3 < ((robot.left_ampere.blue() - leftampereblue) -
+                            (robot.right_ampere.blue()-rightampereblue))) {
+                        leftampere = false;
+                    }
+                    if (-3 > ((robot.left_ampere.red() - leftamperered) -
+                             (robot.right_ampere.red()-rightamperered))) {
+                        rightampere = false;
+                    }
+                    break;
+
+                case -32:
+                    if (leftampere && !rightampere && redteam) {
+                        //change left servo pos
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    if (leftampere && !rightampere && !redteam) {
+                        //change right servo pos
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    if (!leftampere && rightampere && redteam) {
+                        //change right servo pos
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    if (!leftampere && rightampere && !redteam) {
+                        //change left servo pos
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    else {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    break;
+
+                case -33:
+                    //change servos pos
+                    if (now > 2) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    break;
+
+                case -34:
+                    //move servos backward
+                    if (now > 5) {
+                        mode++;
+                        resetClock();
                         robot.MoveStop();
                     }
                     break;

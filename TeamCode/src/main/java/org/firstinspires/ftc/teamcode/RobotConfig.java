@@ -61,6 +61,8 @@ public class RobotConfig
 
     public ColorSensor left_color = null;
     public ColorSensor right_color = null;
+    public ColorSensor left_ampere = null;
+    public ColorSensor right_ampere = null;
 
     /* Public
     * arm control class
@@ -116,6 +118,8 @@ public class RobotConfig
         // Define and Initialize color sensors
         left_color = hwMap.colorSensor.get("left_color");
         right_color = hwMap.colorSensor.get("right_color");
+        left_ampere = hwMap.colorSensor.get("left_ampere");
+        right_ampere = hwMap.colorSensor.get("right_ampere");
 
         LowerArm.init(hwMap,false);
         UpperArm.init(hwMap,true);
