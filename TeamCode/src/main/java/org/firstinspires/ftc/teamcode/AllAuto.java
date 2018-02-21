@@ -29,6 +29,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 //naming the teleop thing
 @Autonomous(name="AllAuto", group ="Drive")
 public class AllAuto extends LinearOpMode {
+
     OpenGLMatrix lastLocation = null;
     VuforiaLocalizer vuforia;
     RobotConfig robot = new RobotConfig();
@@ -136,14 +137,14 @@ public class AllAuto extends LinearOpMode {
     //modes lists which steps and in what order to accomplish them
     //modes is set based on inputted color and position
     int mode = 0;
-    int [] modesRAFI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0,
-            -21, 7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 40, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesRABI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0,
-            -21, 7, 0, 8, /*0, 91, 0, 95, -20, 96, 0, 41, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesBAFI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0,
-            -21, 7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 42, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesBABI = {-4, -30, -31, -32, -33, -34, -20, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0,
-            -21, 7, 0, 8, /*0, 92, 0, 95, -20, 96, 0, 43, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesRAFI = {-4, -30, -31, -32, -33, -20, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0, -21,
+            7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 40, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesRABI = {-4, -30, -31, -32, -33, -20, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0, -21,
+            7, 0, 8, /*0, 91, 0, 95, -20, 96, 0, 41, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesBAFI = {-4, -30, -31, -32, -33, -20, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0, -21,
+            7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 42, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
+    int [] modesBABI = {-4, -30, -31, -32, -33, -20, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0, -21,
+            7, 0, 8, /*0, 92, 0, 95, -20, 96, 0, 43, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
     int[] modes = {};
     /* List of what the mode numbers do so you don't have to hunt them down elsewhere */
     /* except for the jewel scoring and 95-97, the first number is the step number and the second
@@ -184,14 +185,18 @@ public class AllAuto extends LinearOpMode {
          */
         robot.init(hardwareMap);
 
+        /* Pulls the voltage value at the start to the voltage variable and returns telemetry to
+           the drivers*/
         VoltageSensor vs = hardwareMap.voltageSensor.get("Lower hub 2");
         double voltage = vs.getVoltage();
         telemetry.addData("Voltage", voltage);
 
+        /* Initializes the movement speeds which are scaled based on the starting voltage */
         MOVE_SPEED = 0.5 + ((13.2-voltage)/12);
         STRAFFE_SPEED = 0.75 + ((13.2-voltage)/12);
         ROTATE_SPEED = 0.4 + ((13.2-voltage)/12);
 
+        /* Turns off all the color sensor lights */
         robot.left_color.enableLed(false);
         robot.right_color.enableLed(false);
         robot.left_ampere.enableLed(false);
@@ -211,7 +216,6 @@ public class AllAuto extends LinearOpMode {
         imu.initialize(imu_parameters);
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-
         // Send telemetry message to signify robot waiting;
         telemetry.addLine("Init VuForia");    //
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -225,6 +229,8 @@ public class AllAuto extends LinearOpMode {
         relicTrackables.activate();
         RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
 
+        /* Runs the arrays to receive the position and color from the drivers, set the variables,
+           and tell the drivers what it got set to for confirmation */
         redteam = inputTeamColor();
         FI = inputPosition();
         displaySelections();
@@ -319,8 +325,11 @@ public class AllAuto extends LinearOpMode {
 
                 /* jewel scoring steps */
                 case -30:
+                    robot.left_ampere.enableLed(true);
+                    robot.right_ampere.enableLed(true);
+
                     //move servos
-                    if (now > 5) {
+                    if (now > 4.2) {
                         leftamperered = robot.left_ampere.red();
                         leftampereblue = robot.left_ampere.blue();
                         rightamperered = robot.right_ampere.red();
@@ -332,13 +341,14 @@ public class AllAuto extends LinearOpMode {
                     break;
 
                 case -31:
-                    //change servos positions
+                    //move servos back
+                    //change servo positions
                     if (3 < ((robot.left_ampere.red() - leftamperered) -
-                             (robot.right_ampere.red()-rightamperered))) {
+                            (robot.right_ampere.red()-rightamperered))) {
                         leftampere = true;
                     }
                     if (-3 > ((robot.left_ampere.red() - leftamperered) -
-                              (robot.right_ampere.red()-rightamperered))) {
+                            (robot.right_ampere.red()-rightamperered))) {
                         rightampere = true;
                     }
                     if (3 < ((robot.left_ampere.blue() - leftampereblue) -
@@ -346,44 +356,44 @@ public class AllAuto extends LinearOpMode {
                         leftampere = false;
                     }
                     if (-3 > ((robot.left_ampere.red() - leftamperered) -
-                             (robot.right_ampere.red()-rightamperered))) {
+                            (robot.right_ampere.red()-rightamperered))) {
                         rightampere = false;
+                    }
+                    if (now > 1.8) {
+                        //stop moving servos
+                        if (leftampere && !rightampere && redteam) {
+                            //change left servo pos
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                        if (leftampere && !rightampere && !redteam) {
+                            //change right servo pos
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                        if (!leftampere && rightampere && redteam) {
+                            //change right servo pos
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                        if (!leftampere && rightampere && !redteam) {
+                            //change left servo pos
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                        else {
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
                     }
                     break;
 
                 case -32:
-                    if (leftampere && !rightampere && redteam) {
-                        //change left servo pos
-                        mode++;
-                        resetClock();
-                        robot.MoveStop();
-                    }
-                    if (leftampere && !rightampere && !redteam) {
-                        //change right servo pos
-                        mode++;
-                        resetClock();
-                        robot.MoveStop();
-                    }
-                    if (!leftampere && rightampere && redteam) {
-                        //change right servo pos
-                        mode++;
-                        resetClock();
-                        robot.MoveStop();
-                    }
-                    if (!leftampere && rightampere && !redteam) {
-                        //change left servo pos
-                        mode++;
-                        resetClock();
-                        robot.MoveStop();
-                    }
-                    else {
-                        mode++;
-                        resetClock();
-                        robot.MoveStop();
-                    }
-                    break;
-
-                case -33:
                     //change servos pos
                     if (now > 2) {
                         mode++;
@@ -392,9 +402,9 @@ public class AllAuto extends LinearOpMode {
                     }
                     break;
 
-                case -34:
+                case -33:
                     //move servos backward
-                    if (now > 5) {
+                    if (now > 4.2) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -437,6 +447,8 @@ public class AllAuto extends LinearOpMode {
 
                 /* wait one second */
                 case 0:
+                    robot.left_ampere.enableLed(false);
+                    robot.right_ampere.enableLed(false);
                     robot.left_color.enableLed(false);
                     robot.right_color.enableLed(false);
                     if (now > 1.0) {
