@@ -54,7 +54,7 @@ public class teleop extends LinearOpMode {
         while (opModeIsActive()) {
             //and now, the fun stuff
 
-                /* Update extended gamepad */
+            /* Update extended gamepad */
             egamepad1.UpdateEdge();
             egamepad2.UpdateEdge();
 
@@ -165,21 +165,25 @@ public class teleop extends LinearOpMode {
             }
 
             /********** Arm code **********/
+            if (egamepad2.y.pressed) {
+                robot.LowerArm.MoveToPosition(0.0);
+                robot.UpperArm.MoveToPosition(0.1);
+            }
             if (egamepad2.dpad_down.pressed) {
                 robot.LowerArm.MoveHome();
                 robot.UpperArm.MoveHome();
             }
             if (egamepad2.dpad_left.pressed) {
                 robot.LowerArm.MoveToPosition(0.0);
-                robot.UpperArm.MoveToPosition(0.3);
+                robot.UpperArm.MoveToPosition(0.2);
             }
             if (egamepad2.dpad_right.pressed) {
-                robot.LowerArm.MoveToPosition(0.3);
-                robot.UpperArm.MoveToPosition(0.5);
+                robot.LowerArm.MoveToPosition(0.2);
+                robot.UpperArm.MoveToPosition(0.4);
             }
             if (egamepad2.dpad_up.pressed) {
-                robot.LowerArm.MoveToPosition(0.5);
-                robot.UpperArm.MoveToPosition(0.8);
+                robot.LowerArm.MoveToPosition(0.3);
+                robot.UpperArm.MoveToPosition(0.7);
             }
 
             robot.LowerArm.Update(this);
