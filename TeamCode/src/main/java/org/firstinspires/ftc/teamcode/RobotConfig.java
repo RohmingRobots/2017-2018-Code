@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.I2cDevice;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.I2cSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -78,6 +79,10 @@ public class RobotConfig
     ArmControl  LowerArm = new ArmControl();
     ArmControl  UpperArm = new ArmControl();
 
+    /* Public
+    * IMU objects
+    */
+    public VoltageSensor Battery = null;
 
     /* Local OpMode members. */
     HardwareMap hwMap  = null;
@@ -134,11 +139,15 @@ public class RobotConfig
         // Define and Initialize color sensors
         left_color = hwMap.colorSensor.get("left_color");
         right_color = hwMap.colorSensor.get("right_color");
-        left_ampere = hwMap.colorSensor.get("left_ampere");
-        right_ampere = hwMap.colorSensor.get("right_ampere");
+//AJB        left_ampere = hwMap.colorSensor.get("left_ampere");
+//AJB        right_ampere = hwMap.colorSensor.get("right_ampere");
 
+        // **** Initialize Arms ****
         LowerArm.init(hwMap,false);
         UpperArm.init(hwMap,true);
+
+        // **** IMU objects ****
+        Battery = hwMap.voltageSensor.get("Lower hub 2");
     }
 
     /* forward is positive speed, backward is negative speed */

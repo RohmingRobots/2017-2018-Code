@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -187,10 +186,14 @@ public class AllAuto extends LinearOpMode {
          */
         robot.init(hardwareMap);
 
+<<<<<<< HEAD
         /* Pulls the voltage value at the start to the voltage variable and returns telemetry to
            the drivers*/
         VoltageSensor vs = hardwareMap.voltageSensor.get("Lower hub 2");
         double voltage = vs.getVoltage();
+=======
+        double voltage = robot.Battery.getVoltage();
+>>>>>>> master
         telemetry.addData("Voltage", voltage);
 
         /* Initializes the movement speeds which are scaled based on the starting voltage */
