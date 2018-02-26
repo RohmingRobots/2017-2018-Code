@@ -128,6 +128,10 @@ public class MecanumTest extends LinearOpMode {
                 robot.MoveForward(speed);
             } else if (gamepad1.dpad_down){
                 robot.MoveBackward(speed);
+            } else if (gamepad1.x){
+                robot.RotateLeft(speed);
+            } else if (gamepad1.b){
+                robot.RotateRight(speed);
             } else {
                 //takes all those values, divides
                 robot.FR.setPower(front_right);
