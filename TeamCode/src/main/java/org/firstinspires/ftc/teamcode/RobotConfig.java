@@ -114,8 +114,10 @@ public class RobotConfig
 
         // **** Gripper grabbers ****
         // Define and Initialize Motors
-        AWL = hwMap.servo.get("AL");
-        AWR = hwMap.servo.get("AR");
+        AWL = hwMap.servo.get("AWL");
+        AWR = hwMap.servo.get("AWR");
+        AFL = hwMap.servo.get("AFL");
+        AFR = hwMap.servo.get("AFR");
         GGR = hwMap.servo.get("GGR");
         GGL = hwMap.servo.get("GGL");
         Claw = hwMap.servo.get("Claw");

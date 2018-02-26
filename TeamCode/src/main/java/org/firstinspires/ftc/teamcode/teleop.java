@@ -134,6 +134,17 @@ public class teleop extends LinearOpMode {
                 robot.BR.setPower(back_right);
             }
 
+            //ampere test
+            if (gamepad1.x) {
+                robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[2]);
+            }
+            else if (gamepad1.y) {
+                robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[1]);
+            }
+            else {
+                robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+            }
+
             /**------------------------------------------------------------------------**/
             /********** GAMEPAD2 CONTROLS **********/
             /**------------------------------------------------------------------------**/
