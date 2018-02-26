@@ -66,6 +66,18 @@ public class AllAuto extends LinearOpMode {
         return false;
     }
 
+    public void chooseModes() {
+        //chooses modes based on inputted color and position
+        if (FI && redteam)
+            modes = modesRAFI;
+        if (!FI && redteam)
+            modes = modesRABI;
+        if (FI && !redteam)
+            modes = modesBAFI;
+        if (!FI && !redteam)
+            modes = modesBABI;
+    }
+
     public void displaySelections() {
         //displays the selected color and position
         telemetry.addData("Status", "Initialized");
@@ -77,19 +89,9 @@ public class AllAuto extends LinearOpMode {
             telemetry.addData("Team Color", "RED");
         else
             telemetry.addData("Team Color", "BLUE");
+        //says it is ready to start so it adds all the prestart telemetry together
+        telemetry.addData(">", "Press Play to start");
         telemetry.update();
-    }
-
-    public void chooseModes() {
-        //chooses modes based on inputted color and position
-        if (FI && redteam)
-            modes = modesRAFI;
-        if (!FI && redteam)
-            modes = modesRABI;
-        if (FI && !redteam)
-            modes = modesBAFI;
-        if (!FI && !redteam)
-            modes = modesBABI;
     }
 
     public void resetClock() {
@@ -137,20 +139,20 @@ public class AllAuto extends LinearOpMode {
     //modes lists which steps and in what order to accomplish them
     //modes is set based on inputted color and position
     int mode = 0;
-    int [] modesRAFI = {-4, -30, -31, -32, -33, -20, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0, -21,
+    int [] modesRAFI = {-4, -31, -32, -33, -34, -20, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0, -21,
             7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 40, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesRABI = {-4, -30, -31, -32, -33, -20, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0, -21,
+    int [] modesRABI = {-4, -31, -32, -33, -34, -20, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0, -21,
             7, 0, 8, /*0, 91, 0, 95, -20, 96, 0, 41, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesBAFI = {-4, -30, -31, -32, -33, -20, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0, -21,
+    int [] modesBAFI = {-4, -31, -32, -33, -34, -20, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0, -21,
             7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 42, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesBABI = {-4, -30, -31, -32, -33, -20, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0, -21,
+    int [] modesBABI = {-4, -31, -32, -33, -34, -20, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0, -21,
             7, 0, 8, /*0, 92, 0, 95, -20, 96, 0, 43, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
     int[] modes = {};
     /* List of what the mode numbers do so you don't have to hunt them down elsewhere */
     /* except for the jewel scoring and 95-97, the first number is the step number and the second
        number is which version of the step for when it varies based on location
     -4 : Check Vumark
-    -30-34 Score jewel
+    -31-34 Score jewel
     -20: Grab glyph
     -21: Release glyph
     -1 : Raise arm
@@ -216,6 +218,7 @@ public class AllAuto extends LinearOpMode {
         imu.initialize(imu_parameters);
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
+        /* initialize Vuforia */
         // Send telemetry message to signify robot waiting;
         telemetry.addLine("Init VuForia");    //
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -233,15 +236,13 @@ public class AllAuto extends LinearOpMode {
            and tell the drivers what it got set to for confirmation */
         redteam = inputTeamColor();
         FI = inputPosition();
-        displaySelections();
         chooseModes();
-
-        telemetry.addData(">", "Press Play to start");
-        telemetry.update();
+        displaySelections();
 
         //waits for that giant PLAY button to be pressed on RC
         waitForStart();
 
+        //resets the clock and sets the start angle once the 30 seconds begins
         resetClock();
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         startAngle = angles.firstAngle;
@@ -255,6 +256,7 @@ public class AllAuto extends LinearOpMode {
             currentAngle = angles.firstAngle;
             turnAngle = startAngle-currentAngle;
 
+            //keeps the angle in a 360 degree range so the is only one number for each direction
             if (turnAngle > 180)
                 turnAngle -= 360;
             if (turnAngle < -180)
@@ -263,6 +265,7 @@ public class AllAuto extends LinearOpMode {
             //keeps now up to date
             now = runtime.seconds() - lastReset;
 
+            //so if the robot starts acting weird, we can check if is because of the color sensors
             telemetry.addData("left_color red", robot.left_color.red());
             telemetry.addData("left_color blue", robot.left_color.blue());
             telemetry.addData("right_color red", robot.right_color.red());
@@ -271,6 +274,8 @@ public class AllAuto extends LinearOpMode {
             telemetry.addData("rightcolor", rightcolor);
             telemetry.update();
 
+            /* sets the requirements for the left color sensor to be seeing the line it is looking
+               for and keeps it up to date */
             if (robot.left_color.red() > 14 && redteam) {
                 leftcolor = true;
             }
@@ -281,6 +286,7 @@ public class AllAuto extends LinearOpMode {
                 leftcolor = false;
             }
 
+            /* sets the requirements for the right color sensor ...(same as above) */
             if (robot.right_color.red() > 12 && redteam) {
                 rightcolor = true;
             }
@@ -291,8 +297,11 @@ public class AllAuto extends LinearOpMode {
                 rightcolor = false;
             }
 
+            /* the switch containing all the preset modes so it switches between them without a
+               giant list of if, else ifs */
             switch (modes[mode]) {
 
+                /* says it is done when it finishes */
                 default:
                     telemetry.addLine("All done");
                     robot.MoveStop();
@@ -323,13 +332,16 @@ public class AllAuto extends LinearOpMode {
                     }
                     break;
 
-                /* jewel scoring steps */
-                case -30:
+                /* jewel scoring steps part 1 */
+                case -31:
+                    //turns ampere LEDs om
                     robot.left_ampere.enableLed(true);
                     robot.right_ampere.enableLed(true);
 
-                    //move servos
-                    if (now > 4.2) {
+                    //winches out the ampere for a set duration, then calibrates the color sensors
+                    robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[2]);
+                    robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[2]);
+                    if (now > 3.2) {
                         leftamperered = robot.left_ampere.red();
                         leftampereblue = robot.left_ampere.blue();
                         rightamperered = robot.right_ampere.red();
@@ -340,9 +352,18 @@ public class AllAuto extends LinearOpMode {
                     }
                     break;
 
-                case -31:
-                    //move servos back
-                    //change servo positions
+                /* jewel scoring steps part 2 */
+                case -32:
+                    //winches in the slack so it is ready to go back in
+                    robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[0]);
+                    robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[0]);
+
+                    //points the color sensors at the jewels
+                    robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[1]);
+                    robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[1]);
+
+                    /* checks if both color sensors detect a difference in the change of values and
+                       returns true if the side is red and false if the side is blue */
                     if (3 < ((robot.left_ampere.red() - leftamperered) -
                             (robot.right_ampere.red()-rightamperered))) {
                         leftampere = true;
@@ -359,32 +380,40 @@ public class AllAuto extends LinearOpMode {
                             (robot.right_ampere.red()-rightamperered))) {
                         rightampere = false;
                     }
+
+                    //makes sure the code doesn't get stuck
                     if (now > 1.8) {
-                        //stop moving servos
+                        //stops reeling in the slack after a time
+                        robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[1]);
+                        robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[1]);
+
+                        //checks if both color sensors agree and hits the correct one for our color
                         if (leftampere && !rightampere && redteam) {
-                            //change left servo pos
+                            robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[2]);
                             mode++;
                             resetClock();
                             robot.MoveStop();
                         }
                         if (leftampere && !rightampere && !redteam) {
-                            //change right servo pos
+                            robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[2]);
                             mode++;
                             resetClock();
                             robot.MoveStop();
                         }
                         if (!leftampere && rightampere && redteam) {
-                            //change right servo pos
+                            robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[2]);
                             mode++;
                             resetClock();
                             robot.MoveStop();
                         }
                         if (!leftampere && rightampere && !redteam) {
-                            //change left servo pos
+                            robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[2]);
                             mode++;
                             resetClock();
                             robot.MoveStop();
                         }
+
+                        //moves on without knocking one of if it isn't certain it saw it properly
                         else {
                             mode++;
                             resetClock();
@@ -393,18 +422,24 @@ public class AllAuto extends LinearOpMode {
                     }
                     break;
 
-                case -32:
-                    //change servos pos
-                    if (now > 2) {
+                /* jewel scoring steps part 3 */
+                case -33:
+                    //folds in the servos
+                    robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
+                    robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+                    if (now > 0.5) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
                     }
                     break;
 
-                case -33:
-                    //move servos backward
-                    if (now > 4.2) {
+                /* jewel scoring steps part 4 */
+                case -34:
+                    //reels back in the amperes
+                    robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[0]);
+                    robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[0]);
+                    if (now > 3.2) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -413,6 +448,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* grab glyph */
                 case -20:
+                    //closes grabbers
                     robot.GGL.setPosition(robot.GRABBER_LEFT[1]);
                     robot.GGR.setPosition(robot.GRABBER_RIGHT[1]);
                     if (now > 0.5) {
@@ -423,6 +459,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* release glyph */
                 case -21:
+                    //opens grabbers
                     robot.GGL.setPosition(robot.GRABBER_LEFT[0]);
                     robot.GGR.setPosition(robot.GRABBER_RIGHT[0]);
                     if (now > 0.5) {
@@ -433,24 +470,33 @@ public class AllAuto extends LinearOpMode {
 
                 /* raise arm */
                 case -1:
+                    //stops lifting after a set time
                     if (now > 0.9) {
                         robot.UpperArm.MoveHome();
-                        // wait until home until next step
-                        if (robot.UpperArm.Limit.getState()==false) {
+
+                        /* wait until home for next step, exits out if it takes too long so it
+                           doesn't lock up */
+                        if (robot.UpperArm.Limit.getState()==false || (now > 3)) {
                             mode++;
                             resetClock();
                         }
-                    } else {
+                    }
+
+                    //lifts to a position until enough time has passed
+                    else {
                         robot.UpperArm.MoveToPosition(0.3);
                     }
                     break;
 
                 /* wait one second */
                 case 0:
+                    //turns all LEDs off
                     robot.left_ampere.enableLed(false);
                     robot.right_ampere.enableLed(false);
                     robot.left_color.enableLed(false);
                     robot.right_color.enableLed(false);
+
+                    //waits 1 second
                     if (now > 1.0) {
                         mode++;
                         resetClock();
@@ -460,6 +506,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* backup 24 inches */
                 case 1:
+                    //backs up for a set time
                     robot.MoveBackward(MOVE_SPEED);
                     if (now > 0.7) {
                         mode++;
@@ -470,6 +517,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* turn left to -45 (red) */
                 case 20:
+                    //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateLeft(ROTATE_SPEED);
                     if (turnAngle < -40) {
                         mode++;
@@ -480,6 +528,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* turn right to 45 (blue) */
                 case 21:
+                    //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateRight(ROTATE_SPEED);
                     if (turnAngle > 40) {
                         mode++;
@@ -490,6 +539,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* move forward 50.9 inches (FI) */
                 case 30:
+                    //moves forward for a set time
                     robot.MoveForward(MOVE_SPEED);
                     if (now > 1.3) {
                         mode++;
@@ -500,6 +550,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* move forward 33.9 inches (BI) */
                 case 31:
+                    //moves forward for a set time
                     robot.MoveForward(MOVE_SPEED);
                     if (now > 0.9) {
                         mode++;
@@ -510,6 +561,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* turn right to 0 (RAFI) */
                 case 40:
+                    //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateRight(ROTATE_SPEED);
                     if (turnAngle > -5) {
                         mode++;
@@ -520,6 +572,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* turn left to -90 (RABI) */
                 case 41:
+                    //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateLeft(ROTATE_SPEED);
                     if (turnAngle < -40) {
                         mode++;
@@ -531,6 +584,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* turn left to 0 (BAFI) */
                 case 42:
+                    //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateLeft(ROTATE_SPEED);
                     if (turnAngle < 5) {
                         mode++;
@@ -541,6 +595,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* turn right to 90 (BABI) */
                 case 43:
+                    //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateRight(ROTATE_SPEED);
                     if (turnAngle > 85) {
                         mode++;
@@ -551,14 +606,18 @@ public class AllAuto extends LinearOpMode {
 
                 /* tirangulate */
                 case 5:
+                    //turns the LEDs on
                     robot.left_color.enableLed(true);
                     robot.right_color.enableLed(true);
 
+                    //stops if both see the line
                     if (leftcolor && rightcolor) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
                     }
+
+                    //strafes right at an angle if the left side sees the line
                     else if (leftcolor && !rightcolor) {
                         robot.FL.setPower(-MOVE_SPEED/1.5);
                         robot.BR.setPower(-MOVE_SPEED/1.5);
@@ -566,6 +625,8 @@ public class AllAuto extends LinearOpMode {
                         robot.BL.setPower(MOVE_SPEED*1.2);
                         robot.FR.setPower(MOVE_SPEED*1.2);
                     }
+
+                    //strafes left at an angle if the right side sees the line
                     else if (!leftcolor && rightcolor){
                         robot.FL.setPower(MOVE_SPEED*1.2);
                         robot.BR.setPower(MOVE_SPEED*1.2);
@@ -573,6 +634,8 @@ public class AllAuto extends LinearOpMode {
                         robot.BL.setPower(-MOVE_SPEED/1.5);
                         robot.FR.setPower(-MOVE_SPEED/1.5);
                     }
+
+                    //drives forward if it doesn't see anything
                     else {
                         robot.MoveForward(MOVE_SPEED/2.4);
                     }
@@ -581,6 +644,7 @@ public class AllAuto extends LinearOpMode {
                 /* straffe to column */
                 case 6:
                     if (vuMark == RelicRecoveryVuMark.LEFT){
+                        //strafe left until the right sensor gets to the line on the other side
                         robot.MoveLeft(STRAFFE_SPEED/1.5);
                         if (now > 1 && rightcolor) {
                             mode++;
@@ -589,6 +653,7 @@ public class AllAuto extends LinearOpMode {
                         }
                     }
                     else if (vuMark == RelicRecoveryVuMark.RIGHT){
+                        //strafe right until the left sensor gets to the line on the other side
                         robot.MoveRight(STRAFFE_SPEED/1.5);
                         if (now > 1 && leftcolor) {
                             mode++;
@@ -597,6 +662,7 @@ public class AllAuto extends LinearOpMode {
                         }
                     }
                     else {
+                        //already lined up, so moves on
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -605,6 +671,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* move forward 10 inches into cryptobox */
                 case 7:
+                    //moves forward for a set time
                     robot.MoveForward(MOVE_SPEED);
                     if (now > 0.55) {
                         mode++;
@@ -615,6 +682,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* move backward 10 inches */
                 case 8:
+                    //backs up for a set time
                     robot.MoveBackward(MOVE_SPEED);
                     if (now > 0.4) {
                         mode++;
@@ -626,6 +694,7 @@ public class AllAuto extends LinearOpMode {
                 /* straffe back */
                 case 85:
                     if (vuMark == RelicRecoveryVuMark.LEFT){
+                        //strafe right until the right sensor gets to the line on the other side
                         robot.MoveRight(STRAFFE_SPEED);
                         if (now > 1 && rightcolor) {
                             mode++;
@@ -634,6 +703,7 @@ public class AllAuto extends LinearOpMode {
                         }
                     }
                     else if (vuMark == RelicRecoveryVuMark.RIGHT){
+                        //strafe left until the left sensor gets to the line on the other side
                         robot.MoveLeft(STRAFFE_SPEED);
                         if (now > 1 && leftcolor) {
                             mode++;
@@ -642,6 +712,7 @@ public class AllAuto extends LinearOpMode {
                         }
                     }
                     else {
+                        //already lined up, so moves on
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -650,6 +721,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* turn to 180 (FI) */
                 case 90:
+                    //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateRight(ROTATE_SPEED);
                     if (turnAngle > 175) {
                         mode++;
@@ -660,6 +732,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* turn left to 140 (RABI) */
                 case 91:
+                    //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateRight(ROTATE_SPEED);
                     if (turnAngle > 135) {
                         mode++;
@@ -670,6 +743,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* turn right to -140 (BABI) */
                 case 92:
+                    //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateLeft(ROTATE_SPEED);
                     if (turnAngle < -135) {
                         mode++;
@@ -680,6 +754,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* drive into glyph pit */
                 case 95:
+                    //moves forward for a set time
                     robot.MoveForward(MOVE_SPEED);
                     if (now > 1.7) {
                         mode++;
@@ -690,6 +765,7 @@ public class AllAuto extends LinearOpMode {
 
                 /* drive back to cryptobox */
                 case 96:
+                    //backs up for a set time
                     robot.MoveBackward(MOVE_SPEED);
                     if (now > 1.65) {
                         mode++;
@@ -701,16 +777,19 @@ public class AllAuto extends LinearOpMode {
                 /* straffe to column */
                 case 97:
                     if (vuMark == RelicRecoveryVuMark.LEFT){
+                        //already lined up with a column not filled by the first glyph
                         mode++;
                         resetClock();
                         robot.MoveStop();
                     }
                     else if (vuMark == RelicRecoveryVuMark.RIGHT){
+                        //already lined up with a column not filled by the first glyph
                         mode++;
                         resetClock();
                         robot.MoveStop();
                     }
                     else {
+                        //strafe left until the right sensor gets to the line on the other side
                         robot.MoveLeft(STRAFFE_SPEED);
                         if (now > 1 && rightcolor) {
                             mode++;
@@ -722,11 +801,13 @@ public class AllAuto extends LinearOpMode {
 
             }  // end of switch
 
+            //updates the arms
             robot.LowerArm.Update(this);
             robot.UpperArm.Update(this);
         }
     }
 
+    //important thing that makes Vuforia do its job
     String format(OpenGLMatrix transformationMatrix) {
         return (transformationMatrix != null) ? transformationMatrix.formatAsTransform() : "null";
     }

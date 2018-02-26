@@ -51,10 +51,18 @@ public class RobotConfig
     * GGR - gripper grabber right servo motor
     * GGL - gripper grabber right servo motor
     */
+    public Servo AWL = null;
+    public Servo AWR = null;
+    public Servo AFL = null;
+    public Servo AFR = null;
     public Servo GGR = null;
     public Servo GGL = null;
     public Servo Claw = null;
     /* open full, closed full, partial open */
+    public double[] AMPERE_WINCH_LEFT = {0.0, 0.5, 1.0};
+    public double[] AMPERE_WINCH_RIGHT = {1.0, 0.5, 0.0};
+    public double[] AMPERE_FLICKER_LEFT = {0.4, 0.5, 0.6};
+    public double[] AMPERE_FLICKER_RIGHT = {0.4, 0.5, 0.6};
     public double[] GRABBER_LEFT = {0.745, .255, .375};
     public double[] GRABBER_RIGHT = {0.44, .89, .765};
     public double[] CLAW = {0.9, 0.15};
@@ -106,10 +114,16 @@ public class RobotConfig
 
         // **** Gripper grabbers ****
         // Define and Initialize Motors
+        AWL = hwMap.servo.get("AL");
+        AWR = hwMap.servo.get("AR");
         GGR = hwMap.servo.get("GGR");
         GGL = hwMap.servo.get("GGL");
         Claw = hwMap.servo.get("Claw");
         // set initial positions
+        AWL.setPosition(AMPERE_WINCH_LEFT[1]);
+        AWR.setPosition(AMPERE_WINCH_RIGHT[1]);
+        AFL.setPosition(AMPERE_FLICKER_LEFT[0]);
+        AFR.setPosition(AMPERE_FLICKER_RIGHT[0]);
         GGL.setPosition(GRABBER_LEFT[0]);
         GGR.setPosition(GRABBER_RIGHT[0]);
         Claw.setPosition(CLAW[0]);
