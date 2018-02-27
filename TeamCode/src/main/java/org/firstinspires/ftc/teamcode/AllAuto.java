@@ -186,14 +186,7 @@ public class AllAuto extends LinearOpMode {
          */
         robot.init(hardwareMap);
 
-<<<<<<< HEAD
-        /* Pulls the voltage value at the start to the voltage variable and returns telemetry to
-           the drivers*/
-        VoltageSensor vs = hardwareMap.voltageSensor.get("Lower hub 2");
-        double voltage = vs.getVoltage();
-=======
         double voltage = robot.Battery.getVoltage();
->>>>>>> master
         telemetry.addData("Voltage", voltage);
 
         /* Initializes the movement speeds which are scaled based on the starting voltage */
@@ -342,8 +335,8 @@ public class AllAuto extends LinearOpMode {
                     robot.right_ampere.enableLed(true);
 
                     //winches out the ampere for a set duration, then calibrates the color sensors
-                    robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[2]);
-                    robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[2]);
+//AJB                    robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[2]);
+//AJB                    robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[2]);
                     if (now > 3.2) {
                         leftamperered = robot.left_ampere.red();
                         leftampereblue = robot.left_ampere.blue();
@@ -358,8 +351,8 @@ public class AllAuto extends LinearOpMode {
                 /* jewel scoring steps part 2 */
                 case -32:
                     //winches in the slack so it is ready to go back in
-                    robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[0]);
-                    robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[0]);
+//AJB                    robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[0]);
+//AJB                    robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[0]);
 
                     //points the color sensors at the jewels
                     robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[1]);
@@ -387,8 +380,8 @@ public class AllAuto extends LinearOpMode {
                     //makes sure the code doesn't get stuck
                     if (now > 1.8) {
                         //stops reeling in the slack after a time
-                        robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[1]);
-                        robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[1]);
+//AJB                        robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[1]);
+//AJB                        robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[1]);
 
                         //checks if both color sensors agree and hits the correct one for our color
                         if (leftampere && !rightampere && redteam) {
@@ -440,8 +433,8 @@ public class AllAuto extends LinearOpMode {
                 /* jewel scoring steps part 4 */
                 case -34:
                     //reels back in the amperes
-                    robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[0]);
-                    robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[0]);
+//AJB                    robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[0]);
+//AJB                    robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[0]);
                     if (now > 3.2) {
                         mode++;
                         resetClock();

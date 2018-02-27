@@ -33,8 +33,8 @@ public class SensorTest extends LinearOpMode {
         /* turn on color sensor LEDs &/
         robot.left_color.enableLed(true);
         robot.right_color.enableLed(true);
-//        robot.left_ampere.enableLed(true);
-//        robot.right_ampere.enableLed(true);
+        robot.left_ampere.enableLed(true);
+        robot.right_ampere.enableLed(true);
 
         /* Disable servos to allow manual motion */
         ((ServoImplEx) robot.GGL).setPwmDisable();
@@ -81,8 +81,8 @@ public class SensorTest extends LinearOpMode {
             telemetry.addLine("Color Sensors (red/blue)");
             telemetry.addData("   track left ","%3d %3d", robot.left_color.red(),robot.left_color.blue());
             telemetry.addData("   track right","%3d %3d", robot.right_color.red(),robot.right_color.blue());
-//            telemetry.addData("  ampere left ","%3d %3d", robot.left_ampere.red(),robot.left_ampere.blue());
-//            telemetry.addData("  ampere right","%3d %3d", robot.right_ampere.red(),robot.right_ampere.blue());
+            telemetry.addData("  ampere left ","%3d %3d", robot.left_ampere.red(),robot.left_ampere.blue());
+            telemetry.addData("  ampere right","%3d %3d", robot.right_ampere.red(),robot.right_ampere.blue());
 
             telemetry.update();
 
