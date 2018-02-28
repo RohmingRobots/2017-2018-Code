@@ -149,16 +149,21 @@ public class RobotConfig
         // Define and Initialize Motors
         AWL = hwMap.crservo.get("AWL");
         AWR = hwMap.crservo.get("AWR");
-        AFL = hwMap.servo.get("AFL");
-        AFR = hwMap.servo.get("AFR");
         // reverse those motors
         AWR.setDirection(CRServo.Direction.REVERSE);
-        AFR.setDirection(Servo.Direction.REVERSE);
         // set all motors to zero power
         AWL.setPower(0.0);
         AWR.setPower(0.0);
-//AJB        AFL.setPosition(AMPERE_FLICKER_LEFT[0]);
-//AJB        AFR.setPosition(AMPERE_FLICKER_RIGHT[0]);
+
+        // Define and Initialize Motors
+        AFL = hwMap.servo.get("AFL");
+        AFR = hwMap.servo.get("AFR");
+        // reverse those motors
+        AFR.setDirection(Servo.Direction.REVERSE);
+        // set initial positions
+        AFL.setPosition(AMPERE_FLICKER_LEFT[0]);
+        AFR.setPosition(AMPERE_FLICKER_RIGHT[0]);
+
         // Define and Initialize color sensors
         left_ampere = hwMap.colorSensor.get("left_ampere");
         right_ampere = hwMap.colorSensor.get("right_ampere");

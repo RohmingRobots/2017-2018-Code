@@ -26,7 +26,8 @@ public class AmpereTest extends LinearOpMode {
 
         ElapsedTime OurTime = new ElapsedTime();
         double position, step = 0.1;
-        int mode=0;
+        double AMPERE_POWER = 0.8;
+        int mode = 20;
         double increment;
         int index_left_flipper, index_right_flipper;
         int blue_left_right, red_left_right;
@@ -49,6 +50,7 @@ public class AmpereTest extends LinearOpMode {
         telemetry.addLine("b      - cycle through right flipper");
         telemetry.addLine("stick button  - increment flipper");
         telemetry.addLine("bumper button - decrement flipper");
+        telemetry.addLine("y      - autonomous test");
         telemetry.update();
 
         waitForStart();
@@ -101,8 +103,8 @@ public class AmpereTest extends LinearOpMode {
             // side arms
             if (egamepad1.dpad_down.pressed) {
                 // retract
-                robot.AWL.setPower(-0.5);
-                robot.AWR.setPower(-0.5);
+                robot.AWL.setPower(-AMPERE_POWER);
+                robot.AWR.setPower(-AMPERE_POWER);
             } else if (egamepad1.dpad_down.released){
                 // stop
                 robot.AWL.setPower(0.0);
@@ -110,8 +112,8 @@ public class AmpereTest extends LinearOpMode {
             }
             if (egamepad1.dpad_up.pressed) {
                 // extend
-                robot.AWL.setPower(0.5);
-                robot.AWR.setPower(0.5);
+                robot.AWL.setPower(AMPERE_POWER);
+                robot.AWR.setPower(AMPERE_POWER);
             } else if (egamepad1.dpad_up.released){
                 // stop
                 robot.AWL.setPower(0.0);
@@ -146,55 +148,86 @@ public class AmpereTest extends LinearOpMode {
                 robot.AFR.setPosition(robot.AFR.getPosition()-increment);
             }
 
+            if (egamepad1.y.released) {
+                mode = 0;
+                OurTime.reset();
+            }
+
             // no gamepad - mimic autonomous
             switch (mode) {
                 case 0:
-                    if (OurTime.seconds()>5.0) {
-                        mode++;
-                        OurTime.reset();
-                        // extend
-                        robot.AWL.setPower(0.1);
-                        robot.AWR.setPower(0.1);
-                    }
+                    // extend part way
+                    robot.AWL.setPower(AMPERE_POWER);
+                    robot.AWR.setPower(AMPERE_POWER);
+                    if (OurTime.seconds()<4.0)
+                        break;
+                    // stop
+                    robot.AWL.setPower(0.0);
+                    robot.AWR.setPower(0.0);
+                    mode++;
+                    OurTime.reset();
                     break;
                 case 1:
-                    if (OurTime.seconds()>2.0) {
-                        mode++;
-                        OurTime.reset();
-                        // stop
-                        robot.AWL.setPower(0.0);
-                        robot.AWR.setPower(0.0);
-                    }
+                    // extend flippers (continue extending)
+                    robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[2]);
+                    robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[2]);
+                    if (OurTime.seconds()<1.0)
+                        break;
+                    mode++;
+                    OurTime.reset();
                     break;
-
-                case 10:
-                    if (OurTime.seconds()>5.0) {
-                        mode++;
-                        OurTime.reset();
-                        robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[1]);
-                        robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[1]);
-                    }
+                case 2:
+                    // extend rest of the way
+                    robot.AWL.setPower(AMPERE_POWER);
+                    robot.AWR.setPower(AMPERE_POWER);
+                    if (OurTime.seconds()<4.0)
+                        break;
+                    // stop
+                    robot.AWL.setPower(0.0);
+                    robot.AWR.setPower(0.0);
+                    mode++;
+                    OurTime.reset();
                     break;
                 case 11:
-                    if (OurTime.seconds()>5.0) {
-                        mode++;
-                        OurTime.reset();
-                        if ( blue_left_right*red_left_right < 0 ) {
-                            if (blue_left_right > 0) {
-                                robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[2]);
-                            } else {
-                                robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[2]);
-                            }
+                    // flick jewel
+                    if ( blue_left_right*red_left_right < 0 ) {
+                        if (blue_left_right > 0) {
+                            robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+                        } else {
+                            robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
                         }
                     }
+                    if (OurTime.seconds()<1.0)
+                        break;
+                    mode++;
+                    OurTime.reset();
                     break;
                 case 12:
-                    if (OurTime.seconds()>5.0) {
-                        mode++;
-                        OurTime.reset();
-                        robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
-                        robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
-                    }
+                    // retract part of the way
+                    robot.AWL.setPower(-AMPERE_POWER);
+                    robot.AWR.setPower(-AMPERE_POWER);
+                    if (OurTime.seconds()<4.0)
+                        break;
+                    // stop
+                    robot.AWL.setPower(0.0);
+                    robot.AWR.setPower(0.0);
+                    mode++;
+                    OurTime.reset();
+                    break;
+                case 13:
+                    // retract flippers
+                    robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
+                    robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+                    // retract rest of the way
+                    robot.AWL.setPower(-AMPERE_POWER);
+                    robot.AWR.setPower(-AMPERE_POWER);
+                    if (OurTime.seconds()<4.0)
+                        break;
+                    // stop
+                    robot.AWL.setPower(0.0);
+                    robot.AWR.setPower(0.0);
+                    mode++;
+                    OurTime.reset();
                     break;
 
                 case 20:

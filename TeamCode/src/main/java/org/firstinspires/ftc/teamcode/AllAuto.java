@@ -112,6 +112,7 @@ public class AllAuto extends LinearOpMode {
     double MOVE_SPEED = 0.5;
     double STRAFFE_SPEED = 0.75;
     double ROTATE_SPEED = 0.5;
+    double AMPERE_POWER = 0.8;
 
     //turning variables
     double startAngle;
@@ -138,15 +139,15 @@ public class AllAuto extends LinearOpMode {
     //modes lists which steps and in what order to accomplish them
     //modes is set based on inputted color and position
     int mode = 0;
-    int [] modesRAFI = {-4, -31, -32, -33, -34, -20, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0, -21,
+    int [] modesRAFI = {-4, -31, -32, 0, -33, -34, -20, 0, 1, 0, 20, 0, 30, 0, 40, 0, 5, 0, 6, 0, -21,
             7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 40, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesRABI = {-4, -31, -32, -33, -34, -20, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0, -21,
+    int [] modesRABI = {-4, -31, -32, 0, -33, -34, -20, 0, 1, 0, 20, 0, 31, 0, 41, 0, 5, 0, 6, 0, -21,
             7, 0, 8, /*0, 91, 0, 95, -20, 96, 0, 41, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesBAFI = {-4, -31, -32, -33, -34, -20, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0, -21,
+    int [] modesBAFI = {-4, -31, -32, 0, -33, -34, -20, 0, 1, 0, 21, 0, 30, 0, 42, 0, 5, 0, 6, 0, -21,
             7, 0, 8, /*0, 90, 0, 95, -20, 96, 0, 42, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int [] modesBABI = {-4, -31, -32, -33, -34, -20, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0, -21,
+    int [] modesBABI = {-4, -31, -32, 0, -33, -34, -20, 0, 1, 0, 21, 0, 31, 0, 43, 0, 5, 0, 6, 0, -21,
             7, 0, 8, /*0, 92, 0, 95, -20, 96, 0, 43, 0, 5, 0, 97, 0, -21, 7, 0, 8,*/ 100};
-    int[] modes = {};
+    int [] modes = {-31, -32, 0, -33, -34, 0, 100};
     /* List of what the mode numbers do so you don't have to hunt them down elsewhere */
     /* except for the jewel scoring and 95-97, the first number is the step number and the second
        number is which version of the step for when it varies based on location
@@ -232,7 +233,7 @@ public class AllAuto extends LinearOpMode {
            and tell the drivers what it got set to for confirmation */
         redteam = inputTeamColor();
         FI = inputPosition();
-        chooseModes();
+        //chooseModes();
         displaySelections();
 
         //waits for that giant PLAY button to be pressed on RC
@@ -335,9 +336,10 @@ public class AllAuto extends LinearOpMode {
                     robot.right_ampere.enableLed(true);
 
                     //winches out the ampere for a set duration, then calibrates the color sensors
-//AJB                    robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[2]);
-//AJB                    robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[2]);
-                    if (now > 3.2) {
+                    telemetry.addLine("Extend");
+                    robot.AWL.setPower(AMPERE_POWER);
+                    robot.AWR.setPower(AMPERE_POWER);
+                    if (now > 6.0) {
                         leftamperered = robot.left_ampere.red();
                         leftampereblue = robot.left_ampere.blue();
                         rightamperered = robot.right_ampere.red();
@@ -351,10 +353,12 @@ public class AllAuto extends LinearOpMode {
                 /* jewel scoring steps part 2 */
                 case -32:
                     //winches in the slack so it is ready to go back in
-//AJB                    robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[0]);
-//AJB                    robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[0]);
+                    telemetry.addLine("Stop");
+                    robot.AWL.setPower(0.0);
+                    robot.AWR.setPower(0.0);
 
                     //points the color sensors at the jewels
+                    telemetry.addLine("Fold out");
                     robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[1]);
                     robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[1]);
 
@@ -378,11 +382,7 @@ public class AllAuto extends LinearOpMode {
                     }
 
                     //makes sure the code doesn't get stuck
-                    if (now > 1.8) {
-                        //stops reeling in the slack after a time
-//AJB                        robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[1]);
-//AJB                        robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[1]);
-
+                    if (now > 1.0) {
                         //checks if both color sensors agree and hits the correct one for our color
                         if (leftampere && !rightampere && redteam) {
                             robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[2]);
@@ -408,9 +408,8 @@ public class AllAuto extends LinearOpMode {
                             resetClock();
                             robot.MoveStop();
                         }
-
-                        //moves on without knocking one of if it isn't certain it saw it properly
                         else {
+                            //moves on without knocking one of if it isn't certain it saw it properly
                             mode++;
                             resetClock();
                             robot.MoveStop();
@@ -421,6 +420,7 @@ public class AllAuto extends LinearOpMode {
                 /* jewel scoring steps part 3 */
                 case -33:
                     //folds in the servos
+                    telemetry.addLine("Fold in");
                     robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
                     robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
                     if (now > 0.5) {
@@ -433,9 +433,10 @@ public class AllAuto extends LinearOpMode {
                 /* jewel scoring steps part 4 */
                 case -34:
                     //reels back in the amperes
-//AJB                    robot.AWL.setPosition(robot.AMPERE_WINCH_LEFT[0]);
-//AJB                    robot.AWR.setPosition(robot.AMPERE_WINCH_RIGHT[0]);
-                    if (now > 3.2) {
+                    telemetry.addLine("Retract");
+                    robot.AWL.setPower(-AMPERE_POWER);
+                    robot.AWR.setPower(-AMPERE_POWER);
+                    if (now > 6.0) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
