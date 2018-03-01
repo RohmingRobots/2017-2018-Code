@@ -29,8 +29,9 @@ public class teleop extends LinearOpMode {
         double back_right;
         double speed = 2.5;
         double reverse = 1.0;
-        int grabber_left;
-        int grabber_right;
+        int index_grabber_left;
+        int index_grabber_right;
+        int index_claw;
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
@@ -42,9 +43,10 @@ public class teleop extends LinearOpMode {
         egamepad1 = new GamepadEdge(gamepad1);
         egamepad2 = new GamepadEdge(gamepad2);
 
-        grabber_left = 0;
-        grabber_right = 0;
-        telemetry.addData("Version", "State");
+        index_grabber_left = 0;
+        index_grabber_right = 0;
+        index_claw = 0;
+        telemetry.addData("Version", "Super");
         telemetry.update();
 
         //waits for that giant PLAY button to be pressed on RC
@@ -54,7 +56,7 @@ public class teleop extends LinearOpMode {
         while (opModeIsActive()) {
             //and now, the fun stuff
 
-                /* Update extended gamepad */
+            /* Update extended gamepad */
             egamepad1.UpdateEdge();
             egamepad2.UpdateEdge();
 
@@ -140,45 +142,51 @@ public class teleop extends LinearOpMode {
 
             /********** Grabber code **********/
             if (egamepad2.left_bumper.released) {
-                grabber_left = (grabber_left < 2) ? grabber_left + 1 : 0;
+                index_grabber_left = (index_grabber_left < 2) ? index_grabber_left + 1 : 0;
             }
             if (egamepad2.right_bumper.released) {
-                grabber_right = (grabber_right < 2) ? grabber_right + 1 : 0;
+                index_grabber_right = (index_grabber_right < 2) ? index_grabber_right + 1 : 0;
             }
             if (egamepad2.b.released) {
-                grabber_left = 0;
-                grabber_right = 0;
+                index_grabber_left = 0;
+                index_grabber_right = 0;
             }
             if (egamepad2.x.released) {
-                grabber_left = 1;
-                grabber_right = 1;
+                index_grabber_left = 1;
+                index_grabber_right = 1;
             }
-            robot.GGL.setPosition(robot.GRABBER_LEFT[grabber_left]);
-            robot.GGR.setPosition(robot.GRABBER_RIGHT[grabber_right]);
+            robot.GGL.setPosition(robot.GRABBER_LEFT[index_grabber_left]);
+            robot.GGR.setPosition(robot.GRABBER_RIGHT[index_grabber_right]);
 
             if (egamepad2.a.released) {
-                if (robot.Claw.getPosition() > 0.5) {
-                    robot.Claw.setPosition(robot.CLAW[1]);
-                } else {
-                    robot.Claw.setPosition(robot.CLAW[0]);
-                }
+                index_claw = (index_claw < 1) ? index_claw + 1 : 0;
             }
+            robot.Claw.setPosition(robot.CLAW[index_claw]);
 
             /********** Arm code **********/
-            if (gamepad2.dpad_down) {
-                robot.Arm.MoveHome();
+            if (egamepad2.y.pressed) {
+                robot.LowerArm.MoveToPosition(0.0);
+                robot.UpperArm.MoveToPosition(0.1);
             }
-            if (gamepad2.dpad_left) {
-                robot.Arm.MoveToPosition(0.20);
+            if (egamepad2.dpad_down.pressed) {
+                robot.LowerArm.MoveHome();
+                robot.UpperArm.MoveHome();
             }
-            if (gamepad2.dpad_right) {
-                robot.Arm.MoveToPosition(0.30);
+            if (egamepad2.dpad_left.pressed) {
+                robot.LowerArm.MoveToPosition(0.0);
+                robot.UpperArm.MoveToPosition(0.2);
             }
-            if (gamepad2.dpad_up) {
-                robot.Arm.MoveToPosition(0.40);
+            if (egamepad2.dpad_right.pressed) {
+                robot.LowerArm.MoveToPosition(0.2);
+                robot.UpperArm.MoveToPosition(0.4);
+            }
+            if (egamepad2.dpad_up.pressed) {
+                robot.LowerArm.MoveToPosition(0.3);
+                robot.UpperArm.MoveToPosition(0.7);
             }
 
-            robot.Arm.Update(this);
+            robot.LowerArm.Update(this);
+            robot.UpperArm.Update(this);
 
             //let the robot have a little rest, sleep is healthy
             sleep(40);
