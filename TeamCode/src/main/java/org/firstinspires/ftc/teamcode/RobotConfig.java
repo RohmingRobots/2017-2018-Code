@@ -167,11 +167,17 @@ public class RobotConfig
         // Define and Initialize color sensors
         left_ampere = hwMap.colorSensor.get("left_ampere");
         right_ampere = hwMap.colorSensor.get("right_ampere");
+        //turns all LEDs off
+        left_ampere.enableLed(false);
+        right_ampere.enableLed(false);
 
         // **** Color sensors ****
         // Define and Initialize color sensors
         left_color = hwMap.colorSensor.get("left_color");
         right_color = hwMap.colorSensor.get("right_color");
+        //turns all LEDs off
+        left_color.enableLed(false);
+        right_color.enableLed(false);
 
         // **** Initialize Arms ****
         LowerArm.init(hwMap,false);
