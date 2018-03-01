@@ -361,7 +361,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Arm Lift");
         telemetry.update();
-        robot.Arm.MoveToPosition(0.2);
+        robot.UpperArm.MoveToPosition(0.2);
         AutoDelaySec(time_sec);
     }
 
@@ -369,7 +369,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Arm Home");
         telemetry.update();
-        robot.Arm.MoveHome();
+        robot.UpperArm.MoveHome();
 
         double timeStart = 0;
         double timeNow = 0;
@@ -377,7 +377,7 @@ public class AutoTest extends LinearOpMode {
         do {
             AutoUpdate();
             timeNow = runtime.seconds() - timeStart;
-        } while ( (timeNow<time_sec) && opModeIsActive() && (robot.ArmSwitch.getState()==true));
+        } while ( (timeNow<time_sec) && opModeIsActive() && (robot.UpperArm.Limit.getState()==true));
     }
 
     void AutoDelaySec(double time_sec) {
@@ -395,7 +395,7 @@ public class AutoTest extends LinearOpMode {
     void AutoUpdate() {
         if ( !opModeIsActive() ) return;
 
-        robot.Arm.Update(this);
+        robot.UpperArm.Update(this);
         sleep(40);
     }
 }
