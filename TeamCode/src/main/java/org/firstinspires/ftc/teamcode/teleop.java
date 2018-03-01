@@ -29,8 +29,9 @@ public class teleop extends LinearOpMode {
         double back_right;
         double speed = 2.5;
         double reverse = 1.0;
-        int grabber_left;
-        int grabber_right;
+        int index_grabber_left;
+        int index_grabber_right;
+        int index_claw;
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
@@ -42,9 +43,10 @@ public class teleop extends LinearOpMode {
         egamepad1 = new GamepadEdge(gamepad1);
         egamepad2 = new GamepadEdge(gamepad2);
 
-        grabber_left = 0;
-        grabber_right = 0;
-        telemetry.addData("Version", "State");
+        index_grabber_left = 0;
+        index_grabber_right = 0;
+        index_claw = 0;
+        telemetry.addData("Version", "Super");
         telemetry.update();
 
         //waits for that giant PLAY button to be pressed on RC
@@ -140,29 +142,26 @@ public class teleop extends LinearOpMode {
 
             /********** Grabber code **********/
             if (egamepad2.left_bumper.released) {
-                grabber_left = (grabber_left < 2) ? grabber_left + 1 : 0;
+                index_grabber_left = (index_grabber_left < 2) ? index_grabber_left + 1 : 0;
             }
             if (egamepad2.right_bumper.released) {
-                grabber_right = (grabber_right < 2) ? grabber_right + 1 : 0;
+                index_grabber_right = (index_grabber_right < 2) ? index_grabber_right + 1 : 0;
             }
             if (egamepad2.b.released) {
-                grabber_left = 0;
-                grabber_right = 0;
+                index_grabber_left = 0;
+                index_grabber_right = 0;
             }
             if (egamepad2.x.released) {
-                grabber_left = 1;
-                grabber_right = 1;
+                index_grabber_left = 1;
+                index_grabber_right = 1;
             }
-            robot.GGL.setPosition(robot.GRABBER_LEFT[grabber_left]);
-            robot.GGR.setPosition(robot.GRABBER_RIGHT[grabber_right]);
+            robot.GGL.setPosition(robot.GRABBER_LEFT[index_grabber_left]);
+            robot.GGR.setPosition(robot.GRABBER_RIGHT[index_grabber_right]);
 
             if (egamepad2.a.released) {
-                if (robot.Claw.getPosition() > 0.5) {
-                    robot.Claw.setPosition(robot.CLAW[1]);
-                } else {
-                    robot.Claw.setPosition(robot.CLAW[0]);
-                }
+                index_claw = (index_claw < 1) ? index_claw + 1 : 0;
             }
+            robot.Claw.setPosition(robot.CLAW[index_claw]);
 
             /********** Arm code **********/
             if (egamepad2.y.pressed) {

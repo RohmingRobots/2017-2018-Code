@@ -26,32 +26,49 @@ public class GrabberTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
+        double increment;
+        int index_grabber_left;
+        int index_grabber_right;
+        int index_claw;
+
         robot.init(hardwareMap);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
         egamepad2 = new GamepadEdge(gamepad2);
 
-        double increment = 0.005;
-                waitForStart();
+        increment = 0.005;
+        index_grabber_left = 0;
+        index_grabber_right = 0;
+        index_claw = 0;
+
+        telemetry.addLine("Grabber Test");
+        telemetry.addLine("gamepad 1");
+        telemetry.addLine("d-up   - increment left grabber");
+        telemetry.addLine("d-down - decrement left grabber");
+        telemetry.addLine("d-right - increment right grabber");
+        telemetry.addLine("d-left  - decrement right grabber");
+        telemetry.addLine("y   - increment claw");
+        telemetry.addLine("a   - decrement claw");
+        telemetry.update();
+
+        waitForStart();
 
         //telling the code to run until you press that giant STOP button on RC
         while (opModeIsActive()) {
-            telemetry.addData("GGR", robot.GGR.getPosition());
-            telemetry.addData("GGL", robot.GGL.getPosition());
-            telemetry.addData("Claw", robot.Claw.getPosition());
-            telemetry.update();
-
+            /* update extended gamepad */
             egamepad1.UpdateEdge();
             egamepad2.UpdateEdge();
 
+            /* display information */
+            telemetry.addData("Grabbers ", "%.2f %.2f", robot.GGL.getPosition(),robot.GGR.getPosition());
+            telemetry.addData("Claw     ", "%.2f", robot.Claw.getPosition());
+            telemetry.update();
 
-            //increments -------------------------------------------------------------
-
+            // grabbers -------------------------------------------------------------
             if (egamepad1.dpad_down.pressed) {
                 robot.GGL.setPosition(robot.GGL.getPosition() - increment);
             }
-
             if (egamepad1.dpad_up.pressed) {
                 robot.GGL.setPosition(robot.GGL.getPosition() + increment);
             }
@@ -59,30 +76,40 @@ public class GrabberTest extends LinearOpMode {
             if (egamepad1.dpad_left.pressed) {
                 robot.GGR.setPosition(robot.GGR.getPosition() - increment);
             }
-
             if (egamepad1.dpad_right.pressed) {
                 robot.GGR.setPosition(robot.GGR.getPosition() + increment);
             }
+
             if (egamepad1.y.pressed) {
                 robot.Claw.setPosition(robot.Claw.getPosition() + increment);
-
             }
             if (egamepad1.a.pressed) {
                 robot.Claw.setPosition(robot.Claw.getPosition() - increment);
             }
-            //prototype --------------------------------------------------------------
-            if (egamepad1.x.released) {
-                if (robot.Claw.getPosition() > 0.5) {
-                    robot.Claw.setPosition(robot.CLAW[1]);
-                }
-                else {
-                    robot.Claw.setPosition(robot.CLAW[0]);
-                }
+
+            /********** Grabber code **********/
+            if (egamepad2.left_bumper.released) {
+                index_grabber_left = (index_grabber_left < 2) ? index_grabber_left + 1 : 0;
             }
-            /*Left Trigger = Left Grabber Open
-            Left Button = Left Grabber Close
-            Right Trigger = Right Grabber Open
-            Right Button = Right Grabber Close */
+            if (egamepad2.right_bumper.released) {
+                index_grabber_right = (index_grabber_right < 2) ? index_grabber_right + 1 : 0;
+            }
+            if (egamepad2.b.released) {
+                index_grabber_left = 0;
+                index_grabber_right = 0;
+            }
+            if (egamepad2.x.released) {
+                index_grabber_left = 1;
+                index_grabber_right = 1;
+            }
+            robot.GGL.setPosition(robot.GRABBER_LEFT[index_grabber_left]);
+            robot.GGR.setPosition(robot.GRABBER_RIGHT[index_grabber_right]);
+
+            if (egamepad2.a.released) {
+                index_claw = (index_claw < 1) ? index_claw + 1 : 0;
+            }
+            robot.Claw.setPosition(robot.CLAW[index_claw]);
+
 
             //let the robot have a little rest, sleep is healthy
             sleep(40);

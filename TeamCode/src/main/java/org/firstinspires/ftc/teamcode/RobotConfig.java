@@ -4,6 +4,7 @@ import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cCompassSensor;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.CompassSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -23,7 +24,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class RobotConfig
 {
-    /* Public members
+    /* Public members - Mecanum subassembly
     * Devices
     * -------
     * FL - front left DC motor
@@ -41,16 +42,17 @@ public class RobotConfig
     * RotateLeft(speed)
     * RotateRight(speed)
     */
-    public DcMotor  FL   = null;
-    public DcMotor  FR  = null;
-    public DcMotor  BL   = null;
+    public DcMotor  FL = null;
+    public DcMotor  FR = null;
+    public DcMotor  BL = null;
     public DcMotor  BR = null;
 
-    /* Public members
+    /* Public members - gripper grabber subassembly
     * Devices
     * -------
     * GGR - gripper grabber right servo motor
     * GGL - gripper grabber right servo motor
+    * Claw - top grabber
     */
     public Servo GGR = null;
     public Servo GGL = null;
@@ -60,12 +62,36 @@ public class RobotConfig
     public double[] GRABBER_RIGHT = {0.44, .89, .765};
     public double[] CLAW = {0.9, 0.15};
 
-    public ColorSensor left_color = null;
-    public ColorSensor right_color = null;
+    /* Public members - Ampere (side arm) subassembly
+    * Devices
+    * -------
+    * AWL - continuous servo motor for left arm winch
+    * AWR - continuous servo motor for right arm winch
+    * AFL - left arm flipper servo motor
+    * AFR - right arm flipper servo motor
+    * left_ampere - color sensor on left side arm
+    * right_ampere - color sensor on right side arm
+    */
+    public CRServo AWL = null;
+    public CRServo AWR = null;
+    public Servo AFL = null;
+    public Servo AFR = null;
     public ColorSensor left_ampere = null;
     public ColorSensor right_ampere = null;
+    /* open full, closed full, partial open */
+    public double[] AMPERE_FLICKER_LEFT = {0.0, 0.6, 1.0};
+    public double[] AMPERE_FLICKER_RIGHT = {0.0, 0.6, 1.0};
 
-    /* Public
+    /* Public members - color tracking subassembly
+    * Devices
+    * -------
+    * left_color - color sensor on left bottom of robot
+    * right_color - color sensor on right bottom of robot
+    */
+    public ColorSensor left_color = null;
+    public ColorSensor right_color = null;
+
+    /* Public - arm control subassembly
     * arm control class
     */
     ArmControl  LowerArm = new ArmControl();
@@ -119,12 +145,33 @@ public class RobotConfig
         GGR.setPosition(GRABBER_RIGHT[0]);
         Claw.setPosition(CLAW[0]);
 
+        // **** Ampere (side arms and flippers) ****
+        // Define and Initialize Motors
+        AWL = hwMap.crservo.get("AWL");
+        AWR = hwMap.crservo.get("AWR");
+        // reverse those motors
+        AWR.setDirection(CRServo.Direction.REVERSE);
+        // set all motors to zero power
+        AWL.setPower(0.0);
+        AWR.setPower(0.0);
+
+        // Define and Initialize Motors
+        AFL = hwMap.servo.get("AFL");
+        AFR = hwMap.servo.get("AFR");
+        // reverse those motors
+        AFR.setDirection(Servo.Direction.REVERSE);
+        // set initial positions
+        AFL.setPosition(AMPERE_FLICKER_LEFT[0]);
+        AFR.setPosition(AMPERE_FLICKER_RIGHT[0]);
+
+        // Define and Initialize color sensors
+        left_ampere = hwMap.colorSensor.get("left_ampere");
+        right_ampere = hwMap.colorSensor.get("right_ampere");
+
         // **** Color sensors ****
         // Define and Initialize color sensors
         left_color = hwMap.colorSensor.get("left_color");
         right_color = hwMap.colorSensor.get("right_color");
-//AJB        left_ampere = hwMap.colorSensor.get("left_ampere");
-//AJB        right_ampere = hwMap.colorSensor.get("right_ampere");
 
         // **** Initialize Arms ****
         LowerArm.init(hwMap,false);
