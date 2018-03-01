@@ -179,6 +179,11 @@ public class ArmControl {
 
         /* update integral */
         ErrorSum += error*OurTime.milliseconds()/1000.0;
+        /* limit integral gain if never homed */
+        if (!Homed) {
+            if (ErrorSum > 0.5)
+                ErrorSum = 0.5;
+        }
 
         /* determine proportional gain */
         if (error > 0.0 ) {
