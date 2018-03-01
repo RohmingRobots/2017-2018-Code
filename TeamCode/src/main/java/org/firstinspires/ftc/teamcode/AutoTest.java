@@ -37,11 +37,25 @@ public class AutoTest extends LinearOpMode {
     /* IMU objects */
     BNO055IMU imu;
 
+    /* Declare extended gamepad */
+    GamepadEdge egamepad1;
+    GamepadEdge egamepad2;
+
+    //speed variables
+    double MOVE_SPEED = 0.5;
+    double STRAFFE_SPEED = 0.75;
+    double ROTATE_SPEED = 0.5;
+    double AMPERE_POWER = 0.8;
+
+    //color variables
+    int left_blue, left_red, right_blue, right_red;
+
     @Override
     public void runOpMode() throws InterruptedException {
         //declaring all my variables in one place for my sake
         boolean redteam = true;
-        boolean FI = false;
+        boolean do_glyph = false;
+        boolean do_jewels = false;
 
         // Send telemetry message to signify robot waiting;
         telemetry.addLine("Auto Test");    //
@@ -51,48 +65,65 @@ public class AutoTest extends LinearOpMode {
          */
         robot.init(hardwareMap);
 
+        /* Instantiate extended gamepad */
+        egamepad1 = new GamepadEdge(gamepad1);
+        egamepad2 = new GamepadEdge(gamepad2);
+
         /* initialize IMU */
         // Send telemetry message to signify robot waiting;
         telemetry.addLine("Init imu");    //
         BNO055IMU.Parameters imu_parameters = new BNO055IMU.Parameters();
         imu_parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu_parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        imu_parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        imu_parameters.loggingEnabled = true;
+//        imu_parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+//        imu_parameters.loggingEnabled = true;
         imu_parameters.loggingTag = "IMU";
-        imu_parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+//        imu_parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(imu_parameters);
 
         /* Input the team color */
         telemetry.addData("Input: ", "Select Team Color");
         telemetry.update();
-        while (!gamepad1.x && !gamepad1.b) { }
-        if (gamepad1.x)
+        do {
+            egamepad1.UpdateEdge();
+        } while (!egamepad1.x.pressed && !egamepad1.b.pressed);
+        if (egamepad1.x.pressed)
             redteam = false;
+        egamepad1.UpdateEdge();
 
-        /* Input the position */
-        telemetry.addData("Input: ", "Select Position");
+        /* Input options */
+        telemetry.addData("Input: ", "Do Glyph?");
         telemetry.update();
-        while (!gamepad1.dpad_left && !gamepad1.dpad_right) { }
-        if ((gamepad1.dpad_left && redteam) || (gamepad1.dpad_right && !redteam))
-            FI = true;
+        do {
+            egamepad1.UpdateEdge();
+        } while (!egamepad1.x.pressed && !egamepad1.y.pressed);
+        if (egamepad1.y.pressed)
+            do_glyph = true;
+        egamepad1.UpdateEdge();
 
-        /* check voltage level */
-        VoltageSensor vs = hardwareMap.voltageSensor.get("Lower hub 2");
-        double voltage = vs.getVoltage();
+        telemetry.addData("Input: ", "Do Jewel?");
+        telemetry.update();
+        do {
+            egamepad1.UpdateEdge();
+        } while (!egamepad1.x.pressed && !egamepad1.y.pressed);
+        if (egamepad1.y.pressed)
+            do_jewels = true;
+        egamepad1.UpdateEdge();
+
+        double voltage = robot.Battery.getVoltage();
         telemetry.addData("Voltage", voltage);
 
-        /* adjust speeds based on voltage level */
-        final double MOVE_SPEED = 0.5 + ((13.2-voltage)/8);
-        final double STRAFFE_SPEED = 0.75 + ((13.2-voltage)/8);
-        final double ROTATE_SPEED = 0.4 + ((13.2-voltage)/8);
+        /* Initializes the movement speeds which are scaled based on the starting voltage */
+        MOVE_SPEED = 0.5 + ((13.2-voltage)/12);
+        STRAFFE_SPEED = 0.75 + ((13.2-voltage)/12);
+        ROTATE_SPEED = 0.4 + ((13.2-voltage)/12);
 
         telemetry.addData("Status", "Initialized");
-        if (FI)
-            telemetry.addData("Position", "FI");
-        else
-            telemetry.addData("Position", "BI");
+        if (do_glyph)
+            telemetry.addData("Do", "Glyph");
+        if (do_jewels)
+            telemetry.addData("Do", "Jewels");
         if (redteam)
             telemetry.addData("Team Color", "RED");
         else
@@ -107,13 +138,38 @@ public class AutoTest extends LinearOpMode {
         telemetry.addData("Go", "...");
         telemetry.update();
 
-        /* Common initial moves */
+        if (do_glyph) {
+            AutoGlyphGrab(1.0);
+            AutoArmLift(0.4, 3.0);
+            AutoArmHome(2.0);
+            AutoDelaySec(2.0);
+        }
+
+        if (do_jewels) {
+            AutoGlyphGrab(0.0);
+
+            AutoFlippersColorEnable(true);
+            AutoAmpereExtend(4.0);
+            AutoFlippersExtend(0.0);
+            AutoFlippersColorRecord();
+            AutoAmpereExtend(4.0);
+
+            AutoFlippersColorFlick(redteam, 0.0);
+
+            AutoFlippersColorEnable(false);
+            AutoAmpereRetract(3.0);
+            AutoFlippersRetract(0.0);
+            AutoAmpereRetract(6.0);
+        }
+
+/***********
+        // Common initial moves
         AutoFindVuMark(5.0);
         AutoGlyphGrab(1.0);                 AutoDelaySec(1.0);
         AutoArmLift(2.0);                   AutoDelaySec(1.0);
         AutoArmHome(2.0);                   AutoDelaySec(1.0);
 
-        /* back off stone */
+        // back off stone
         AutoMoveBackward(MOVE_SPEED,0.92);   AutoDelaySec(1.0);
 
         if (redteam){
@@ -169,6 +225,7 @@ public class AutoTest extends LinearOpMode {
         }
 
         AutoGlyphRelease(1.0);              AutoDelaySec(1.0);
+
         // Drive into cryptobox
         if (vuMark == RelicRecoveryVuMark.CENTER){
             AutoMoveForward(MOVE_SPEED,0.35);    AutoDelaySec(1.0);
@@ -184,7 +241,7 @@ public class AutoTest extends LinearOpMode {
             AutoMoveBackward(MOVE_SPEED,0.45);    AutoDelaySec(1.0);
         }
 
-        /* line up for autonomous */
+        // line up for autonomous
         if (redteam){
             if (FI) {
                 AutoRotateAngle(ROTATE_SPEED,170);     AutoDelaySec(1.0);
@@ -198,6 +255,7 @@ public class AutoTest extends LinearOpMode {
                 AutoRotateAngle(ROTATE_SPEED,-140);     AutoDelaySec(1.0);
             }
         }
+***********/
 
     }
 
@@ -357,11 +415,11 @@ public class AutoTest extends LinearOpMode {
         AutoDelaySec(time_sec);
     }
 
-    void AutoArmLift(double time_sec) {
+    void AutoArmLift(double position, double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Arm Lift");
         telemetry.update();
-        robot.UpperArm.MoveToPosition(0.2);
+        robot.UpperArm.MoveToPosition(position);
         AutoDelaySec(time_sec);
     }
 
@@ -380,6 +438,105 @@ public class AutoTest extends LinearOpMode {
         } while ( (timeNow<time_sec) && opModeIsActive() && (robot.UpperArm.Limit.getState()==true));
     }
 
+    void AutoAmpereExtend(double time_sec) {
+        if ( !opModeIsActive() ) return;
+        telemetry.addLine("Ampere Extend");
+        telemetry.update();
+        robot.AWL.setPower(AMPERE_POWER);
+        robot.AWR.setPower(AMPERE_POWER);
+        AutoDelaySec(time_sec);
+        robot.AWL.setPower(0.0);
+        robot.AWR.setPower(0.0);
+    }
+
+    void AutoAmpereRetract(double time_sec) {
+        if ( !opModeIsActive() ) return;
+        telemetry.addLine("Ampere Retract");
+        telemetry.update();
+        robot.AWL.setPower(-AMPERE_POWER);
+        robot.AWR.setPower(-AMPERE_POWER);
+        AutoDelaySec(time_sec);
+        robot.AWL.setPower(0.0);
+        robot.AWR.setPower(0.0);
+    }
+
+    void AutoFlippersExtend(double time_sec) {
+        if ( !opModeIsActive() ) return;
+        telemetry.addLine("Flipper Extend");
+        telemetry.update();
+        robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[2]);
+        robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[2]);
+        AutoDelaySec(time_sec);
+    }
+
+    void AutoFlippersRetract(double time_sec) {
+        if ( !opModeIsActive() ) return;
+        telemetry.addLine("Flipper Retract");
+        telemetry.update();
+        robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
+        robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+        AutoDelaySec(time_sec);
+    }
+
+    void AutoFlippersColorEnable(boolean enable) {
+        if ( !opModeIsActive() ) return;
+        robot.left_ampere.enableLed(enable);
+        robot.right_ampere.enableLed(enable);
+    }
+
+    void AutoFlippersColorRecord() {
+        if ( !opModeIsActive() ) return;
+        left_blue = robot.left_ampere.blue();
+        right_blue = robot.right_ampere.blue();
+        left_red = robot.left_ampere.red();
+        right_red = robot.right_ampere.red();
+    }
+
+    void AutoFlippersColorFlick(boolean red, double time_sec) {
+        if (!opModeIsActive()) return;
+        telemetry.addLine("Flipper Flick");
+
+        left_blue = robot.left_ampere.blue() - left_blue;
+        left_red = robot.left_ampere.red() - left_red;
+        right_blue = robot.right_ampere.blue() - right_blue;
+        right_red = robot.right_ampere.red() - right_red;
+
+        if ((left_blue - left_red) >= 3) {
+            left_blue = 1;
+            left_red = 0;
+        } else if ((left_red - left_blue) >= 3) {
+            left_blue = 0;
+            left_red = 1;
+        } else {
+            left_blue = 0;
+            left_red = 0;
+        }
+        if ((right_blue - right_red) >= 3) {
+            right_blue = 1;
+            right_red = 0;
+        } else if ((right_red - right_blue) >= 3) {
+            right_blue = 0;
+            right_red = 1;
+        } else {
+            right_blue = 0;
+            right_red = 0;
+        }
+        telemetry.update();
+
+        if ( (left_blue>0) && (right_red>0) ) {
+            if (red)
+                robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[1]);
+            else
+                robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[1]);
+        } else if ( (left_red>0) && (right_blue>0) ) {
+            if (red)
+                robot.AFR.setPosition(robot.AMPERE_FLICKER_LEFT[1]);
+            else
+                robot.AFL.setPosition(robot.AMPERE_FLICKER_RIGHT[1]);
+        }
+        AutoDelaySec(time_sec);
+    }
+
     void AutoDelaySec(double time_sec) {
         if ( !opModeIsActive() ) return;
 
@@ -395,7 +552,7 @@ public class AutoTest extends LinearOpMode {
     void AutoUpdate() {
         if ( !opModeIsActive() ) return;
 
-        robot.UpperArm.Update(this);
+        robot.UpperArm.Update(null);
         sleep(40);
     }
 }

@@ -199,22 +199,6 @@ public class ArmControl {
         if (Power>1.0) Power = 1.0;
         if (Power<-1.0) Power = -1.0;
 
-/*
-        if ( (error>0.0) && (CurrentVelocity<0.0)) {
-            // dropping down, give power boost
-            Power += MAX_POWER * (-2.0 * CurrentVelocity);
-            om.telemetry.addLine("++++ Boost");
-        } else if ( (error<0.0) && (CurrentVelocity>0.0)) {
-            // passing by, reverse thrusters
-            Power += MAX_POWER * (-0.5 * CurrentVelocity);
-            om.telemetry.addLine("-- Reverse");
-        } else if ((CurrentTarget > 0.0) && (Math.abs(Power) < HOLD_POWER) ) {
-            // always use positive power when trying to hold
-            Power = HOLD_POWER;
-            om.telemetry.addLine("..........");
-        }
-*/
-
         /* prevent negative power when...
             at home position or never homed
         */
@@ -253,7 +237,8 @@ public class ArmControl {
         RightMotor.setPower(Power);
         LeftMotor.setPower(Power);
 
-        om.telemetry.addData("Power Error Sum", "%.2f %.2f %.2f", Power, error, ErrorSum);
+        if (om!=null)
+            om.telemetry.addData("Power Error Sum", "%.2f %.2f %.2f", Power, error, ErrorSum);
     }
 
     public void SetPower(double power) {

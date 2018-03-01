@@ -25,9 +25,7 @@ public class AmpereTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         ElapsedTime OurTime = new ElapsedTime();
-        double position, step = 0.1;
         double AMPERE_POWER = 0.8;
-        int mode = 100;
         double increment;
         int index_left_flipper, index_right_flipper;
         int blue_left_right, red_left_right;
@@ -147,119 +145,6 @@ public class AmpereTest extends LinearOpMode {
             if (egamepad1.right_bumper.released) {
                 robot.AFR.setPosition(robot.AFR.getPosition()-increment);
             }
-
-            if (egamepad1.y.released) {
-                mode = 0;
-                OurTime.reset();
-            }
-
-            // no gamepad - mimic autonomous
-            switch (mode) {
-                case 0:
-                    robot.LowerArm.MoveToPosition(0.0);
-                    robot.UpperArm.MoveToPosition(0.4);
-                    if (OurTime.seconds()<4.0)
-                        break;
-                    mode++;
-                    OurTime.reset();
-                    break;
-
-                case 10:
-                    // extend part way
-                    robot.AWL.setPower(AMPERE_POWER);
-                    robot.AWR.setPower(AMPERE_POWER);
-                    if (OurTime.seconds()<4.0)
-                        break;
-                    // stop
-                    robot.AWL.setPower(0.0);
-                    robot.AWR.setPower(0.0);
-                    mode++;
-                    OurTime.reset();
-                    break;
-                case 11:
-                    // extend flippers (continue extending)
-                    robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[2]);
-                    robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[2]);
-                    if (OurTime.seconds()<1.0)
-                        break;
-                    mode++;
-                    OurTime.reset();
-                    break;
-                case 12:
-                    // extend rest of the way
-                    robot.AWL.setPower(AMPERE_POWER);
-                    robot.AWR.setPower(AMPERE_POWER);
-                    if (OurTime.seconds()<4.0)
-                        break;
-                    // stop
-                    robot.AWL.setPower(0.0);
-                    robot.AWR.setPower(0.0);
-                    mode++;
-                    OurTime.reset();
-                    break;
-
-                case 20:
-                    // flick jewel
-                    if ( blue_left_right*red_left_right < 0 ) {
-                        if (blue_left_right > 0) {
-                            robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
-                        } else {
-                            robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
-                        }
-                    }
-                    if (OurTime.seconds()<1.0)
-                        break;
-                    mode++;
-                    OurTime.reset();
-                    break;
-
-                case 31:
-                    // retract part of the way
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
-                    if (OurTime.seconds()<4.0)
-                        break;
-                    // stop
-                    robot.AWL.setPower(0.0);
-                    robot.AWR.setPower(0.0);
-                    mode++;
-                    OurTime.reset();
-                    break;
-                case 32:
-                    // retract flippers
-                    robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
-                    robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
-                    // retract rest of the way
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
-                    if (OurTime.seconds()<4.0)
-                        break;
-                    // stop
-                    robot.AWL.setPower(0.0);
-                    robot.AWR.setPower(0.0);
-                    mode++;
-                    OurTime.reset();
-                    break;
-
-                case 40:
-                    robot.LowerArm.MoveHome();
-                    robot.UpperArm.MoveHome();
-                    if (OurTime.seconds()<1.0)
-                        break;
-                    mode++;
-                    OurTime.reset();
-                    break;
-
-                case 100:
-                    break;
-
-                default:
-                    mode++;
-                    break;
-            }
-
-            robot.LowerArm.Update(this);
-            robot.UpperArm.Update(this);
 
             //let the robot have a little rest, sleep is healthy
             sleep(40);
