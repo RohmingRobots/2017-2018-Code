@@ -58,3 +58,4 @@ freeline_project_description.json
 # FTC specific ignores
 DogeCV/build
 FtcRobotController/build
+local.properties
