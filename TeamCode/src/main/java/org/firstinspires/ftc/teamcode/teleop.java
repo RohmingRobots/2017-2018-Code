@@ -148,8 +148,8 @@ public class teleop extends LinearOpMode {
                 index_grabber_right = (index_grabber_right < 2) ? index_grabber_right + 1 : 0;
             }
             if (egamepad2.b.released) {
-                index_grabber_left = 0;
-                index_grabber_right = 0;
+                index_grabber_left = 2;
+                index_grabber_right = 2;
             }
             if (egamepad2.x.released) {
                 index_grabber_left = 1;
@@ -164,10 +164,6 @@ public class teleop extends LinearOpMode {
             robot.Claw.setPosition(robot.CLAW[index_claw]);
 
             /********** Arm code **********/
-            if (egamepad2.y.pressed) {
-                robot.LowerArm.MoveToPosition(0.0);
-                robot.UpperArm.MoveToPosition(0.1);
-            }
             if (egamepad2.dpad_down.pressed) {
                 robot.LowerArm.MoveHome();
                 robot.UpperArm.MoveHome();
@@ -178,7 +174,7 @@ public class teleop extends LinearOpMode {
             }
             if (egamepad2.dpad_right.pressed) {
                 robot.LowerArm.MoveToPosition(0.2);
-                robot.UpperArm.MoveToPosition(0.4);
+                robot.UpperArm.MoveToPosition(0.45);
             }
             if (egamepad2.dpad_up.pressed) {
                 robot.LowerArm.MoveToPosition(0.3);

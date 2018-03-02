@@ -33,6 +33,7 @@ public class AutoTest extends LinearOpMode {
 
     /* VuMark variable */
     RelicRecoveryVuMark vuMark;
+    VuforiaTrackable relicTemplate = null;
 
     /* IMU objects */
     BNO055IMU imu;
@@ -56,6 +57,7 @@ public class AutoTest extends LinearOpMode {
         boolean redteam = true;
         boolean do_glyph = false;
         boolean do_jewels = false;
+        boolean do_motion = false;
 
         // Send telemetry message to signify robot waiting;
         telemetry.addLine("Auto Test");    //
@@ -81,6 +83,18 @@ public class AutoTest extends LinearOpMode {
 //        imu_parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(imu_parameters);
+
+        telemetry.addData("Initialize","VuForia");
+        telemetry.update();
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        VuforiaLocalizer.Parameters vuforia_parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+        vuforia_parameters.vuforiaLicenseKey = "AQepDXf/////AAAAGcvzfI2nd0MHnzIGZ7JtquJk3Yx64l7jwu6XImRkNmBkhjVdVcI47QZ7xQq0PvugAb3+ppJxL4n+pNcnt1+PYpQHVETBEPk5WkofitFuYL8zzXEbs7uLY0dMUepnOiJcLSiVISKWWDyc8BJkKcK3a/KmB2sHaE1Lp2LJ+skW43+pYeqtgJE8o8xStowxPJB0OaSFXXw5dGUurK+ykmPam5oE+t+6hi9o/pO1EOHZFoqKl6tj/wsdu9+3I4lqGMsRutKH6s1rKLfip8s3MdlxqnlRKFmMDFewprELOwm+zpjmrJ1cqdlzzWQ6i/EMOzhcOzrPmH3JiH4CocA/Kcck12IuqvN4l6iAIjntb8b0G8zL";
+        vuforia_parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK  ;
+        this.vuforia = ClassFactory.createVuforiaLocalizer(vuforia_parameters);
+        VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+        relicTemplate = relicTrackables.get(0);
+        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+        relicTrackables.activate();
 
         /* Input the team color */
         telemetry.addData("Input: ", "Select Team Color");
@@ -111,13 +125,22 @@ public class AutoTest extends LinearOpMode {
             do_jewels = true;
         egamepad1.UpdateEdge();
 
+        telemetry.addData("Input: ", "Do Motion?");
+        telemetry.update();
+        do {
+            egamepad1.UpdateEdge();
+        } while (!egamepad1.x.pressed && !egamepad1.y.pressed);
+        if (egamepad1.y.pressed)
+            do_motion = true;
+        egamepad1.UpdateEdge();
+
         double voltage = robot.Battery.getVoltage();
         telemetry.addData("Voltage", voltage);
 
         /* Initializes the movement speeds which are scaled based on the starting voltage */
         MOVE_SPEED = 0.5 + ((13.2-voltage)/12);
         STRAFFE_SPEED = 0.75 + ((13.2-voltage)/12);
-        ROTATE_SPEED = 0.4 + ((13.2-voltage)/12);
+        ROTATE_SPEED = 0.5 + ((13.2-voltage)/12);
 
         telemetry.addData("Status", "Initialized");
         if (do_glyph)
@@ -138,141 +161,82 @@ public class AutoTest extends LinearOpMode {
         telemetry.addData("Go", "...");
         telemetry.update();
 
-        if (do_glyph) {
-            AutoGlyphGrab(1.0);
-            AutoArmLift(0.4, 3.0);
-            AutoArmHome(2.0);
-            AutoDelaySec(2.0);
+        if (do_motion) {
+            AutoFindVuMark(1.0);
         }
 
-        if (do_jewels) {
+        if (do_glyph && do_jewels) {
             AutoGlyphGrab(0.0);
+            AutoDelaySec(1.0);
+            AutoArmLift(0.4, 0.0);
 
             AutoFlippersColorEnable(true);
-            AutoAmpereExtend(4.0);
+            AutoAmpereExtend(0.0);
+            AutoDelaySec(4.0);
             AutoFlippersExtend(0.0);
             AutoFlippersColorRecord();
-            AutoAmpereExtend(4.0);
+            AutoDelaySec(4.0);
+            AutoAmpereStop(0.0);
 
             AutoFlippersColorFlick(redteam, 0.0);
 
             AutoFlippersColorEnable(false);
-            AutoAmpereRetract(3.0);
+            AutoAmpereRetract(0.0);
+            AutoDelaySec(3.0);
             AutoFlippersRetract(0.0);
-            AutoAmpereRetract(6.0);
+            AutoDelaySec(2.0);
+            AutoArmHome(0.0);
+            AutoDelaySec(3.0);
+            AutoAmpereStop(0.0);
+
+        } else if (do_glyph) {
+            AutoGlyphGrab(1.0);
+            AutoArmLift(0.4, 3.0);
+            AutoArmHome(2.0);
+
+        } else if (do_jewels) {
+
+            AutoGlyphGrab(0.0);
+
+            AutoFlippersColorEnable(true);
+            AutoAmpereExtend(0.0);
+            AutoDelaySec(4.0);
+            AutoFlippersExtend(0.0);
+            AutoFlippersColorRecord();
+            AutoDelaySec(4.0);
+            AutoAmpereStop(0.0);
+
+            AutoFlippersColorFlick(redteam, 0.0);
+
+            AutoFlippersColorEnable(false);
+            AutoAmpereRetract(0.0);
+            AutoDelaySec(3.0);
+            AutoFlippersRetract(0.0);
+            AutoDelaySec(5.0);
+            AutoAmpereStop(0.0);
         }
 
-/***********
-        // Common initial moves
-        AutoFindVuMark(5.0);
-        AutoGlyphGrab(1.0);                 AutoDelaySec(1.0);
-        AutoArmLift(2.0);                   AutoDelaySec(1.0);
-        AutoArmHome(2.0);                   AutoDelaySec(1.0);
-
-        // back off stone
-        AutoMoveBackward(MOVE_SPEED,0.92);   AutoDelaySec(1.0);
-
-        if (redteam){
-            if (FI) {
-                AutoRotateAngle(ROTATE_SPEED,-45);     AutoDelaySec(1.0);
-                // Drive 1.5 diagonal tile
-                AutoMoveForward(MOVE_SPEED,1.46);    AutoDelaySec(1.0);
-                // Turn to column
-                if (vuMark == RelicRecoveryVuMark.LEFT){
-                    AutoRotateAngle(ROTATE_SPEED,-25);
-                }
-                if (vuMark == RelicRecoveryVuMark.RIGHT){
-                    AutoRotateAngle(ROTATE_SPEED,25);
-                }
+        if (do_motion) {
+            AutoMoveBackward(MOVE_SPEED,0.75);
+            AutoRotateAngle(ROTATE_SPEED,-45);
+            AutoMoveForward(MOVE_SPEED,1.30);
+            AutoRotateAngle(ROTATE_SPEED,45);
+            if (vuMark == RelicRecoveryVuMark.LEFT){
+                AutoRotateAngle(ROTATE_SPEED,-25);
+                AutoMoveForward(MOVE_SPEED,1.5);
+            } else if (vuMark == RelicRecoveryVuMark.RIGHT){
+                AutoRotateAngle(ROTATE_SPEED,25);
+                AutoMoveForward(MOVE_SPEED,1.5);
             } else {
-                AutoRotateAngle(ROTATE_SPEED,-45);     AutoDelaySec(1.0);
-                // Drive 1 diagonal tiles
-                AutoMoveForward(MOVE_SPEED,1.12);    AutoDelaySec(1.0);
-                AutoRotateAngle(ROTATE_SPEED,-90);     AutoDelaySec(1.0);
-                // Turn to column
-                if (vuMark == RelicRecoveryVuMark.LEFT){
-                    AutoRotateAngle(ROTATE_SPEED,-115);
-                }
-                if (vuMark == RelicRecoveryVuMark.RIGHT){
-                    AutoRotateAngle(ROTATE_SPEED,-65);
-                }
+                AutoMoveForward(0.75*MOVE_SPEED,0.75);
             }
-        } else {
-            if (FI) {
-                AutoRotateAngle(ROTATE_SPEED,45);     AutoDelaySec(1.0);
-                // Drive 1.5 diagonal tile
-                AutoMoveForward(MOVE_SPEED,1.46);    AutoDelaySec(1.0);
-                // Turn to column
-                if (vuMark == RelicRecoveryVuMark.LEFT){
-                    AutoRotateAngle(ROTATE_SPEED,-25);
-                }
-                if (vuMark == RelicRecoveryVuMark.RIGHT){
-                    AutoRotateAngle(ROTATE_SPEED,25);
-                }
-            } else {
-                AutoRotateAngle(ROTATE_SPEED,45);     AutoDelaySec(1.0);
-                // Drive 1 diagonal tiles
-                AutoMoveForward(MOVE_SPEED,1.12);    AutoDelaySec(1.0);
-                AutoRotateAngle(ROTATE_SPEED,90);     AutoDelaySec(1.0);
-                // Turn to column
-                if (vuMark == RelicRecoveryVuMark.LEFT){
-                    AutoRotateAngle(ROTATE_SPEED,-65);
-                }
-                if (vuMark == RelicRecoveryVuMark.RIGHT){
-                    AutoRotateAngle(ROTATE_SPEED,115);
-                }
-            }
+            AutoGlyphRelease(0.0);
+            AutoMoveBackward(MOVE_SPEED,0.20);
         }
-
-        AutoGlyphRelease(1.0);              AutoDelaySec(1.0);
-
-        // Drive into cryptobox
-        if (vuMark == RelicRecoveryVuMark.CENTER){
-            AutoMoveForward(MOVE_SPEED,0.35);    AutoDelaySec(1.0);
-        }
-        else {
-            AutoMoveForward(MOVE_SPEED,0.45);    AutoDelaySec(1.0);
-        }
-        // Back up from cryptobox
-        if (vuMark == RelicRecoveryVuMark.CENTER){
-            AutoMoveBackward(MOVE_SPEED,0.3);    AutoDelaySec(1.0);
-        }
-        else {
-            AutoMoveBackward(MOVE_SPEED,0.45);    AutoDelaySec(1.0);
-        }
-
-        // line up for autonomous
-        if (redteam){
-            if (FI) {
-                AutoRotateAngle(ROTATE_SPEED,170);     AutoDelaySec(1.0);
-            } else {
-                AutoRotateAngle(ROTATE_SPEED,140);     AutoDelaySec(1.0);
-            }
-        } else {
-            if (FI) {
-                AutoRotateAngle(ROTATE_SPEED,170);     AutoDelaySec(1.0);
-            } else {
-                AutoRotateAngle(ROTATE_SPEED,-140);     AutoDelaySec(1.0);
-            }
-        }
-***********/
-
     }
 
     void AutoFindVuMark(double time_sec) {
         if ( !opModeIsActive() ) return;
-
-        telemetry.addData("Initialize","VuForia");
-        telemetry.update();
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters vuforia_parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-        vuforia_parameters.vuforiaLicenseKey = "AQepDXf/////AAAAGcvzfI2nd0MHnzIGZ7JtquJk3Yx64l7jwu6XImRkNmBkhjVdVcI47QZ7xQq0PvugAb3+ppJxL4n+pNcnt1+PYpQHVETBEPk5WkofitFuYL8zzXEbs7uLY0dMUepnOiJcLSiVISKWWDyc8BJkKcK3a/KmB2sHaE1Lp2LJ+skW43+pYeqtgJE8o8xStowxPJB0OaSFXXw5dGUurK+ykmPam5oE+t+6hi9o/pO1EOHZFoqKl6tj/wsdu9+3I4lqGMsRutKH6s1rKLfip8s3MdlxqnlRKFmMDFewprELOwm+zpjmrJ1cqdlzzWQ6i/EMOzhcOzrPmH3JiH4CocA/Kcck12IuqvN4l6iAIjntb8b0G8zL";
-        vuforia_parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK  ;
-        this.vuforia = ClassFactory.createVuforiaLocalizer(vuforia_parameters);
-        VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
-        VuforiaTrackable relicTemplate = relicTrackables.get(0);
-        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
-        relicTrackables.activate();
 
         vuMark = RelicRecoveryVuMark.from(relicTemplate);
 
@@ -445,8 +409,6 @@ public class AutoTest extends LinearOpMode {
         robot.AWL.setPower(AMPERE_POWER);
         robot.AWR.setPower(AMPERE_POWER);
         AutoDelaySec(time_sec);
-        robot.AWL.setPower(0.0);
-        robot.AWR.setPower(0.0);
     }
 
     void AutoAmpereRetract(double time_sec) {
@@ -456,8 +418,15 @@ public class AutoTest extends LinearOpMode {
         robot.AWL.setPower(-AMPERE_POWER);
         robot.AWR.setPower(-AMPERE_POWER);
         AutoDelaySec(time_sec);
+    }
+
+    void AutoAmpereStop(double time_sec) {
+        if ( !opModeIsActive() ) return;
+        telemetry.addLine("Ampere Stop");
+        telemetry.update();
         robot.AWL.setPower(0.0);
         robot.AWR.setPower(0.0);
+        AutoDelaySec(time_sec);
     }
 
     void AutoFlippersExtend(double time_sec) {
