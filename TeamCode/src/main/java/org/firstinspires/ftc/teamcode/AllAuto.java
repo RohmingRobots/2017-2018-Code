@@ -485,7 +485,7 @@ public class AllAuto extends LinearOpMode {
 
                     //backs up for a set time
                     robot.MoveBackward(MOVE_SPEED);
-                    if (now > 0.72) {
+                    if (now > 0.7) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -533,7 +533,7 @@ public class AllAuto extends LinearOpMode {
 
                     //moves forward for a set time
                     robot.MoveForward(MOVE_SPEED);
-                    if (now > 1.4) {
+                    if (now > 1.25) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -565,7 +565,7 @@ public class AllAuto extends LinearOpMode {
 
                     //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateRight(ROTATE_SPEED);
-                    if (turnAngle > -15) {
+                    if (turnAngle > -10) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -581,7 +581,7 @@ public class AllAuto extends LinearOpMode {
 
                     //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateLeft(ROTATE_SPEED);
-                    if (turnAngle < -75) {
+                    if (turnAngle < -80) {
                         mode++;
                         resetClock();
                         robot.RotateRight(ROTATE_SPEED);
@@ -598,7 +598,7 @@ public class AllAuto extends LinearOpMode {
 
                     //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateLeft(ROTATE_SPEED);
-                    if (turnAngle < 15) {
+                    if (turnAngle < 10) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -614,7 +614,7 @@ public class AllAuto extends LinearOpMode {
 
                     //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateRight(ROTATE_SPEED);
-                    if (turnAngle > 75) {
+                    if (turnAngle > 80) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
