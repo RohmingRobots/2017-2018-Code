@@ -21,6 +21,14 @@ public class AmpereTest extends LinearOpMode {
     GamepadEdge egamepad1;
     GamepadEdge egamepad2;
 
+    //ampere color sensor variables
+    int leftamperered = 0;
+    int leftampereblue = 0;
+    int rightamperered = 0;
+    int rightampereblue = 0;
+    boolean leftampere;
+    boolean rightampere;
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -66,7 +74,7 @@ public class AmpereTest extends LinearOpMode {
             egamepad2.UpdateEdge();
 
             /* display information */
-            telemetry.addData("AW   ","%.2f %.2f", robot.AWL.getPower(), robot.AWR.getPower());
+            /*telemetry.addData("AW   ","%.2f %.2f", robot.AWL.getPower(), robot.AWR.getPower());
             telemetry.addData("AF   ","%.2f %.2f", robot.AFL.getPosition(), robot.AFR.getPosition());
             telemetry.addData("Blue ","%3d %3d", robot.left_ampere.blue(),robot.right_ampere.blue());
             telemetry.addData("Red  ","%3d %3d", robot.left_ampere.red(),robot.right_ampere.red());
@@ -96,7 +104,7 @@ public class AmpereTest extends LinearOpMode {
                 telemetry.addLine("RED ???");
                 red_left_right = 0;
             }
-            telemetry.update();
+            telemetry.update();*/
 
             // side arms
             if (egamepad1.dpad_down.pressed) {
@@ -145,6 +153,47 @@ public class AmpereTest extends LinearOpMode {
             if (egamepad1.right_bumper.released) {
                 robot.AFR.setPosition(robot.AFR.getPosition()-increment);
             }
+
+            if (egamepad1.dpad_left.released) {
+                //calibrates to light of open air
+                leftamperered = robot.left_ampere.red();
+                leftampereblue = robot.left_ampere.blue();
+                rightamperered = robot.right_ampere.red();
+                rightampereblue = robot.right_ampere.blue();
+            }
+
+            /* checks if both color sensors detect a difference in the change of values and
+                       returns true if the side is red and false if the side is blue */
+            if (egamepad1.dpad_right.released) {
+                if (3 < ((robot.left_ampere.red() - leftamperered) -
+                        (robot.right_ampere.red()-rightamperered))) {
+                    leftampere = true;
+                }
+                if (-3 > ((robot.left_ampere.red() - leftamperered) -
+                        (robot.right_ampere.red()-rightamperered))) {
+                    rightampere = true;
+                }
+                if (3 < ((robot.left_ampere.blue() - leftampereblue) -
+                        (robot.right_ampere.blue()-rightampereblue))) {
+                    leftampere = false;
+                }
+                if (-3 > ((robot.left_ampere.red() - leftamperered) -
+                        (robot.right_ampere.red()-rightamperered))) {
+                    rightampere = false;
+                }
+            }
+
+            telemetry.addData("leftamperered", leftamperered);
+            telemetry.addData("leftampereblue", leftampereblue);
+            telemetry.addData("rightamperered", rightamperered);
+            telemetry.addData("rightampereblue", rightampereblue);
+            telemetry.addData("robot.left_ampere.red()", robot.left_ampere.red());
+            telemetry.addData("robot.left_ampere.blue()", robot.left_ampere.blue());
+            telemetry.addData("robot.right_ampere.red()", robot.right_ampere.red());
+            telemetry.addData("robot.right_ampere.blue()", robot.right_ampere.blue());
+            telemetry.addData("leftampere", leftampere);
+            telemetry.addData("rightampere", rightampere);
+            telemetry.update();
 
             //let the robot have a little rest, sleep is healthy
             sleep(40);
