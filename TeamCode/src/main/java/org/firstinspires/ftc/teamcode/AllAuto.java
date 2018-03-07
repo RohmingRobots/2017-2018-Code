@@ -396,34 +396,30 @@ public class AllAuto extends LinearOpMode {
                     robot.AWR.setPower(0.0);
 
                     /* checks if both color sensors detect a difference in the change of values and
-                       returns true if the side is red and false if the side is blue */
-                    if (3 < ((robot.left_ampere.red() - leftamperered) -
-                            (robot.right_ampere.red()-rightamperered))) {
+                       returns true if the side is red and the side is blue */
+                    if (    (robot.left_ampere.red() - leftamperered) > 30 +
+                            (robot.right_ampere.red() - rightamperered) &&
+                            (robot.right_ampere.blue() - rightampereblue) > 30 +
+                            (robot.left_ampere.blue() - leftampereblue)) {
                         leftampere = true;
                     }
-                    if (-3 > ((robot.left_ampere.red() - leftamperered) -
-                            (robot.right_ampere.red()-rightamperered))) {
+                    if (    (robot.right_ampere.red() - rightamperered) > 30 +
+                            (robot.left_ampere.red() - leftamperered) &&
+                            (robot.left_ampere.blue() - leftampereblue) > 30 +
+                            (robot.right_ampere.blue() - rightampereblue)) {
                         rightampere = true;
-                    }
-                    if (3 < ((robot.left_ampere.blue() - leftampereblue) -
-                            (robot.right_ampere.blue()-rightampereblue))) {
-                        leftampere = false;
-                    }
-                    if (-3 > ((robot.left_ampere.red() - leftamperered) -
-                            (robot.right_ampere.red()-rightamperered))) {
-                        rightampere = false;
                     }
 
                     //gives it a bit to check
                     if (now > 0.1) {
                         //if both color sensors agree, then it hits the correct one for our color
-                        if (leftampere && !rightampere) {
+                        if (leftampere) {
                             if (redteam) {
                                 robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
                             } else {
                                 robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
                             }
-                        } else if (!leftampere && rightampere) {
+                        } else if (rightampere) {
                             if (redteam) {
                                 robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
                             } else {
