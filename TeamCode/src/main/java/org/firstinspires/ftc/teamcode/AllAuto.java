@@ -128,8 +128,8 @@ public class AllAuto extends LinearOpMode {
     int leftampereblue = 0;
     int rightamperered = 0;
     int rightampereblue = 0;
-    boolean leftampere;
-    boolean rightampere;
+    boolean leftampere = false;
+    boolean rightampere = false;
 
     /* IMU objects */
     BNO055IMU imu;
@@ -331,6 +331,18 @@ public class AllAuto extends LinearOpMode {
                         resetClock();
                         robot.MoveStop();
                     }
+
+                    telemetry.addData("leftamperered", leftamperered);
+                    telemetry.addData("leftampereblue", leftampereblue);
+                    telemetry.addData("rightamperered", rightamperered);
+                    telemetry.addData("rightampereblue", rightampereblue);
+                    telemetry.addData("robot.left_ampere.red()", robot.left_ampere.red());
+                    telemetry.addData("robot.left_ampere.blue()", robot.left_ampere.blue());
+                    telemetry.addData("robot.right_ampere.red()", robot.right_ampere.red());
+                    telemetry.addData("robot.right_ampere.blue()", robot.right_ampere.blue());
+                    telemetry.addData("leftampere", leftampere);
+                    telemetry.addData("rightampere", rightampere);
+                    telemetry.update();
                     break;
 
                 /* wait for vuMark detection */
@@ -410,15 +422,15 @@ public class AllAuto extends LinearOpMode {
 
                     /* checks if both color sensors detect a difference in the change of values and
                        returns true if the side is red and the side is blue */
-                    if (    (robot.left_ampere.red() - leftamperered) > 30 +
+                    if (    (robot.left_ampere.red() - leftamperered) > 10 +
                             (robot.right_ampere.red() - rightamperered) &&
-                            (robot.right_ampere.blue() - rightampereblue) > 30 +
+                            (robot.right_ampere.blue() - rightampereblue) > 10 +
                             (robot.left_ampere.blue() - leftampereblue)) {
                         leftampere = true;
                     }
-                    if (    (robot.right_ampere.red() - rightamperered) > 30 +
+                    if (    (robot.right_ampere.red() - rightamperered) > 10 +
                             (robot.left_ampere.red() - leftamperered) &&
-                            (robot.left_ampere.blue() - leftampereblue) > 30 +
+                            (robot.left_ampere.blue() - leftampereblue) > 10 +
                             (robot.right_ampere.blue() - rightampereblue)) {
                         rightampere = true;
                     }
@@ -480,7 +492,7 @@ public class AllAuto extends LinearOpMode {
 
                     //backs up for a set time
                     robot.MoveBackward(MOVE_SPEED);
-                    if (now > 0.7) {
+                    if (now > 0.6) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -544,7 +556,7 @@ public class AllAuto extends LinearOpMode {
 
                     //moves forward for a set time
                     robot.MoveForward(MOVE_SPEED);
-                    if (now > 0.9) {
+                    if (now > 0.8) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
