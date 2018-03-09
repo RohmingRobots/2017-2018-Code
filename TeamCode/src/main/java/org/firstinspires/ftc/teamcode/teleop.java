@@ -33,6 +33,10 @@ public class teleop extends LinearOpMode {
         int index_grabber_right;
         int index_claw;
 
+        //navigation color sensor variables
+        boolean leftcolor = false;
+        boolean rightcolor = false;
+
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
@@ -66,6 +70,10 @@ public class teleop extends LinearOpMode {
 
             /******Telemetry*****/
             //adds a lil' version thing to the telemetry so you know you're using the right version
+            telemetry.addData("leftcolor", leftcolor);
+            telemetry.addData("rightcolor", rightcolor);
+            telemetry.addData("Lower", robot.LowerArm.CurrentPosition);
+            telemetry.addData("Upper", robot.UpperArm.CurrentPosition);
             telemetry.addData("Speed", speed);
             telemetry.update();
 

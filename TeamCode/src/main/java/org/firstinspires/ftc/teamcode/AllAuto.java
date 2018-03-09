@@ -264,10 +264,10 @@ public class AllAuto extends LinearOpMode {
 
             /* sets the requirements for the left color sensor to be seeing the line it is looking
                for and keeps it up to date */
-            if (robot.left_color.red() > 14 && redteam) {
+            if (robot.left_color.red() > 25 && redteam) {
                 leftcolor = true;
             }
-            else if (robot.left_color.blue() > 14 && !redteam) {
+            else if (robot.left_color.blue() > 23 && !redteam) {
                 leftcolor = true;
             }
             else {
@@ -275,10 +275,10 @@ public class AllAuto extends LinearOpMode {
             }
 
             /* sets the requirements for the right color sensor ...(same as above) */
-            if (robot.right_color.red() > 12 && redteam) {
+            if (robot.right_color.red() > 15 && redteam) {
                 rightcolor = true;
             }
-            else if (robot.right_color.blue() > 9 && !redteam) {
+            else if (robot.right_color.blue() > 18 && !redteam) {
                 rightcolor = true;
             }
             else {
@@ -492,7 +492,7 @@ public class AllAuto extends LinearOpMode {
 
                     //backs up for a set time
                     robot.MoveBackward(MOVE_SPEED);
-                    if (now > 0.6) {
+                    if (now > 0.64) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
