@@ -60,7 +60,7 @@ public class RobotConfig
     /* open full, closed full, partial open */
     public double[] GRABBER_LEFT = {0.745, .255, .375};
     public double[] GRABBER_RIGHT = {0.44, .89, .765};
-    public double[] CLAW = {0.9, 0.15};
+    public double[] CLAW = {0.9, 0.1};
 
     /* Public members - Ampere (side arm) subassembly
     * Devices

@@ -139,10 +139,10 @@ public class AllAuto extends LinearOpMode {
     //modes lists which steps and in what order to accomplish them
     //modes is set based on inputted color and position
     int mode = 0;
-    int [] modesRAFI = {1, 11, 12, 13, 2, 30, 40, 50, 6, 7, -1, 8, 9, 100};
-    int [] modesRABI = {1, 11, 12, 13, 2, 30, 41, 51, 6, 7, -1, 8, 9, 100};
-    int [] modesBAFI = {1, 11, 12, 13, 2, 31, 40, 52, 6, 7, -1, 8, 9, 100};
-    int [] modesBABI = {1, 11, 12, 13, 2, 31, 41, 53, 6, 7, -1, 8, 9, 100};
+    int [] modesRAFI = {1, -11, 11, 12, 13, 2, 30, 40, 50, 20, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesRABI = {1, -11, 11, 12, 13, 2, 30, 41, 51, 20, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesBAFI = {1, -11, 11, 12, 13, 2, 31, 40, 52, 20, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesBABI = {1, -11, 11, 12, 13, 2, 31, 41, 53, 20, 6, 70, 71, -1, 8, 9, 100};
     int [] modes = {};
     /* List of what the mode numbers do so you don't have to hunt them down elsewhere */
     /* except for the jewel scoring, the first number is the step number and the second number is
@@ -366,7 +366,13 @@ public class AllAuto extends LinearOpMode {
                     if (vuMark == RelicRecoveryVuMark.CENTER){
                         telemetry.addData("VuMark", "center");
                     }
-                    if (now > 1.0){
+                    if (now > 0.5){
+                        robot.UpperArm.MoveToPosition(0.5);
+                    }
+                    if (now > 3.0) {
+                        robot.UpperArm.MoveHome();
+                    }
+                    if (robot.UpperArm.Limit.getState()==false) {
                         mode++;
                         resetClock();
                         startAngle = angles.firstAngle;
@@ -377,7 +383,9 @@ public class AllAuto extends LinearOpMode {
                 /* jewel scoring steps part 1 */
                 case 11:
                     //raises arm
-                    robot.UpperArm.MoveToPosition(0.4);
+                    if (now > 0.7) {
+                        robot.UpperArm.MoveToPosition(0.2);
+                    }
 
                     //turns ampere LEDs om
                     robot.left_ampere.enableLed(true);
@@ -492,7 +500,17 @@ public class AllAuto extends LinearOpMode {
 
                     //backs up for a set time
                     robot.MoveBackward(MOVE_SPEED);
-                    if (now > 0.64) {
+                    if (now > 0.72) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    break;
+
+                case 20:
+                    //backs up for a set time
+                    robot.MoveBackward(MOVE_SPEED);
+                    if (now > 0.5) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -540,7 +558,7 @@ public class AllAuto extends LinearOpMode {
 
                     //moves forward for a set time
                     robot.MoveForward(MOVE_SPEED);
-                    if (now > 1.25) {
+                    if (now > 1.27) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -666,11 +684,36 @@ public class AllAuto extends LinearOpMode {
                     break;
 
                 /* straffe to column */
-                case 7:
+                case 70:
                     if (vuMark == RelicRecoveryVuMark.LEFT){
                         //strafe left until the right sensor gets to the line on the other side
                         robot.MoveLeft(STRAFFE_SPEED);
-                        if (now > 2 && rightcolor) {
+                        if (!rightcolor) {
+                            mode++;
+                            resetClock();
+                        }
+                    }
+                    else if (vuMark == RelicRecoveryVuMark.RIGHT){
+                        //strafe right until the left sensor gets to the line on the other side
+                        robot.MoveRight(STRAFFE_SPEED);
+                        if (!leftcolor) {
+                            mode++;
+                            resetClock();
+                        }
+                    }
+                    else {
+                        //already lined up, so moves on
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                    }
+                    break;
+
+                case 71:
+                    if (vuMark == RelicRecoveryVuMark.LEFT){
+                        //strafe left until the right sensor gets to the line on the other side
+                        robot.MoveLeft(STRAFFE_SPEED);
+                        if (rightcolor) {
                             mode++;
                             resetClock();
                             robot.MoveStop();
@@ -679,7 +722,7 @@ public class AllAuto extends LinearOpMode {
                     else if (vuMark == RelicRecoveryVuMark.RIGHT){
                         //strafe right until the left sensor gets to the line on the other side
                         robot.MoveRight(STRAFFE_SPEED);
-                        if (now > 2 && leftcolor) {
+                        if (leftcolor) {
                             mode++;
                             resetClock();
                             robot.MoveStop();
@@ -721,7 +764,7 @@ public class AllAuto extends LinearOpMode {
             robot.LowerArm.Update(this);
             robot.UpperArm.Update(this);
 
-            telemetry.update();
+//            telemetry.update();
             sleep(40);
         }
     }
