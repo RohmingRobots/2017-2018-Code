@@ -139,9 +139,9 @@ public class AllAuto extends LinearOpMode {
     //modes lists which steps and in what order to accomplish them
     //modes is set based on inputted color and position
     int mode = 0;
-    int [] modesRAFI = {1, -11, 11, 12, 13, 2, 30, 40, 50, 20, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesRAFI = {1, -11, 11, 12, 13, 2, 30, 40, 50, 6, 70, 71, -1, 8, 9, 100};
     int [] modesRABI = {1, -11, 11, 12, 13, 2, 30, 41, 51, 20, 6, 70, 71, -1, 8, 9, 100};
-    int [] modesBAFI = {1, -11, 11, 12, 13, 2, 31, 40, 52, 20, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesBAFI = {1, -11, 11, 12, 13, 2, 31, 40, 52, 6, 70, 71, -1, 8, 9, 100};
     int [] modesBABI = {1, -11, 11, 12, 13, 2, 31, 41, 53, 20, 6, 70, 71, -1, 8, 9, 100};
     int [] modes = {};
     /* List of what the mode numbers do so you don't have to hunt them down elsewhere */
@@ -476,7 +476,7 @@ public class AllAuto extends LinearOpMode {
                     robot.AWR.setPower(-AMPERE_POWER);
 
                     //gives time to get past the jewels
-                    if (now > 3.0) {
+                    if (now > 2.6) {
                         //folds in the servos
                         telemetry.addLine("Fold in");
                         robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
@@ -500,7 +500,7 @@ public class AllAuto extends LinearOpMode {
 
                     //backs up for a set time
                     robot.MoveBackward(MOVE_SPEED);
-                    if (now > 0.72) {
+                    if (now > 0.78) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -510,7 +510,7 @@ public class AllAuto extends LinearOpMode {
                 case 20:
                     //backs up for a set time
                     robot.MoveBackward(MOVE_SPEED);
-                    if (now > 0.5) {
+                    if (now > 0.7) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -558,7 +558,7 @@ public class AllAuto extends LinearOpMode {
 
                     //moves forward for a set time
                     robot.MoveForward(MOVE_SPEED);
-                    if (now > 1.27) {
+                    if (now > 1.3) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
