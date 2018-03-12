@@ -46,6 +46,7 @@ public class ArmControl {
     private double MAX_NEG_POWER = 0.0;
     private double INTEGRAL_GAIN = 0.0;
     private double MAX_POSITION = 1.5;
+    private double boost = 0.0;
 
     private ElapsedTime OurTime = new ElapsedTime();
 
@@ -79,7 +80,7 @@ public class ArmControl {
             // Set power values
             MAX_POS_POWER = 0.8;
             MAX_NEG_POWER = 0.2;
-            INTEGRAL_GAIN = 1.0;
+            INTEGRAL_GAIN = 0.0;
         } else {
             LeftMotor = hwMap.dcMotor.get("LL");
             RightMotor = hwMap.dcMotor.get("LR");
@@ -185,11 +186,21 @@ public class ArmControl {
                 ErrorSum = 0.5;
         }
 
+        if (CurrentPosition > 0.4) {
+            if (FinalTarget == 0.6 || Homed) {
+                //boost = CurrentPosition / 4;
+                boost = 0.0;
+            }
+        }
+        else {
+            boost = 0.0;
+        }
+
         /* determine proportional gain */
         if (error > 0.0 ) {
-            Power = MAX_POS_POWER * 5 * error;
+            Power = MAX_POS_POWER * 5 * error /*- boost*/;
         } else {
-            Power = MAX_NEG_POWER * 5 * error;
+            Power = MAX_NEG_POWER * 5 * error /*+ boost*/;
         }
 
         /* determine integral gain */
@@ -197,7 +208,7 @@ public class ArmControl {
 
         /* limit power */
         if (Power>1.0) Power = 1.0;
-        if (Power<-1.0) Power = -1.0;
+        if (Power<-1.0 - boost) Power = -1.0 - boost;
 
         /* prevent negative power when...
             at home position or never homed
