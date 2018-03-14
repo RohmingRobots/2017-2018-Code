@@ -139,10 +139,10 @@ public class AllAuto extends LinearOpMode {
     //modes lists which steps and in what order to accomplish them
     //modes is set based on inputted color and position
     int mode = 0;
-    int [] modesRAFI = {1, -11, 11, 12, 13, 2, 30, 40, 50, 6, 70, 71, -1, 8, 9, 100};
-    int [] modesRABI = {1, -11, 11, 12, 13, 2, 30, 41, 51, 20, 6, 70, 71, -1, 8, 9, 100};
-    int [] modesBAFI = {1, -11, 11, 12, 13, 2, 31, 40, 52, 6, 70, 71, -1, 8, 9, 100};
-    int [] modesBABI = {1, -11, 11, 12, 13, 2, 31, 41, 53, 20, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesRAFI = {1, 11, 12, 13, 2, 30, 40, 50, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesRABI = {1, 11, 12, 13, 2, 30, 41, 51, 20, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesBAFI = {1, 11, 12, 13, 2, 31, 40, 52, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesBABI = {1, 11, 12, 13, 2, 31, 41, 53, 20, 6, 70, 71, -1, 8, 9, 100};
     int [] modes = {};
     /* List of what the mode numbers do so you don't have to hunt them down elsewhere */
     /* except for the jewel scoring, the first number is the step number and the second number is
