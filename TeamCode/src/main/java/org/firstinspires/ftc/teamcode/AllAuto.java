@@ -138,37 +138,38 @@ public class AllAuto extends LinearOpMode {
     /* Mode 'stuff' */
     //modes lists which steps and in what order to accomplish them
     //modes is set based on inputted color and position
+    int step = 0;
     int mode = 0;
-    int [] modesRAFI = {1, 11, 12, 13, 2, 30, 40, 50, 6, 70, 71, -1, 8, 9, 100};
-    int [] modesRABI = {1, 11, 12, 13, 2, 30, 41, 51, 20, 6, 70, 71, -1, 8, 9, 100};
-    int [] modesBAFI = {1, 11, 12, 13, 2, 31, 40, 52, 6, 70, 71, -1, 8, 9, 100};
-    int [] modesBABI = {1, 11, 12, 13, 2, 31, 41, 53, 20, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesRAFI = {1, 2, 30, 50, 60, 70, 8, 9, 100};
+    int [] modesBAFI = {1, 2, 31, 50, 61, 70, 8, 9, 100};
+    int [] modesRABI = {1, 2, 30, 40, 51, 71, 8, 9, 100};
+    int [] modesBABI = {1, 2, 31, 41, 51, 72, 8, 9, 100};
     int [] modes = {};
     /* List of what the mode numbers do so you don't have to hunt them down elsewhere */
-    /* except for the jewel scoring, the first number is the step number and the second number is
-       which version of the step for when it varies based on location
-    -2 : Grab glyph
-    -1 : Release glyph
-     0 : Wait 1 sec
-     1 : Check Vumark
-     11: Score jewel (part 1)
-     12: Score jewel (part 2)
-     13: Score jewel (part 3)
+    /* Actual Program Modes: the first number is the mode number and the second number is which
+       version of the mode for when it varies based on location
+     1 : Vumark detection + jewel selection
      2 : Back off balancing stone
-     30: Turn left to -45 (red)
-     31: Turn right to 45 (blue)
-     40: Drive 1.5 diagonal tile (FI)
-     41: Drive 1 diagonal tiles (BI)
-     50: Turn right to 0
-     51: Turn left to -90
-     52: Turn left to 0
-     53: Turn right to 90
-     6 : Triangulate position
-     7 : Straffe to column
+     30: Turn left to -90 (red)
+     31: Turn right to 90 (blue)
+     40: Strafe right to align on balancing stone (red)
+     41: Strafe left to align on balancing stone (blue)
+     50: Move forward (FI)
+     51: Move forward until color (BI)
+     60: Turn right to 0 (RAFI)
+     61: Turn left to 0 (BAFI)
+     70: Tirangulate 'n strafe (FI)
+     71: Straffe right till column (RABI)
+     72: Straffe left till column (BABI)
      8 : Drive into cryptobox
      9 : Back up from cryptobox
     100: End
-    */
+
+       Troublshooting and Hotwiring modes
+    -2 : Grab glyph
+    -1 : Release glyph
+     0 : Wait 1 sec
+     */
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -303,6 +304,7 @@ public class AllAuto extends LinearOpMode {
                     if (now > 0.5) {
                         mode++;
                         resetClock();
+                        step = 0;
                     }
                     break;
 
@@ -314,6 +316,7 @@ public class AllAuto extends LinearOpMode {
                     if (now > 0.5) {
                         mode++;
                         resetClock();
+                        step = 0;
                     }
                     break;
 
@@ -330,164 +333,157 @@ public class AllAuto extends LinearOpMode {
                         mode++;
                         resetClock();
                         robot.MoveStop();
+                        step = 0;
                     }
-
-                    telemetry.addData("leftamperered", leftamperered);
-                    telemetry.addData("leftampereblue", leftampereblue);
-                    telemetry.addData("rightamperered", rightamperered);
-                    telemetry.addData("rightampereblue", rightampereblue);
-                    telemetry.addData("robot.left_ampere.red()", robot.left_ampere.red());
-                    telemetry.addData("robot.left_ampere.blue()", robot.left_ampere.blue());
-                    telemetry.addData("robot.right_ampere.red()", robot.right_ampere.red());
-                    telemetry.addData("robot.right_ampere.blue()", robot.right_ampere.blue());
-                    telemetry.addData("leftampere", leftampere);
-                    telemetry.addData("rightampere", rightampere);
-                    telemetry.update();
                     break;
 
-                /* wait for vuMark detection */
+                /* vuMark detection + jewel selection */
                 case 1:
-                    //closes grabbers
-                    robot.GGL.setPosition(robot.GRABBER_LEFT[1]);
-                    robot.GGR.setPosition(robot.GRABBER_RIGHT[1]);
+                    /* vuMark detection */
+                    if (step == 0) {
+                        //closes grabbers
+                        robot.GGL.setPosition(robot.GRABBER_LEFT[1]);
+                        robot.GGR.setPosition(robot.GRABBER_RIGHT[1]);
 
-                    /* VuForia update code */
-                    vuMark = RelicRecoveryVuMark.from(relicTemplate);
+                        /* VuForia update code */
+                        vuMark = RelicRecoveryVuMark.from(relicTemplate);
 
-                    if (vuMark == RelicRecoveryVuMark.UNKNOWN) {
-                        telemetry.addData("VuMark", "not visible");
-                    }
-                    if (vuMark == RelicRecoveryVuMark.LEFT){
-                        telemetry.addData("VuMark", "left");
-                    }
-                    if (vuMark == RelicRecoveryVuMark.RIGHT){
-                        telemetry.addData("VuMark", "right");
-                    }
-                    if (vuMark == RelicRecoveryVuMark.CENTER){
-                        telemetry.addData("VuMark", "center");
-                    }
-                    if (now > 0.5){
-                        robot.UpperArm.MoveToPosition(0.5);
-                    }
-                    if (now > 3.0) {
-                        robot.UpperArm.MoveHome();
-                    }
-                    if (robot.UpperArm.Limit.getState()==false) {
-                        mode++;
-                        resetClock();
-                        startAngle = angles.firstAngle;
-                        robot.MoveStop();
-                    }
-                    break;
-
-                /* jewel scoring steps part 1 */
-                case 11:
-                    //raises arm
-                    if (now > 0.7) {
-                        robot.UpperArm.MoveToPosition(0.2);
-                    }
-
-                    //turns ampere LEDs om
-                    robot.left_ampere.enableLed(true);
-                    robot.right_ampere.enableLed(true);
-
-                    //winches out the ampere
-                    telemetry.addLine("Extend");
-                    robot.AWL.setPower(AMPERE_POWER);
-                    robot.AWR.setPower(AMPERE_POWER);
-
-                    //waits 4 seconds
-                    if (now > 4.0) {
-                        //extends flickers
-                        robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[2]);
-                        robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[2]);
-
-                        //if it hasn't calibrated yet. this makes sure it only runs this bit once
-                        if (leftamperered==0) {
-                            //calibrates to light of open air
-                            leftamperered = robot.left_ampere.red();
-                            leftampereblue = robot.left_ampere.blue();
-                            rightamperered = robot.right_ampere.red();
-                            rightampereblue = robot.right_ampere.blue();
+                        if (vuMark == RelicRecoveryVuMark.UNKNOWN) {
+                            telemetry.addData("VuMark", "not visible");
+                        }
+                        if (vuMark == RelicRecoveryVuMark.LEFT){
+                            telemetry.addData("VuMark", "left");
+                        }
+                        if (vuMark == RelicRecoveryVuMark.RIGHT){
+                            telemetry.addData("VuMark", "right");
+                        }
+                        if (vuMark == RelicRecoveryVuMark.CENTER){
+                            telemetry.addData("VuMark", "center");
+                        }
+                        if (now > 0.3){
+                            robot.UpperArm.MoveToPosition(0.5);
+                        }
+                        if (now > 3.0) {
+                            robot.UpperArm.MoveHome();
+                        }
+                        if (robot.UpperArm.Limit.getState()==false) {
+                            step++;
+                            resetClock();
+                            startAngle = angles.firstAngle;
+                            robot.MoveStop();
                         }
                     }
 
-                    //waits till fully extended
-                    if (now > 8.0) {
-                        //ends the mode
-                        mode++;
-                        resetClock();
-                        robot.MoveStop();
-                    }
-                    break;
+                    /* jewel selection step 1 */
+                    if (step == 1) {
+                        //raises arm
+                        if (now > 0.7) {
+                            robot.UpperArm.MoveToPosition(0.2);
+                        }
 
-                /* jewel scoring steps part 2 */
-                case 12:
-                    //stops the winches
-                    telemetry.addLine("Stop");
-                    robot.AWL.setPower(0.0);
-                    robot.AWR.setPower(0.0);
+                        //turns ampere LEDs om
+                        robot.left_ampere.enableLed(true);
+                        robot.right_ampere.enableLed(true);
 
-                    /* checks if both color sensors detect a difference in the change of values and
-                       returns true if the side is red and the side is blue */
-                    if (    (robot.left_ampere.red() - leftamperered) > 10 +
-                            (robot.right_ampere.red() - rightamperered) &&
-                            (robot.right_ampere.blue() - rightampereblue) > 10 +
-                            (robot.left_ampere.blue() - leftampereblue)) {
-                        leftampere = true;
-                    }
-                    if (    (robot.right_ampere.red() - rightamperered) > 10 +
-                            (robot.left_ampere.red() - leftamperered) &&
-                            (robot.left_ampere.blue() - leftampereblue) > 10 +
-                            (robot.right_ampere.blue() - rightampereblue)) {
-                        rightampere = true;
+                        //winches out the ampere
+                        telemetry.addLine("Extend");
+                        robot.AWL.setPower(AMPERE_POWER);
+                        robot.AWR.setPower(AMPERE_POWER);
+
+                        //waits 4 seconds
+                        if (now > 4.0) {
+                            //extends flickers
+                            robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[2]);
+                            robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[2]);
+
+                            //if it hasn't calibrated yet. this makes sure it only runs this bit once
+                            if (leftamperered==0) {
+                                //calibrates to light of open air
+                                leftamperered = robot.left_ampere.red();
+                                leftampereblue = robot.left_ampere.blue();
+                                rightamperered = robot.right_ampere.red();
+                                rightampereblue = robot.right_ampere.blue();
+                            }
+                        }
+
+                        //waits till fully extended
+                        if (now > 8.0) {
+                            //ends the mode
+                            step++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
                     }
 
-                    //gives it a bit to check
-                    if (now > 0.1) {
+                    /* jewel selection step 2 */
+                    if (step == 2) {
+                        //stops the winches
+                        telemetry.addLine("Stop");
+                        robot.AWL.setPower(0.0);
+                        robot.AWR.setPower(0.0);
+
+                        /* checks if both color sensors detect a difference in the change of values and
+                           returns true if the side is red and the side is blue */
+                        if (    (robot.left_ampere.red() - leftamperered) > 10 +
+                                (robot.right_ampere.red() - rightamperered) &&
+                                (robot.right_ampere.blue() - rightampereblue) > 10 +
+                                        (robot.left_ampere.blue() - leftampereblue)) {
+                            leftampere = true;
+                        }
+                        if (    (robot.right_ampere.red() - rightamperered) > 10 +
+                                (robot.left_ampere.red() - leftamperered) &&
+                                (robot.left_ampere.blue() - leftampereblue) > 10 +
+                                        (robot.right_ampere.blue() - rightampereblue)) {
+                            rightampere = true;
+                        }
+
+                        //gives it a bit to check
+                        if (now > 0.1) {
                         /* if both color sensors agree, the one that is true will be red. it hits the
                            correct one for our color. if both didn't agree, they will both be false,
                            so it will move on without scoring the wrong jewel */
-                        if (leftampere) {
-                            if (redteam) {
-                                robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
-                            } else {
-                                robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
+                            if (leftampere) {
+                                if (redteam) {
+                                    robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+                                } else {
+                                    robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
+                                }
+                            } else if (rightampere) {
+                                if (redteam) {
+                                    robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
+                                } else {
+                                    robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+                                }
                             }
-                        } else if (rightampere) {
-                            if (redteam) {
-                                robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
-                            } else {
-                                robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
-                            }
+                            //moves on without knocking one of if it isn't certain it saw it properly
+                            step++;
+                            resetClock();
+                            robot.MoveStop();
                         }
-                        //moves on without knocking one of if it isn't certain it saw it properly
-                        mode++;
-                        resetClock();
-                        robot.MoveStop();
-                    }
-                    break;
-
-                /* jewel scoring steps part 3 */
-                case 13:
-                    //reels back in the amperes
-                    telemetry.addLine("Retract");
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
-
-                    //gives time to get past the jewels
-                    if (now > 2.6) {
-                        //folds in the servos
-                        telemetry.addLine("Fold in");
-                        robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
-                        robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
                     }
 
-                    //gives time for jewel servos to fold in
-                    if (now > 5.0) {
-                        robot.UpperArm.MoveHome();
-                        mode++;
-                        resetClock();
+                    /* jewel selection step 3 */
+                    if (step == 3) {
+                        //reels back in the amperes
+                        telemetry.addLine("Retract");
+                        robot.AWL.setPower(-AMPERE_POWER);
+                        robot.AWR.setPower(-AMPERE_POWER);
+
+                        //gives time to get past the jewels
+                        if (now > 2.4) {
+                            //folds in the servos
+                            telemetry.addLine("Fold in");
+                            robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
+                            robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+                        }
+
+                        //gives time for jewel servos to fold in
+                        if (now > 5.0) {
+                            robot.UpperArm.MoveHome();
+                            mode++;
+                            resetClock();
+                            step = 0;
+                        }
                     }
                     break;
 
@@ -500,24 +496,15 @@ public class AllAuto extends LinearOpMode {
 
                     //backs up for a set time
                     robot.MoveBackward(MOVE_SPEED);
-                    if (now > 0.78) {
+                    if (now > 0.5) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
+                        step = 0;
                     }
                     break;
 
-                case 20:
-                    //backs up for a set time
-                    robot.MoveBackward(MOVE_SPEED);
-                    if (now > 0.7) {
-                        mode++;
-                        resetClock();
-                        robot.MoveStop();
-                    }
-                    break;
-
-                /* turn left to -45 (red) */
+                /* turn left to -90 (red) */
                 case 30:
                     //continues reeling in the amperes
                     telemetry.addLine("Retract");
@@ -526,14 +513,15 @@ public class AllAuto extends LinearOpMode {
 
                     //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateLeft(ROTATE_SPEED);
-                    if (turnAngle < -40) {
+                    if (turnAngle < -85) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
+                        step = 0;
                     }
                     break;
 
-                /* turn right to 45 (blue) */
+                /* turn right to 90 (blue) */
                 case 31:
                     //continues reeling in the amperes
                     telemetry.addLine("Retract");
@@ -542,31 +530,50 @@ public class AllAuto extends LinearOpMode {
 
                     //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateRight(ROTATE_SPEED);
-                    if (turnAngle > 40) {
+                    if (turnAngle > 85) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
+                        step = 0;
                     }
                     break;
 
-                /* move forward 50.9 inches (FI) */
+                /* strafe right to align on balancing stone (red) */
                 case 40:
                     //continues reeling in the amperes
                     telemetry.addLine("Retract");
                     robot.AWL.setPower(-AMPERE_POWER);
                     robot.AWR.setPower(-AMPERE_POWER);
 
-                    //moves forward for a set time
-                    robot.MoveForward(MOVE_SPEED);
-                    if (now > 1.3) {
+                    //strafes right for a set time
+                    robot.MoveRight(STRAFFE_SPEED);
+                    if (now > 2.0) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
+                        step = 0;
                     }
                     break;
 
-                /* move forward 33.9 inches (BI) */
+                /* strafe left to align on balancing stone (blue) */
                 case 41:
+                    //continues reeling in the amperes
+                    telemetry.addLine("Retract");
+                    robot.AWL.setPower(-AMPERE_POWER);
+                    robot.AWR.setPower(-AMPERE_POWER);
+
+                    //strafes right for a set time
+                    robot.MoveLeft(STRAFFE_SPEED);
+                    if (now > 2.0) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                        step = 0;
+                    }
+                    break;
+
+                /* move forward 36 inches (FI) */
+                case 50:
                     //continues reeling in the amperes
                     telemetry.addLine("Retract");
                     robot.AWL.setPower(-AMPERE_POWER);
@@ -574,15 +581,33 @@ public class AllAuto extends LinearOpMode {
 
                     //moves forward for a set time
                     robot.MoveForward(MOVE_SPEED);
-                    if (now > 0.8) {
+                    if (now > 1.2) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
+                        step = 0;
+                    }
+                    break;
+
+                /* move forward until color (BI) */
+                case 51:
+                    //continues reeling in the amperes
+                    telemetry.addLine("Retract");
+                    robot.AWL.setPower(-AMPERE_POWER);
+                    robot.AWR.setPower(-AMPERE_POWER);
+
+                    //moves forward until it sees a line
+                    robot.MoveForward(MOVE_SPEED);
+                    if (leftcolor || rightcolor) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                        step = 0;
                     }
                     break;
 
                 /* turn right to 0 (RAFI) */
-                case 50:
+                case 60:
                     //continues reeling in the amperes
                     telemetry.addLine("Retract");
                     robot.AWL.setPower(-AMPERE_POWER);
@@ -594,28 +619,12 @@ public class AllAuto extends LinearOpMode {
                         mode++;
                         resetClock();
                         robot.MoveStop();
-                    }
-                    break;
-
-                /* turn left to -90 (RABI) */
-                case 51:
-                    //continues reeling in the amperes
-                    telemetry.addLine("Retract");
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
-
-                    //turns until it gets passed 5 degrees short of the target angle
-                    robot.RotateLeft(ROTATE_SPEED);
-                    if (turnAngle < -80) {
-                        mode++;
-                        resetClock();
-                        robot.RotateRight(ROTATE_SPEED);
-                        robot.MoveStop();
+                        step = 0;
                     }
                     break;
 
                 /* turn left to 0 (BAFI) */
-                case 52:
+                case 61:
                     //continues reeling in the amperes
                     telemetry.addLine("Retract");
                     robot.AWL.setPower(-AMPERE_POWER);
@@ -627,78 +636,78 @@ public class AllAuto extends LinearOpMode {
                         mode++;
                         resetClock();
                         robot.MoveStop();
+                        step = 0;
                     }
                     break;
 
-                /* turn right to 90 (BABI) */
-                case 53:
-                    //continues reeling in the amperes
-                    telemetry.addLine("Retract");
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
-
-                    //turns until it gets passed 5 degrees short of the target angle
-                    robot.RotateRight(ROTATE_SPEED);
-                    if (turnAngle > 80) {
-                        mode++;
-                        resetClock();
-                        robot.MoveStop();
-                    }
-                    break;
-
-                /* tirangulate */
-                case 6:
+                /* tirangulate 'n strafe (FI) */
+                case 70:
                     //turns the LEDs on
                     robot.left_color.enableLed(true);
                     robot.right_color.enableLed(true);
 
-                    //stops if both see the line
-                    if (leftcolor && rightcolor) {
-                        mode++;
-                        resetClock();
-                        robot.MoveStop();
-                    }
-
-                    //strafes right at an angle if the left side sees the line
-                    else if (leftcolor && !rightcolor) {
-                        robot.FL.setPower(-MOVE_SPEED/1.5);
-                        robot.BR.setPower(-MOVE_SPEED/1.5);
-
-                        robot.BL.setPower(MOVE_SPEED*1.4);
-                        robot.FR.setPower(MOVE_SPEED*1.4);
-                    }
-
-                    //strafes left at an angle if the right side sees the line
-                    else if (!leftcolor && rightcolor){
-                        robot.FL.setPower(MOVE_SPEED*1.4);
-                        robot.BR.setPower(MOVE_SPEED*1.4);
-
-                        robot.BL.setPower(-MOVE_SPEED/1.5);
-                        robot.FR.setPower(-MOVE_SPEED/1.5);
-                    }
-
-                    //drives forward if it doesn't see anything
-                    else {
-                        robot.MoveForward(MOVE_SPEED/1.8);
-                    }
-                    break;
-
-                /* straffe to column */
-                case 70:
-                    if (vuMark == RelicRecoveryVuMark.LEFT){
-                        //strafe left until the right sensor gets to the line on the other side
-                        robot.MoveLeft(STRAFFE_SPEED);
-                        if (!rightcolor) {
-                            mode++;
+                    /* triangulate */
+                    if (step == 0){
+                        //stops if both see the line
+                        if (leftcolor && rightcolor) {
+                            step++;
                             resetClock();
+                            robot.MoveStop();
+                        }
+
+                        //strafes right at an angle if the left side sees the line
+                        else if (leftcolor && !rightcolor) {
+                            robot.FL.setPower(-MOVE_SPEED/1.5);
+                            robot.BR.setPower(-MOVE_SPEED/1.5);
+
+                            robot.BL.setPower(MOVE_SPEED*1.4);
+                            robot.FR.setPower(MOVE_SPEED*1.4);
+                        }
+
+                        //strafes left at an angle if the right side sees the line
+                        else if (!leftcolor && rightcolor){
+                            robot.FL.setPower(MOVE_SPEED*1.4);
+                            robot.BR.setPower(MOVE_SPEED*1.4);
+
+                            robot.BL.setPower(-MOVE_SPEED/1.5);
+                            robot.FR.setPower(-MOVE_SPEED/1.5);
+                        }
+
+                        //drives forward if it doesn't see anything
+                        else {
+                            robot.MoveForward(MOVE_SPEED/1.8);
                         }
                     }
-                    else if (vuMark == RelicRecoveryVuMark.RIGHT){
-                        //strafe right until the left sensor gets to the line on the other side
-                        robot.MoveRight(STRAFFE_SPEED);
-                        if (!leftcolor) {
+
+                    /* 'n strafe */
+                    if (vuMark == RelicRecoveryVuMark.LEFT) {
+                        //strafe left until the right sensor gets to the line on the other side
+                        robot.MoveLeft(STRAFFE_SPEED);
+                        if (step == 1 && !rightcolor) {
+                            step++;
+                            resetClock();
+                        }
+                        if (step == 2 && rightcolor){
+                            //lined up, so moves on
                             mode++;
                             resetClock();
+                            robot.MoveStop();
+                            step = 0;
+                        }
+                    }
+                    if (vuMark == RelicRecoveryVuMark.RIGHT){
+                        //strafe right until the left sensor gets to the line on the other side
+                        robot.MoveRight(STRAFFE_SPEED);
+                        if (step == 1 && !leftcolor) {
+                            step++;
+                            resetClock();
+                        }
+                        if (step == 2 && leftcolor){
+                            //lined up, so moves on
+                            mode++;
+                            resetClock();
+                            robot.MoveStop();
+                            step = 0;
                         }
                     }
                     else {
@@ -706,44 +715,98 @@ public class AllAuto extends LinearOpMode {
                         mode++;
                         resetClock();
                         robot.MoveStop();
+                        step = 0;
                     }
                     break;
 
+                /* strafe right to column (RABI) */
                 case 71:
-                    if (vuMark == RelicRecoveryVuMark.LEFT){
-                        //strafe left until the right sensor gets to the line on the other side
-                        robot.MoveLeft(STRAFFE_SPEED);
-                        if (rightcolor) {
-                            mode++;
-                            resetClock();
-                            robot.MoveStop();
-                        }
-                    }
-                    else if (vuMark == RelicRecoveryVuMark.RIGHT){
+                    if (step == 0 && (vuMark == RelicRecoveryVuMark.CENTER || vuMark == RelicRecoveryVuMark.RIGHT)) {
                         //strafe right until the left sensor gets to the line on the other side
                         robot.MoveRight(STRAFFE_SPEED);
                         if (leftcolor) {
-                            mode++;
+                            step++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                    }
+                    if (step == 1 && vuMark == RelicRecoveryVuMark.RIGHT){
+                        robot.MoveRight(STRAFFE_SPEED);
+                        if (!leftcolor) {
+                            step++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                    }
+                    if (step == 2){
+                        robot.MoveRight(STRAFFE_SPEED);
+                        if (leftcolor) {
+                            step++;
                             resetClock();
                             robot.MoveStop();
                         }
                     }
                     else {
-                        //already lined up, so moves on
+                        //lined up, so moves on
                         mode++;
                         resetClock();
                         robot.MoveStop();
+                        step = 0;
                     }
                     break;
 
-                /* move forward 10 inches into cryptobox */
+
+                /* strafe left till column (BABI) */
+                case 72:
+                    if (step == 0 && (vuMark == RelicRecoveryVuMark.CENTER || vuMark == RelicRecoveryVuMark.RIGHT)) {
+                        //strafe left until the right sensor gets to the line on the other side
+                        robot.MoveLeft(STRAFFE_SPEED);
+                        if (rightcolor) {
+                            step++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                    }
+                    if (step == 1 && vuMark == RelicRecoveryVuMark.RIGHT){
+                        robot.MoveLeft(STRAFFE_SPEED);
+                        if (!rightcolor) {
+                            step++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                    }
+                    if (step == 2){
+                        robot.MoveLeft(STRAFFE_SPEED);
+                        if (rightcolor) {
+                            step++;
+                            resetClock();
+                            robot.MoveStop();
+                        }
+                    }
+                    else {
+                        //lined up, so moves on
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                        step = 0;
+                    }
+
+
+                    break;
+
+                /* release glyph and move forward 10 inches into cryptobox */
                 case 8:
+                    //opens grabbers
+                    robot.GGL.setPosition(robot.GRABBER_LEFT[0]);
+                    robot.GGR.setPosition(robot.GRABBER_RIGHT[0]);
+
                     //moves forward for a set time
                     robot.MoveForward(MOVE_SPEED/1.2);
                     if (now > 0.6) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
+                        step = 0;
                     }
                     break;
 
@@ -755,6 +818,7 @@ public class AllAuto extends LinearOpMode {
                         mode++;
                         resetClock();
                         robot.MoveStop();
+                        step = 0;
                     }
                     break;
 
