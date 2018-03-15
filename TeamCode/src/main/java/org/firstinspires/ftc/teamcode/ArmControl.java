@@ -46,7 +46,7 @@ public class ArmControl {
     private double MAX_NEG_POWER = 0.0;
     private double INTEGRAL_GAIN = 0.0;
     private double MAX_POSITION = 1.5;
-    private double boost = 0.0;
+    private int scale = 1;
 
     private ElapsedTime OurTime = new ElapsedTime();
 
@@ -186,29 +186,26 @@ public class ArmControl {
                 ErrorSum = 0.5;
         }
 
-        if (CurrentPosition > 0.4) {
-            if (FinalTarget == 0.6 || Homed) {
-                //boost = CurrentPosition / 4;
-                boost = 0.0;
-            }
+        if (UpperLower && CurrentPosition > 0.5) {
+            scale = 2;
         }
         else {
-            boost = 0.0;
+            scale = 1;
         }
 
         /* determine proportional gain */
         if (error > 0.0 ) {
-            Power = MAX_POS_POWER * 5 * error /*- boost*/;
+            Power = MAX_POS_POWER * 5 * error * scale;
         } else {
-            Power = MAX_NEG_POWER * 5 * error /*+ boost*/;
+            Power = MAX_NEG_POWER * 5 * error * scale;
         }
 
         /* determine integral gain */
         Power += ErrorSum*INTEGRAL_GAIN;
 
         /* limit power */
-        if (Power>1.0) Power = 1.0;
-        if (Power<-1.0 - boost) Power = -1.0 - boost;
+        if (Power > 1.0 / scale) Power = 1.0 / scale;
+        if (Power < -1.0 * scale) Power = -1.0 * scale;
 
         /* prevent negative power when...
             at home position or never homed
