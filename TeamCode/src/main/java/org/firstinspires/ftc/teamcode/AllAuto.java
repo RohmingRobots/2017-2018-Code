@@ -180,33 +180,30 @@ public class AllAuto extends LinearOpMode {
     int step = 0;
     int mode = 0;
     int [] modes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 100};
-
+    /* List of what the mode numbers do so you don't have to hunt them down elsewhere
+      1: Vumark detection + jewel selection
+      2: Back off balancing stone
+      3: Turn to -90 (red) or 90 (blue)
+      4: Strafe right (red) or left (blue) to align on balancing stone (BI)
+      5: Move forward for time (FI) or until color (BI)
+      6: Turn to 0 (FI)
+      7: Tirangulate 'n strafe (FI) or strafe right (RABI) or left till column (BABI)
+      8: Drive into cryptobox
+      9: Back up from cryptobox
+    100: End
+    */
+    
+    /* Troublshooting and Hotwiring modes
+    -2 : Grab glyph
+    -1 : Release glyph
+     0 : Wait 1 sec
+     */
     /* in case I want to modify it more easily for one position */
     //modes is set based on inputted color and position
     //int [] modesRAFI = {};
     //int [] modesBAFI = {};
     //int [] modesRABI = {};
     //int [] modesBABI = {};
-
-    /* List of what the mode numbers do so you don't have to hunt them down elsewhere */
-    /* Actual Program Modes: the first number is the mode number and the second number is which
-       version of the mode for when it varies based on location
-     1 : Vumark detection + jewel selection
-     2 : Back off balancing stone
-     3 : Turn to -90 (red) or 90 (blue)
-     4 : Strafe right (red) or left (blue) to align on balancing stone (BI)
-     5 : Move forward for time (FI) or until color (BI)
-     6 : Turn to 0 (FI)
-     7 : Tirangulate 'n strafe (FI) or strafe right (RABI) or left till column (BABI)
-     8 : Drive into cryptobox
-     9 : Back up from cryptobox
-    100: End
-
-       Troublshooting and Hotwiring modes
-    -2 : Grab glyph
-    -1 : Release glyph
-     0 : Wait 1 sec
-     */
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -334,49 +331,6 @@ public class AllAuto extends LinearOpMode {
                     telemetry.addLine("All done");
                     robot.MoveStop();
                     break;
-
-                    /*
-                /* grab glyph *
-                case -2:
-                    //closes grabbers
-                    robot.GGL.setPosition(robot.GRABBER_LEFT[1]);
-                    robot.GGR.setPosition(robot.GRABBER_RIGHT[1]);
-                    if (now > 0.5) {
-                        mode++;
-                        resetClock();
-                        step = 0;
-                    }
-                    break;
-
-                /* release glyph *
-                case -1:
-                    //opens grabbers
-                    robot.GGL.setPosition(robot.GRABBER_LEFT[0]);
-                    robot.GGR.setPosition(robot.GRABBER_RIGHT[0]);
-                    if (now > 0.5) {
-                        mode++;
-                        resetClock();
-                        step = 0;
-                    }
-                    break;
-
-                /* wait one second *
-                case 0:
-                    //turns all LEDs off
-                    robot.left_ampere.enableLed(false);
-                    robot.right_ampere.enableLed(false);
-                    robot.left_color.enableLed(false);
-                    robot.right_color.enableLed(false);
-
-                    //waits 1 second
-                    if (now > 1.0) {
-                        mode++;
-                        resetClock();
-                        robot.MoveStop();
-                        step = 0;
-                    }
-                    break;
-                    */
 
                 /* vuMark detection + jewel selection */
                 case 1:
@@ -615,7 +569,7 @@ public class AllAuto extends LinearOpMode {
                     }
                     break;
 
-                /* turn to 0 */
+                /* turn to 0 (FI) */
                 case 6:
                     //continues reeling in the amperes
                     telemetry.addLine("Retract");
@@ -819,6 +773,48 @@ public class AllAuto extends LinearOpMode {
                         step = 0;
                     }
                     break;
+/*
+                /* grab glyph *
+                case -2:
+                    //closes grabbers
+                    robot.GGL.setPosition(robot.GRABBER_LEFT[1]);
+                    robot.GGR.setPosition(robot.GRABBER_RIGHT[1]);
+                    if (now > 0.5) {
+                        mode++;
+                        resetClock();
+                        step = 0;
+                    }
+                    break;
+
+                /* release glyph *
+                case -1:
+                    //opens grabbers
+                    robot.GGL.setPosition(robot.GRABBER_LEFT[0]);
+                    robot.GGR.setPosition(robot.GRABBER_RIGHT[0]);
+                    if (now > 0.5) {
+                        mode++;
+                        resetClock();
+                        step = 0;
+                    }
+                    break;
+
+                /* wait one second *
+                case 0:
+                    //turns all LEDs off
+                    robot.left_ampere.enableLed(false);
+                    robot.right_ampere.enableLed(false);
+                    robot.left_color.enableLed(false);
+                    robot.right_color.enableLed(false);
+
+                    //waits 1 second
+                    if (now > 1.0) {
+                        mode++;
+                        resetClock();
+                        robot.MoveStop();
+                        step = 0;
+                    }
+                    break;
+                */
 
             }  // end of switch
 
