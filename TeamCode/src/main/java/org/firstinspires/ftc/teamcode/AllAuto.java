@@ -139,10 +139,10 @@ public class AllAuto extends LinearOpMode {
     //modes lists which steps and in what order to accomplish them
     //modes is set based on inputted color and position
     int mode = 0;
-    int [] modesRAFI = {1, -11, 11, 12, 13, 2, 30, 40, 50, 6, 70, 71, -1, 8, 9, 100};
-    int [] modesRABI = {1, -11, 11, 12, 13, 2, 30, 41, 51, 20, 6, 70, 71, -1, 8, 9, 100};
-    int [] modesBAFI = {1, -11, 11, 12, 13, 2, 31, 40, 52, 6, 70, 71, -1, 8, 9, 100};
-    int [] modesBABI = {1, -11, 11, 12, 13, 2, 31, 41, 53, 20, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesRAFI = {-11, 1, -11, 11, 12, 13, 2, 30, 40, 50, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesRABI = {-11, 1, -11, 11, 12, 13, 2, 30, 41, 51, 20, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesBAFI = {-11, 1, -11, 11, 12, 13, 2, 31, 40, 52, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesBABI = {-11, 1, -11, 11, 12, 13, 2, 31, 41, 53, 20, 6, 70, 71, -1, 8, 9, 100};
     int [] modes = {};
     /* List of what the mode numbers do so you don't have to hunt them down elsewhere */
     /* except for the jewel scoring, the first number is the step number and the second number is
@@ -208,17 +208,18 @@ public class AllAuto extends LinearOpMode {
 
         /* initialize Vuforia */
         // Send telemetry message to signify robot waiting;
-        telemetry.addLine("Init VuForia");    //
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters vuforia_parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-        vuforia_parameters.vuforiaLicenseKey = "AQepDXf/////AAAAGcvzfI2nd0MHnzIGZ7JtquJk3Yx64l7jwu6XImRkNmBkhjVdVcI47QZ7xQq0PvugAb3+ppJxL4n+pNcnt1+PYpQHVETBEPk5WkofitFuYL8zzXEbs7uLY0dMUepnOiJcLSiVISKWWDyc8BJkKcK3a/KmB2sHaE1Lp2LJ+skW43+pYeqtgJE8o8xStowxPJB0OaSFXXw5dGUurK+ykmPam5oE+t+6hi9o/pO1EOHZFoqKl6tj/wsdu9+3I4lqGMsRutKH6s1rKLfip8s3MdlxqnlRKFmMDFewprELOwm+zpjmrJ1cqdlzzWQ6i/EMOzhcOzrPmH3JiH4CocA/Kcck12IuqvN4l6iAIjntb8b0G8zL";
-        vuforia_parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK  ;
-        this.vuforia = ClassFactory.createVuforiaLocalizer(vuforia_parameters);
-        VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
-        VuforiaTrackable relicTemplate = relicTrackables.get(0);
-        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
-        relicTrackables.activate();
-        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+//AJB        telemetry.addLine("Init VuForia");
+//AJB        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//AJB        VuforiaLocalizer.Parameters vuforia_parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+//AJB        vuforia_parameters.vuforiaLicenseKey = "AQepDXf/////AAAAGcvzfI2nd0MHnzIGZ7JtquJk3Yx64l7jwu6XImRkNmBkhjVdVcI47QZ7xQq0PvugAb3+ppJxL4n+pNcnt1+PYpQHVETBEPk5WkofitFuYL8zzXEbs7uLY0dMUepnOiJcLSiVISKWWDyc8BJkKcK3a/KmB2sHaE1Lp2LJ+skW43+pYeqtgJE8o8xStowxPJB0OaSFXXw5dGUurK+ykmPam5oE+t+6hi9o/pO1EOHZFoqKl6tj/wsdu9+3I4lqGMsRutKH6s1rKLfip8s3MdlxqnlRKFmMDFewprELOwm+zpjmrJ1cqdlzzWQ6i/EMOzhcOzrPmH3JiH4CocA/Kcck12IuqvN4l6iAIjntb8b0G8zL";
+//AJB        vuforia_parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK  ;
+//AJB        this.vuforia = ClassFactory.createVuforiaLocalizer(vuforia_parameters);
+//AJB        VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+//AJB        VuforiaTrackable relicTemplate = relicTrackables.get(0);
+//AJB        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+//AJB        relicTrackables.activate();
+//AJB        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+        RelicRecoveryVuMark vuMark=null;
 
         /* Runs the arrays to receive the position and color from the drivers, set the variables,
            and tell the drivers what it got set to for confirmation */
@@ -254,13 +255,12 @@ public class AllAuto extends LinearOpMode {
             now = runtime.seconds() - lastReset;
 
             //so if the robot starts acting weird, we can check if is because of the color sensors
-            telemetry.addData("left_color red", robot.left_color.red());
-            telemetry.addData("left_color blue", robot.left_color.blue());
-            telemetry.addData("right_color red", robot.right_color.red());
-            telemetry.addData("right_color blue", robot.right_color.blue());
-            telemetry.addData("leftcolor", leftcolor);
-            telemetry.addData("rightcolor", rightcolor);
-            telemetry.update();
+//            telemetry.addData("left_color red", robot.left_color.red());
+//            telemetry.addData("left_color blue", robot.left_color.blue());
+//            telemetry.addData("right_color red", robot.right_color.red());
+//            telemetry.addData("right_color blue", robot.right_color.blue());
+//            telemetry.addData("leftcolor", leftcolor);
+//            telemetry.addData("rightcolor", rightcolor);
 
             /* sets the requirements for the left color sensor to be seeing the line it is looking
                for and keeps it up to date */
@@ -285,13 +285,13 @@ public class AllAuto extends LinearOpMode {
                 rightcolor = false;
             }
 
+            telemetry.addData("modes", modes[mode]);
             /* the switch containing all the preset modes so it switches between them without a
                giant list of if, else ifs */
             switch (modes[mode]) {
 
                 /* says it is done when it finishes */
                 default:
-                    telemetry.addLine("All done");
                     robot.MoveStop();
                     break;
 
@@ -331,18 +331,6 @@ public class AllAuto extends LinearOpMode {
                         resetClock();
                         robot.MoveStop();
                     }
-
-                    telemetry.addData("leftamperered", leftamperered);
-                    telemetry.addData("leftampereblue", leftampereblue);
-                    telemetry.addData("rightamperered", rightamperered);
-                    telemetry.addData("rightampereblue", rightampereblue);
-                    telemetry.addData("robot.left_ampere.red()", robot.left_ampere.red());
-                    telemetry.addData("robot.left_ampere.blue()", robot.left_ampere.blue());
-                    telemetry.addData("robot.right_ampere.red()", robot.right_ampere.red());
-                    telemetry.addData("robot.right_ampere.blue()", robot.right_ampere.blue());
-                    telemetry.addData("leftampere", leftampere);
-                    telemetry.addData("rightampere", rightampere);
-                    telemetry.update();
                     break;
 
                 /* wait for vuMark detection */
@@ -352,7 +340,7 @@ public class AllAuto extends LinearOpMode {
                     robot.GGR.setPosition(robot.GRABBER_RIGHT[1]);
 
                     /* VuForia update code */
-                    vuMark = RelicRecoveryVuMark.from(relicTemplate);
+//AJB                    vuMark = RelicRecoveryVuMark.from(relicTemplate);
 
                     if (vuMark == RelicRecoveryVuMark.UNKNOWN) {
                         telemetry.addData("VuMark", "not visible");
@@ -367,7 +355,7 @@ public class AllAuto extends LinearOpMode {
                         telemetry.addData("VuMark", "center");
                     }
                     if (now > 0.5){
-                        robot.UpperArm.MoveToPosition(0.5);
+                        robot.UpperArm.MoveToPosition(0.4, 1.0);
                     }
                     if (now > 3.0) {
                         robot.UpperArm.MoveHome();
@@ -384,7 +372,7 @@ public class AllAuto extends LinearOpMode {
                 case 11:
                     //raises arm
                     if (now > 0.7) {
-                        robot.UpperArm.MoveToPosition(0.2);
+                        robot.UpperArm.MoveToPosition(0.2, 1.0);
                     }
 
                     //turns ampere LEDs om
@@ -392,15 +380,14 @@ public class AllAuto extends LinearOpMode {
                     robot.right_ampere.enableLed(true);
 
                     //winches out the ampere
-                    telemetry.addLine("Extend");
-                    robot.AWL.setPower(AMPERE_POWER);
-                    robot.AWR.setPower(AMPERE_POWER);
+//AJB                    robot.AWL.setPower(AMPERE_POWER);
+//AJB                    robot.AWR.setPower(AMPERE_POWER);
 
                     //waits 4 seconds
                     if (now > 4.0) {
                         //extends flickers
-                        robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[2]);
-                        robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[2]);
+//AJB                        robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[2]);
+//AJB                        robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[2]);
 
                         //if it hasn't calibrated yet. this makes sure it only runs this bit once
                         if (leftamperered==0) {
@@ -424,7 +411,6 @@ public class AllAuto extends LinearOpMode {
                 /* jewel scoring steps part 2 */
                 case 12:
                     //stops the winches
-                    telemetry.addLine("Stop");
                     robot.AWL.setPower(0.0);
                     robot.AWR.setPower(0.0);
 
@@ -450,15 +436,15 @@ public class AllAuto extends LinearOpMode {
                            so it will move on without scoring the wrong jewel */
                         if (leftampere) {
                             if (redteam) {
-                                robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+//AJB                                robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
                             } else {
-                                robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
+//AJB                                robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
                             }
                         } else if (rightampere) {
                             if (redteam) {
-                                robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
+//AJB                                robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
                             } else {
-                                robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+//AJB                                robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
                             }
                         }
                         //moves on without knocking one of if it isn't certain it saw it properly
@@ -471,16 +457,14 @@ public class AllAuto extends LinearOpMode {
                 /* jewel scoring steps part 3 */
                 case 13:
                     //reels back in the amperes
-                    telemetry.addLine("Retract");
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
+//AJB                    robot.AWL.setPower(-AMPERE_POWER);
+//AJB                    robot.AWR.setPower(-AMPERE_POWER);
 
                     //gives time to get past the jewels
                     if (now > 2.6) {
                         //folds in the servos
-                        telemetry.addLine("Fold in");
-                        robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
-                        robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+//AJB                        robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
+//AJB                        robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
                     }
 
                     //gives time for jewel servos to fold in
@@ -494,9 +478,8 @@ public class AllAuto extends LinearOpMode {
                 /* backup 24 inches */
                 case 2:
                     //continues reeling in the amperes
-                    telemetry.addLine("Retract");
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
+//AJB                    robot.AWL.setPower(-AMPERE_POWER);
+//AJB                    robot.AWR.setPower(-AMPERE_POWER);
 
                     //backs up for a set time
                     robot.MoveBackward(MOVE_SPEED);
@@ -520,9 +503,8 @@ public class AllAuto extends LinearOpMode {
                 /* turn left to -45 (red) */
                 case 30:
                     //continues reeling in the amperes
-                    telemetry.addLine("Retract");
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
+//AJB                    robot.AWL.setPower(-AMPERE_POWER);
+//AJB                    robot.AWR.setPower(-AMPERE_POWER);
 
                     //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateLeft(ROTATE_SPEED);
@@ -536,9 +518,8 @@ public class AllAuto extends LinearOpMode {
                 /* turn right to 45 (blue) */
                 case 31:
                     //continues reeling in the amperes
-                    telemetry.addLine("Retract");
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
+//AJB                    robot.AWL.setPower(-AMPERE_POWER);
+//AJB                    robot.AWR.setPower(-AMPERE_POWER);
 
                     //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateRight(ROTATE_SPEED);
@@ -552,9 +533,8 @@ public class AllAuto extends LinearOpMode {
                 /* move forward 50.9 inches (FI) */
                 case 40:
                     //continues reeling in the amperes
-                    telemetry.addLine("Retract");
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
+//AJB                    robot.AWL.setPower(-AMPERE_POWER);
+//AJB                    robot.AWR.setPower(-AMPERE_POWER);
 
                     //moves forward for a set time
                     robot.MoveForward(MOVE_SPEED);
@@ -568,9 +548,8 @@ public class AllAuto extends LinearOpMode {
                 /* move forward 33.9 inches (BI) */
                 case 41:
                     //continues reeling in the amperes
-                    telemetry.addLine("Retract");
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
+//AJB                    robot.AWL.setPower(-AMPERE_POWER);
+//AJB                    robot.AWR.setPower(-AMPERE_POWER);
 
                     //moves forward for a set time
                     robot.MoveForward(MOVE_SPEED);
@@ -584,9 +563,8 @@ public class AllAuto extends LinearOpMode {
                 /* turn right to 0 (RAFI) */
                 case 50:
                     //continues reeling in the amperes
-                    telemetry.addLine("Retract");
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
+//AJB                    robot.AWL.setPower(-AMPERE_POWER);
+//AJB                    robot.AWR.setPower(-AMPERE_POWER);
 
                     //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateRight(ROTATE_SPEED);
@@ -600,9 +578,8 @@ public class AllAuto extends LinearOpMode {
                 /* turn left to -90 (RABI) */
                 case 51:
                     //continues reeling in the amperes
-                    telemetry.addLine("Retract");
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
+//AJB                    robot.AWL.setPower(-AMPERE_POWER);
+//AJB                    robot.AWR.setPower(-AMPERE_POWER);
 
                     //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateLeft(ROTATE_SPEED);
@@ -617,9 +594,8 @@ public class AllAuto extends LinearOpMode {
                 /* turn left to 0 (BAFI) */
                 case 52:
                     //continues reeling in the amperes
-                    telemetry.addLine("Retract");
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
+//AJB                    robot.AWL.setPower(-AMPERE_POWER);
+//AJB                    robot.AWR.setPower(-AMPERE_POWER);
 
                     //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateLeft(ROTATE_SPEED);
@@ -633,9 +609,8 @@ public class AllAuto extends LinearOpMode {
                 /* turn right to 90 (BABI) */
                 case 53:
                     //continues reeling in the amperes
-                    telemetry.addLine("Retract");
-                    robot.AWL.setPower(-AMPERE_POWER);
-                    robot.AWR.setPower(-AMPERE_POWER);
+//AJB                    robot.AWL.setPower(-AMPERE_POWER);
+//AJB                    robot.AWR.setPower(-AMPERE_POWER);
 
                     //turns until it gets passed 5 degrees short of the target angle
                     robot.RotateRight(ROTATE_SPEED);
@@ -761,10 +736,11 @@ public class AllAuto extends LinearOpMode {
             }  // end of switch
 
             //updates the arms
-            robot.LowerArm.Update(this);
-            robot.UpperArm.Update(this);
+            robot.LowerArm.Update(this, 0.0);
+            robot.UpperArm.Update(this, -robot.LowerArm.Angle);
 
-//            telemetry.update();
+            telemetry.update();
+
             sleep(40);
         }
     }
