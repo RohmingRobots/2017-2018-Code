@@ -200,9 +200,12 @@ public class ArmControl {
         if (error > 0.2) error = 0.2;
         if (error < -0.2) error = -0.2;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> parent of 2853f73... reverting
+=======
+>>>>>>> parent of 1298d51... Merge branch 'master' of https://github.com/RohmingRobots/2017-2018-Code
 
         /* update integral */
         ErrorSum += error*seconds;
