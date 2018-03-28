@@ -196,7 +196,7 @@ public class ArmControl {
         error = CurrentTarget - CurrentPosition;
         if (error > 0.2) error = 0.2;
         if (error < -0.2) error = -0.2;
-        
+
 
         /* update integral */
         ErrorSum += error*seconds;
