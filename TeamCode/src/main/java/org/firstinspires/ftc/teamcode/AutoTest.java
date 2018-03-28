@@ -383,7 +383,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Arm Lift");
         telemetry.update();
-        robot.UpperArm.MoveToPosition(position, 1.0);
+        robot.UpperArm.MoveToPosition(position);
         AutoDelaySec(time_sec);
     }
 
@@ -521,8 +521,7 @@ public class AutoTest extends LinearOpMode {
     void AutoUpdate() {
         if ( !opModeIsActive() ) return;
 
-        robot.LowerArm.Update(this, 0.0);
-        robot.UpperArm.Update(this, -robot.LowerArm.Angle);
+        robot.UpperArm.Update(null);
         sleep(40);
     }
 }
