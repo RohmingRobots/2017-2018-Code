@@ -199,7 +199,10 @@ public class ArmControl {
         error = CurrentTarget - CurrentPosition;
         if (error > 0.2) error = 0.2;
         if (error < -0.2) error = -0.2;
+<<<<<<< HEAD
 
+=======
+>>>>>>> parent of 2853f73... reverting
 
         /* update integral */
         ErrorSum += error*seconds;
