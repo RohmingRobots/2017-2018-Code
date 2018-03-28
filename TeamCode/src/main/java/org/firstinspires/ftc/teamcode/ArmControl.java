@@ -44,12 +44,15 @@ public class ArmControl {
     private double HIGH_MAX_POWER = 0.0;
     private double LOW_MAX_POWER = 0.0;
     private double INTEGRAL_GAIN = 0.0;
+<<<<<<< HEAD
     private double MAX_POSITION = 0.0;
     private double NINETY_ANGLE_RANGE = 0.0;
     private double INITIAL_ANGLE = 0.0;
     private double POSITION_TO_ANGLE = 0.0;
     private double RelativeAngle = 0.0;
     public double Angle = 0.0;
+=======
+>>>>>>> 7de7784c395016a13bc6a43fde21d61cd3b680be
 
     private ElapsedTime OurTime = new ElapsedTime();
 
@@ -208,6 +211,7 @@ public class ArmControl {
                 ErrorSum = 0.5;
         }
 
+<<<<<<< HEAD
         /* determine proportional gain */
         if (error > 0.0 ) {
             if (Angle < 120.0) {
@@ -221,6 +225,8 @@ public class ArmControl {
             } else {
                 max_power = (HIGH_MAX_POWER-LOW_MAX_POWER)*(Angle-60.0)/120.0 + LOW_MAX_POWER;
             }
+=======
+>>>>>>> 7de7784c395016a13bc6a43fde21d61cd3b680be
         }
         Power = max_power * 5 * error;
 
@@ -228,8 +234,11 @@ public class ArmControl {
         Power += ErrorSum*INTEGRAL_GAIN;
 
         /* limit power */
+<<<<<<< HEAD
         if (Power>1.0) Power = 1.0;
         if (Power<-1.0) Power = -1.0;
+=======
+>>>>>>> 7de7784c395016a13bc6a43fde21d61cd3b680be
 
         /* prevent negative power when...
             at home position or never homed

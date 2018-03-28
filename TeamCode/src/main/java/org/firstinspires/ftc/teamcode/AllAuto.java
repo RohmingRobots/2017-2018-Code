@@ -65,6 +65,7 @@ public class AllAuto extends LinearOpMode {
         return false;
     }
 
+    /* in case I want to modify it more easily for one position
     public void chooseModes() {
         //chooses modes based on inputted color and position
         if (FI && redteam)
