@@ -60,6 +60,9 @@ public class RobotConfig
     /* open full, closed full, partial open */
     public double[] GRABBER_LEFT = {0.745, .255, .375};
     public double[] GRABBER_RIGHT = {0.44, .89, .765};
+    public double[] LOWERARM = {0.0, 0.2, 0.3};
+    public double[] UPPERARM = {0.2, 0.2, 0.7};
+
     public double[] CLAW = {0.9, 0.1};
 
     /* Public members - Ampere (side arm) subassembly
@@ -184,7 +187,7 @@ public class RobotConfig
         UpperArm.init(hwMap,true);
 
         // **** IMU objects ****
-        Battery = hwMap.voltageSensor.get("Lower hub 2");
+        Battery = hwMap.voltageSensor.get("Lower hub 3");
     }
 
     /* forward is positive speed, backward is negative speed */
