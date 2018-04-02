@@ -24,6 +24,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
+import java.lang.annotation.Target;
+
 
 //naming the teleop thing
 @Autonomous(name="AllAuto", group ="Drive")
@@ -65,19 +67,19 @@ public class AllAuto extends LinearOpMode {
         return false;
     }
 
-    /* in case I want to modify it more easily for one position
-    public void chooseModes() {
-        //chooses modes based on inputted color and position
-        if (FI && redteam)
-            modes = modesRAFI;
-        if (!FI && redteam)
-            modes = modesRABI;
-        if (FI && !redteam)
-            modes = modesBAFI;
-        if (!FI && !redteam)
-            modes = modesBABI;
-    }
-    */
+    //Multiple Modes setter
+    // in case I want to modify it more easily for one position
+    // public void chooseModes() {
+    //  //chooses modes based on inputted color and position
+    //  if (FI && redteam)
+    //      modes = modesRAFI;
+    //  if (!FI && redteam)
+    //      modes = modesRABI;
+    //  if (FI && !redteam)
+    //      modes = modesBAFI;
+    //  if (!FI && !redteam)
+    //      modes = modesBABI;
+    //}
 
     public void displaySelections() {
         //displays the selected color and position
@@ -97,38 +99,51 @@ public class AllAuto extends LinearOpMode {
 
     /* turns to the specified angle */
     public void turn2angle(int angle) {
-        angle2turn = (angle - turnAngle);
+        TargetAngle = angle;
+        if (step == 0) {
+            angle2turn = (TargetAngle - turnAngle);
+            step++;
+        }
+        angleleft2turn = (TargetAngle - turnAngle);
+
         if (angle2turn > 180){
             angle2turn -= 360;
         }
         if (angle2turn < -180){
             angle2turn += 360;
         }
+        if (angleleft2turn > 180){
+            angleleft2turn -= 360;
+        }
+        if (angleleft2turn < -180){
+            angleleft2turn += 360;
+        }
 
         //turns until it gets within a certain distance based on how far it has been turning
-        if (angle2turn > 0){
+        if (angleleft2turn > 10){
             robot.RotateRight(ROTATE_SPEED);
-            if (turnAngle > angle - (angle2turn/18)){
-                mode++;
-                resetClock();
-                robot.MoveStop();
-                step = 0;
-            }
         }
-        if (angle2turn < 0){
+        if (angleleft2turn < 10){
             robot.RotateLeft(ROTATE_SPEED);
-            if (turnAngle < angle - (angle2turn/18)){
+        }
+        //at this point, it is within 10 degrees, so it tries to narrow down further
+        else {
+            if (step == 1){
+                robot.MoveStop();
+                step++;
+            }
+            if (angleleft2turn > 0){
+                robot.RotateRight(angleleft2turn*0.1);
+            }
+            if (angleleft2turn < 0){
+                robot.RotateRight(angleleft2turn*0.1);
+            }
+            if (2.5 > Math.abs(angleleft2turn)){
                 mode++;
                 resetClock();
                 robot.MoveStop();
                 step = 0;
             }
-        }
-        else {
-            mode++;
-            resetClock();
-            robot.MoveStop();
-            step = 0;
         }
     }
 
@@ -158,6 +173,8 @@ public class AllAuto extends LinearOpMode {
     double currentAngle;
     double turnAngle;       //actual angle relative to where we started used for turning
     double angle2turn;
+    double TargetAngle = 0;
+    double angleleft2turn = 0;
 
     //navigation color sensor variables
     boolean leftcolor = false;
@@ -356,7 +373,7 @@ public class AllAuto extends LinearOpMode {
                             telemetry.addData("VuMark", "center");
                         }
                         if (now > 0.3){
-                            robot.UpperArm.MoveToPosition(0.5);
+                            robot.UpperArm.MoveToPosition(0.5, 2.0);
                         }
                         if (now > 3.0) {
                             robot.UpperArm.MoveHome();
@@ -373,7 +390,7 @@ public class AllAuto extends LinearOpMode {
                     if (step == 1) {
                         //raises arm
                         if (now > 0.7) {
-                            robot.UpperArm.MoveToPosition(0.2);
+                            robot.UpperArm.MoveToPosition(0.2, 2.0);
                         }
 
                         //turns ampere LEDs om
@@ -773,48 +790,48 @@ public class AllAuto extends LinearOpMode {
                         step = 0;
                     }
                     break;
-/*
-                /* grab glyph *
-                case -2:
-                    //closes grabbers
-                    robot.GGL.setPosition(robot.GRABBER_LEFT[1]);
-                    robot.GGR.setPosition(robot.GRABBER_RIGHT[1]);
-                    if (now > 0.5) {
-                        mode++;
-                        resetClock();
-                        step = 0;
-                    }
-                    break;
 
-                /* release glyph *
-                case -1:
-                    //opens grabbers
-                    robot.GGL.setPosition(robot.GRABBER_LEFT[0]);
-                    robot.GGR.setPosition(robot.GRABBER_RIGHT[0]);
-                    if (now > 0.5) {
-                        mode++;
-                        resetClock();
-                        step = 0;
-                    }
-                    break;
-
-                /* wait one second *
-                case 0:
-                    //turns all LEDs off
-                    robot.left_ampere.enableLed(false);
-                    robot.right_ampere.enableLed(false);
-                    robot.left_color.enableLed(false);
-                    robot.right_color.enableLed(false);
-
-                    //waits 1 second
-                    if (now > 1.0) {
-                        mode++;
-                        resetClock();
-                        robot.MoveStop();
-                        step = 0;
-                    }
-                    break;
-                */
+                    //Unused modes
+//                /* grab glyph *
+//                case -2:
+//                    //closes grabbers
+//                    robot.GGL.setPosition(robot.GRABBER_LEFT[1]);
+//                    robot.GGR.setPosition(robot.GRABBER_RIGHT[1]);
+//                    if (now > 0.5) {
+//                        mode++;
+//                        resetClock();
+//                        step = 0;
+//                    }
+//                    break;
+//
+//                /* release glyph *
+//                case -1:
+//                    //opens grabbers
+//                    robot.GGL.setPosition(robot.GRABBER_LEFT[0]);
+//                    robot.GGR.setPosition(robot.GRABBER_RIGHT[0]);
+//                    if (now > 0.5) {
+//                        mode++;
+//                        resetClock();
+//                        step = 0;
+//                    }
+//                    break;
+//
+//                /* wait one second *
+//                case 0:
+//                    //turns all LEDs off
+//                    robot.left_ampere.enableLed(false);
+//                    robot.right_ampere.enableLed(false);
+//                    robot.left_color.enableLed(false);
+//                    robot.right_color.enableLed(false);
+//
+//                    //waits 1 second
+//                    if (now > 1.0) {
+//                        mode++;
+//                        resetClock();
+//                        robot.MoveStop();
+//                        step = 0;
+//                    }
+//                    break;
 
             }  // end of switch
 
