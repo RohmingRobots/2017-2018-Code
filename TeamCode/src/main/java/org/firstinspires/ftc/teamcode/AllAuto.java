@@ -373,7 +373,7 @@ public class AllAuto extends LinearOpMode {
                             telemetry.addData("VuMark", "center");
                         }
                         if (now > 0.3){
-                            robot.UpperArm.MoveToPosition(0.5, 2.0);
+                            robot.UpperArm.MoveToPosition(0.5);
                         }
                         if (now > 3.0) {
                             robot.UpperArm.MoveHome();
@@ -390,7 +390,7 @@ public class AllAuto extends LinearOpMode {
                     if (step == 1) {
                         //raises arm
                         if (now > 0.7) {
-                            robot.UpperArm.MoveToPosition(0.2, 2.0);
+                            robot.UpperArm.MoveToPosition(0.2);
                         }
 
                         //turns ampere LEDs om
