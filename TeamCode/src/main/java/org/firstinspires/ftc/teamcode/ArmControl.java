@@ -34,22 +34,19 @@ public class ArmControl {
     //declaring all my variables in one place for my sake
     private double HomePosition = 0;        /* position value at home */
     public double CurrentPosition = 0;      /* current position relative to home */
+    private double LastPosition = 0;        /* last position relative to home, used to calculate velocity */
+    private double CurrentVelocity = 0;     /* velocity of arm */
     private double FinalTarget = 0;         /* final target position */
-    private double TargetTime = 0;
     private double CurrentTarget = 0;       /* target position */
     private boolean Homed = false;          /* arm has been at home - home position valid */
     private boolean AtHome = false;         /* home switch active - currently at home */
     private double ErrorSum = 0.0;          /* integral error */
     public double Power = 0.0;              /* power to send to motors */
-    private double HIGH_MAX_POWER = 0.0;
-    private double LOW_MAX_POWER = 0.0;
+    private double MAX_POS_POWER = 0.0;
+    private double MAX_NEG_POWER = 0.0;
     private double INTEGRAL_GAIN = 0.0;
-    private double MAX_POSITION = 0.0;
-    private double NINETY_ANGLE_RANGE = 0.0;
-    private double INITIAL_ANGLE = 0.0;
-    private double POSITION_TO_ANGLE = 0.0;
-    private double RelativeAngle = 0.0;
-    public double Angle = 0.0;
+    private double MAX_POSITION = 1.5;
+    private double boost = 0.0;
 
     private ElapsedTime OurTime = new ElapsedTime();
 
@@ -78,21 +75,13 @@ public class ArmControl {
             Limit.setMode(DigitalChannel.Mode.INPUT);           // false = pressed
 
             // Define and initialize potentiometers
-            // 2V is approximately 180 degrees
             Potentiometer = hwMap.analogInput.get("upper pot");
 
-            // Set arm constants
-            HIGH_MAX_POWER = 0.8;    //0.8
-            LOW_MAX_POWER = 0.2;    //0.2
+            // Set power values
+            MAX_POS_POWER = 0.8;
+            MAX_NEG_POWER = 0.2;
             INTEGRAL_GAIN = 0.0;
-
-            MAX_POSITION = 2.0;
-            NINETY_ANGLE_RANGE = 1.0;
-            INITIAL_ANGLE = -10.0;
-            POSITION_TO_ANGLE = 90.0;
         } else {
-            //LOWER
-            // Define and Initialize Motors
             LeftMotor = hwMap.dcMotor.get("LL");
             RightMotor = hwMap.dcMotor.get("LR");
             // reverse those motors
@@ -103,18 +92,12 @@ public class ArmControl {
             Limit.setMode(DigitalChannel.Mode.INPUT);           // false = pressed
 
             // Define and initialize potentiometers
-            // 1V is approximately 180 degrees
             Potentiometer = hwMap.analogInput.get("lower pot");
 
-            // Set arm constants
-            HIGH_MAX_POWER = 0.8;    //0.8
-            LOW_MAX_POWER = 0.1;    //0.1
+            // Set power values
+            MAX_POS_POWER = 0.8;
+            MAX_NEG_POWER = 0.1;
             INTEGRAL_GAIN = 0.0;    // not needed??
-
-            MAX_POSITION = 1.0;
-            NINETY_ANGLE_RANGE = 0.5;
-            INITIAL_ANGLE = -5.0;
-            POSITION_TO_ANGLE = 180.0;
         }
         // Set all motors to zero power
         LeftMotor.setPower(0);
@@ -135,11 +118,14 @@ public class ArmControl {
         ErrorSum = 0.0;     // zero integral
     }
 
-    public void MoveIncrement(double inc, double time) {
-        FinalTarget += inc;
+    public void MoveUp() {
+        FinalTarget += 0.01;
         if (FinalTarget > MAX_POSITION) FinalTarget = MAX_POSITION;
+    }
+
+    public void MoveDown() {
+        FinalTarget -= 0.01;
         if (FinalTarget < 0.0) FinalTarget = 0.0;
-        TargetTime = time;
     }
 
     public void MoveHome() {
@@ -150,18 +136,15 @@ public class ArmControl {
         FinalTarget = CurrentPosition;
     }
 
-    public void MoveToPosition(double target, double time) {
+    public void MoveToPosition(double target) {
         FinalTarget = target;
         if (FinalTarget > MAX_POSITION) FinalTarget = MAX_POSITION;
         if (FinalTarget < 0.0) FinalTarget = 0.0;
-        TargetTime = time;
     }
 
     /* Call this method when you want to update the arm motors */
-    public void Update(OpMode om, double offset) {
-        double seconds;
+    public void Update(OpMode om) {
         double error;
-        double max_power;
 
         /* Check to see if on home switch */
         AtHome = false;
@@ -172,25 +155,23 @@ public class ArmControl {
             HomePosition = Potentiometer.getVoltage();
 
             ErrorSum = 0.0;     // zero integral
+            //adds a lil' version thing to the telemetry so you know you're using the right version
+//            om.telemetry.addLine("At Home");
         }
-
-        seconds = OurTime.seconds();
-        OurTime.reset();
 
         /* incrementally change target value */
-        if (TargetTime > seconds) {
-            CurrentTarget = CurrentTarget + (FinalTarget-CurrentTarget)*seconds/TargetTime;
-            TargetTime = TargetTime - seconds;
-        } else {
-            CurrentTarget = FinalTarget;
-            TargetTime = 0.0;
-        }
+        if (CurrentTarget < FinalTarget - 0.01) CurrentTarget += 0.02;
+        if (CurrentTarget > FinalTarget + 0.01) CurrentTarget -= 0.02;
+        if (FinalTarget < 0.01) CurrentTarget = 0.0;
+        if (CurrentTarget > MAX_POSITION) CurrentTarget = MAX_POSITION;
+        if (CurrentTarget < 0.0) CurrentTarget = 0.0;
 
         /* determine current position relative to home */
         CurrentPosition = Potentiometer.getVoltage() - HomePosition;
 
-        RelativeAngle = POSITION_TO_ANGLE*CurrentPosition + INITIAL_ANGLE;
-        Angle = RelativeAngle + offset;
+        /* determine velocity */
+        CurrentVelocity = 1000.0 * (CurrentPosition - LastPosition) / OurTime.milliseconds();
+        LastPosition = CurrentPosition;
 
         /*********** control code **********/
         error = CurrentTarget - CurrentPosition;
@@ -199,37 +180,36 @@ public class ArmControl {
 
 
         /* update integral */
-        ErrorSum += error*seconds;
-        om.telemetry.addData("Time Sum","%7.3f %6.3f",seconds,ErrorSum);
-
+        ErrorSum += error*OurTime.milliseconds()/1000.0;
         /* limit integral gain if never homed */
         if (!Homed) {
             if (ErrorSum > 0.5)
                 ErrorSum = 0.5;
         }
 
-        /* determine proportional gain */
-        if (error > 0.0 ) {
-            if (Angle < 120.0) {
-                max_power = (LOW_MAX_POWER-HIGH_MAX_POWER)*Angle/120.0 + HIGH_MAX_POWER;
-            } else {
-                max_power = LOW_MAX_POWER;
-            }
-        } else {
-            if (Angle < 60.0) {
-                max_power = LOW_MAX_POWER;
-            } else {
-                max_power = (HIGH_MAX_POWER-LOW_MAX_POWER)*(Angle-60.0)/120.0 + LOW_MAX_POWER;
+        if (CurrentPosition > 0.4) {
+            if (FinalTarget == 0.6 || Homed) {
+                //boost = CurrentPosition / 4;
+                boost = 0.0;
             }
         }
-        Power = max_power * 5 * error;
+        else {
+            boost = 0.0;
+        }
+
+        /* determine proportional gain */
+        if (error > 0.0 ) {
+            Power = MAX_POS_POWER * 5 * error /*- boost*/;
+        } else {
+            Power = MAX_NEG_POWER * 5 * error /*+ boost*/;
+        }
 
         /* determine integral gain */
         Power += ErrorSum*INTEGRAL_GAIN;
 
         /* limit power */
         if (Power>1.0) Power = 1.0;
-        if (Power<-1.0) Power = -1.0;
+        if (Power<-1.0 - boost) Power = -1.0 - boost;
 
         /* prevent negative power when...
             at home position or never homed
@@ -264,11 +244,13 @@ public class ArmControl {
             }
         }
 
+        OurTime.reset();
+
         RightMotor.setPower(Power);
         LeftMotor.setPower(Power);
 
         if (om!=null)
-            om.telemetry.addData("Power Error Angle", "%.2f %.2f %5.0f", Power, error, RelativeAngle);
+            om.telemetry.addData("Power Error Sum", "%.2f %.2f %.2f", Power, error, ErrorSum);
     }
 
     public void SetPower(double power) {

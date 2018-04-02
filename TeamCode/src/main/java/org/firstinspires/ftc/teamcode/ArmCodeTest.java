@@ -53,35 +53,23 @@ public class ArmCodeTest extends LinearOpMode {
                 robot.UpperArm.MoveHome();
             }
             if (egamepad2.dpad_left.pressed) {
-                robot.LowerArm.MoveToPosition(0.0, 1.0);
-                robot.UpperArm.MoveToPosition(0.2, 1.0);
+                robot.LowerArm.MoveToPosition(0.0);
+                robot.UpperArm.MoveToPosition(0.2);
             }
             if (egamepad2.dpad_right.pressed) {
-                robot.LowerArm.MoveToPosition(0.3, 1.0);
-                robot.UpperArm.MoveToPosition(0.5, 1.0);
+                robot.LowerArm.MoveToPosition(0.3);
+                robot.UpperArm.MoveToPosition(0.5);
             }
             if (egamepad2.dpad_up.pressed) {
-                robot.LowerArm.MoveToPosition(0.5, 1.0);
-                robot.UpperArm.MoveToPosition(0.8, 1.0);
+                robot.LowerArm.MoveToPosition(0.5);
+                robot.UpperArm.MoveToPosition(0.8);
             }
 
-            if (egamepad2.y.pressed) {
-                robot.UpperArm.MoveIncrement(0.1, 1.0);
-            }
-            if (egamepad2.a.pressed) {
-                robot.UpperArm.MoveIncrement(-0.1, 1.0);
-            }
-            if (egamepad2.b.pressed) {
-                robot.LowerArm.MoveIncrement(0.05, 1.0);
-            }
-            if (egamepad2.x.pressed) {
-                robot.LowerArm.MoveIncrement(-0.05, 1.0);
-            }
+            robot.LowerArm.Update(this);
+            robot.UpperArm.Update(this);
 
-            robot.LowerArm.Update(this, 0.0);
-            robot.UpperArm.Update(this, -robot.LowerArm.Angle);
-
-            telemetry.addData("Angles","%5.0f %5.0f",robot.LowerArm.Angle,robot.UpperArm.Angle);
+            telemetry.addData("Lower ", "%.2f %.2f", robot.LowerArm.CurrentPosition,robot.LowerArm.Power);
+            telemetry.addData("Upper ", "%.2f %.2f", robot.UpperArm.CurrentPosition,robot.UpperArm.Power);
             telemetry.update();
 
             //let the robot have a little rest, sleep is healthy
