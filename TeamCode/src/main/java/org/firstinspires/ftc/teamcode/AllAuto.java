@@ -100,11 +100,7 @@ public class AllAuto extends LinearOpMode {
     /* turns to the specified angle */
     public void turn2angle(int angle) {
         TargetAngle = angle;
-        if (step == 0) {
-            angle2turn = (TargetAngle - turnAngle);
-            step++;
-        }
-        angleleft2turn = (TargetAngle - turnAngle);
+        angle2turn = (TargetAngle - turnAngle);
 
         if (angle2turn > 180){
             angle2turn -= 360;
@@ -112,18 +108,12 @@ public class AllAuto extends LinearOpMode {
         if (angle2turn < -180){
             angle2turn += 360;
         }
-        if (angleleft2turn > 180){
-            angleleft2turn -= 360;
-        }
-        if (angleleft2turn < -180){
-            angleleft2turn += 360;
-        }
 
         //turns until it gets within a certain distance based on how far it has been turning
-        if (angleleft2turn > 10){
+        if (angle2turn < 10){
             robot.RotateRight(ROTATE_SPEED);
         }
-        if (angleleft2turn < 10){
+        if (angle2turn > -10){
             robot.RotateLeft(ROTATE_SPEED);
         }
         //at this point, it is within 10 degrees, so it tries to narrow down further
@@ -132,13 +122,9 @@ public class AllAuto extends LinearOpMode {
                 robot.MoveStop();
                 step++;
             }
-            if (angleleft2turn > 0){
-                robot.RotateRight(angleleft2turn*0.1);
-            }
-            if (angleleft2turn < 0){
-                robot.RotateRight(angleleft2turn*0.1);
-            }
-            if (2.5 > Math.abs(angleleft2turn)){
+
+            robot.RotateRight(angle2turn*0.1);
+            if (2.5 > Math.abs(angle2turn)){
                 mode++;
                 resetClock();
                 robot.MoveStop();
@@ -174,7 +160,6 @@ public class AllAuto extends LinearOpMode {
     double turnAngle;       //actual angle relative to where we started used for turning
     double angle2turn;
     double TargetAngle = 0;
-    double angleleft2turn = 0;
 
     //navigation color sensor variables
     boolean leftcolor = false;
@@ -375,7 +360,7 @@ public class AllAuto extends LinearOpMode {
                         if (now > 0.3){
                             robot.UpperArm.MoveToPosition(0.5);
                         }
-                        if (now > 3.0) {
+                        if (now > 10.0) {
                             robot.UpperArm.MoveHome();
                         }
                         if (robot.UpperArm.Limit.getState()==false) {
