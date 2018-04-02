@@ -70,12 +70,11 @@ public class teleop extends LinearOpMode {
 
             /******Telemetry*****/
             //adds a lil' version thing to the telemetry so you know you're using the right version
-            telemetry.addData("leftcolor", leftcolor);
-            telemetry.addData("rightcolor", rightcolor);
-            telemetry.addData("Lower", robot.LowerArm.CurrentPosition);
-            telemetry.addData("Upper", robot.UpperArm.CurrentPosition);
-            telemetry.addData("Speed", speed);
-            telemetry.update();
+//AJB            telemetry.addData("leftcolor", leftcolor);
+//AJB            telemetry.addData("rightcolor", rightcolor);
+//AJB            telemetry.addData("Lower", robot.LowerArm.CurrentPosition);
+//AJB            telemetry.addData("Upper", robot.UpperArm.CurrentPosition);
+//AJB            telemetry.addData("Speed", speed);
 
             /**------------------------------------------------------------------------**/
             /******GAMEPAD1 CONTROLS*****/
@@ -177,28 +176,33 @@ public class teleop extends LinearOpMode {
                 robot.UpperArm.MoveHome();
             }
             if (egamepad2.dpad_left.pressed) {
-                robot.LowerArm.MoveToPosition(0.0);
-                robot.UpperArm.MoveToPosition(0.2);
+                robot.LowerArm.MoveToPosition(0.0, 0.5);
+                robot.UpperArm.MoveToPosition(0.2, 0.5);
             }
             if (egamepad2.dpad_right.pressed) {
-                robot.LowerArm.MoveToPosition(0.2);
-                robot.UpperArm.MoveToPosition(0.5);
+                robot.LowerArm.MoveToPosition(0.2, 0.5);
+                robot.UpperArm.MoveToPosition(0.5, 0.5);
             }
             if (egamepad2.dpad_up.pressed) {
-                robot.LowerArm.MoveToPosition(0.3);
-                robot.UpperArm.MoveToPosition(0.7);
+                robot.LowerArm.MoveToPosition(0.3, 0.5);
+                robot.UpperArm.MoveToPosition(0.7, 0.5);
             }
-            if (egamepad2.y.pressed) {
+            /*(if (egamepad2.y.pressed) {
                 robot.LowerArm.MoveToPosition(1.9);
+            }
+            if (egamepad2.y.released) {
                 robot.UpperArm.MoveToPosition(0.6);
             }
+            */
 
-            robot.LowerArm.Update(this);
-            robot.UpperArm.Update(this);
+
+            robot.LowerArm.Update(this, 0.0);
+            robot.UpperArm.Update(this, -robot.LowerArm.Angle);
+
+            telemetry.update();
 
             //let the robot have a little rest, sleep is healthy
             sleep(40);
-
         }
     }
 }
