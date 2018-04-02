@@ -78,8 +78,8 @@ public class ArmControl {
             Potentiometer = hwMap.analogInput.get("upper pot");
 
             // Set power values
-            MAX_POS_POWER = 0.8;
-            MAX_NEG_POWER = 0.2;
+            MAX_POS_POWER = 0.6;
+            MAX_NEG_POWER = 0.1;
             INTEGRAL_GAIN = 0.0;
         } else {
             LeftMotor = hwMap.dcMotor.get("LL");
@@ -95,7 +95,7 @@ public class ArmControl {
             Potentiometer = hwMap.analogInput.get("lower pot");
 
             // Set power values
-            MAX_POS_POWER = 0.8;
+            MAX_POS_POWER = 0.9;
             MAX_NEG_POWER = 0.1;
             INTEGRAL_GAIN = 0.0;    // not needed??
         }

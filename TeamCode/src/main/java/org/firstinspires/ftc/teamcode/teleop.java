@@ -72,11 +72,12 @@ public class teleop extends LinearOpMode {
 
             /******Telemetry*****/
             //adds a lil' version thing to the telemetry so you know you're using the right version
-//AJB            telemetry.addData("leftcolor", leftcolor);
-//AJB            telemetry.addData("rightcolor", rightcolor);
-//AJB            telemetry.addData("Lower", robot.LowerArm.CurrentPosition);
-//AJB            telemetry.addData("Upper", robot.UpperArm.CurrentPosition);
-//AJB            telemetry.addData("Speed", speed);
+            telemetry.addData("leftcolor", leftcolor);
+            telemetry.addData("rightcolor", rightcolor);
+            telemetry.addData("Lower", robot.LowerArm.CurrentPosition);
+            telemetry.addData("Upper", robot.UpperArm.CurrentPosition);
+            telemetry.addData("Speed", speed);
+            telemetry.update();
 
             /**------------------------------------------------------------------------**/
             /******GAMEPAD1 CONTROLS*****/
@@ -182,25 +183,25 @@ public class teleop extends LinearOpMode {
 
 
             if (egamepad2.dpad_up.pressed) {
-                index_arm = (index_arm < 2) ? index_arm + 1 : 2;
+                index_arm = (index_arm < 3) ? index_arm + 1 : 3;
             }
             if (egamepad2.dpad_down.pressed) {
-                index_arm = (index_arm > -1) ? index_arm - 1 : 0;
+                index_arm = (index_arm > 0) ? index_arm - 1 : 0;
             }
 
             if (egamepad2.dpad_left.pressed) {
-                robot.LowerArm.MoveToPosition(0.0, 0.5);
-                robot.UpperArm.MoveToPosition(0.2, 0.5);
+                robot.LowerArm.MoveToPosition(0.0);
+                robot.UpperArm.MoveToPosition(0.2);
             }
             if (egamepad2.dpad_right.pressed) {
-                robot.LowerArm.MoveToPosition(0.2, 0.5);
-                robot.UpperArm.MoveToPosition(0.5, 0.5);
+                robot.LowerArm.MoveToPosition(0.2);
+                robot.UpperArm.MoveToPosition(0.5);
             }
             robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm]);
             robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm]);
             /*if (egamepad2.dpad_up.pressed) {
-                robot.LowerArm.MoveToPosition(0.3, 0.5);
-                robot.UpperArm.MoveToPosition(0.7, 0.5);
+                robot.LowerArm.MoveToPosition(0.3);
+                robot.UpperArm.MoveToPosition(0.7);
             }
 
             (if (egamepad2.y.pressed) {
@@ -212,14 +213,12 @@ public class teleop extends LinearOpMode {
             */
 
 
-            robot.LowerArm.Update(this, 0.0);
-            robot.UpperArm.Update(this, -robot.LowerArm.Angle);
-
-            telemetry.update();
+            robot.LowerArm.Update(this);
+            robot.UpperArm.Update(this);
 
             //let the robot have a little rest, sleep is healthy
             sleep(40);
+
         }
     }
 }
-
