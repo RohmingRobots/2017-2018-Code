@@ -110,14 +110,15 @@ public class AllAuto extends LinearOpMode {
         }
 
         //turns until it gets within a certain distance based on how far it has been turning
-        if (angle2turn < 10){
+        if (angle2turn > 10){
             robot.RotateRight(ROTATE_SPEED);
         }
-        if (angle2turn > -10){
+        if (angle2turn < -10){
             robot.RotateLeft(ROTATE_SPEED);
         }
         //at this point, it is within 10 degrees, so it tries to narrow down further
         else {
+            /*
             if (step == 1){
                 robot.MoveStop();
                 step++;
@@ -130,6 +131,11 @@ public class AllAuto extends LinearOpMode {
                 robot.MoveStop();
                 step = 0;
             }
+            */
+            mode++;
+            resetClock();
+            robot.MoveStop();
+            step = 0;
         }
     }
 
@@ -181,7 +187,7 @@ public class AllAuto extends LinearOpMode {
     //modes lists which steps and in what order to accomplish them
     int step = 0;
     int mode = 0;
-    int [] modes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 100};
+    int [] modes = {/*1, */2, 3, 4, 5, 6, /*7, 8, 9, */100};
     /* List of what the mode numbers do so you don't have to hunt them down elsewhere
       1: Vumark detection + jewel selection
       2: Back off balancing stone
@@ -221,7 +227,7 @@ public class AllAuto extends LinearOpMode {
         /* Initializes the movement speeds which are scaled based on the starting voltage */
         MOVE_SPEED = 0.5 + ((13.2-voltage)/12);
         STRAFFE_SPEED = 0.75 + ((13.2-voltage)/12);
-        ROTATE_SPEED = 0.4 + ((13.2-voltage)/12);
+        ROTATE_SPEED = 0.35 + ((13.2-voltage)/12);
 
         /* Turns off all the color sensor lights */
         robot.left_color.enableLed(false);
@@ -360,7 +366,7 @@ public class AllAuto extends LinearOpMode {
                         if (now > 0.3){
                             robot.UpperArm.MoveToPosition(0.5);
                         }
-                        if (now > 10.0) {
+                        if (now > 3.0) {
                             robot.UpperArm.MoveHome();
                         }
                         if (robot.UpperArm.Limit.getState()==false) {
@@ -480,7 +486,7 @@ public class AllAuto extends LinearOpMode {
                         }
 
                         //gives time for jewel servos to fold in
-                        if (now > 5.0) {
+                        if (now > 6.0) {
                             robot.UpperArm.MoveHome();
                             mode++;
                             resetClock();
@@ -498,7 +504,7 @@ public class AllAuto extends LinearOpMode {
 
                     //backs up for a set time
                     robot.MoveBackward(MOVE_SPEED);
-                    if (now > 0.5) {
+                    if (now > 0.4) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -563,7 +569,7 @@ public class AllAuto extends LinearOpMode {
 
                     //moves forward for a set time (FI) or till it sees a line (BI)
                     robot.MoveForward(MOVE_SPEED);
-                    if ((FI && now > 1.2) || (!FI && (leftcolor || rightcolor))) {
+                    if ((FI && now > 1.0) || (!FI && (leftcolor || rightcolor))) {
                         mode++;
                         resetClock();
                         robot.MoveStop();

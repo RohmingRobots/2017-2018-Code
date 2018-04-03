@@ -78,7 +78,7 @@ public class ArmControl {
             Potentiometer = hwMap.analogInput.get("upper pot");
 
             // Set power values
-            MAX_POS_POWER = 0.8;
+            MAX_POS_POWER = 0.6;
             MAX_NEG_POWER = 0.2;
             INTEGRAL_GAIN = 0.0;
         } else {
