@@ -272,6 +272,9 @@ public class AllAuto extends LinearOpMode {
         /* in case I want to modify it more easily for one position */
         //chooseModes();
 
+        //transitions to and initializes teleop once auto is done
+        AutoTransitioner.transitionOnStop(this, "TeleOp");
+
         //waits for that giant PLAY button to be pressed on RC
         waitForStart();
 
