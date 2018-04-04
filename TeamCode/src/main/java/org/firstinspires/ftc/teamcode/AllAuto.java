@@ -384,6 +384,8 @@ public class AllAuto extends LinearOpMode {
                             break;
                         case 3:
                             if (robot.UpperArm.Limit.getState()==false) {
+                                //raises arm
+                                robot.UpperArm.MoveToPosition(0.2, 0.5);
                                 mode++;
                                 resetClock();
                                 startAngle = angles.firstAngle;
@@ -395,11 +397,6 @@ public class AllAuto extends LinearOpMode {
 
                 /* jewel scoring steps part 1 */
                 case 11:
-                    //raises arm
-                    if (now > 0.7) {
-                        robot.UpperArm.MoveToPosition(0.2);
-                    }
-
                     //turns ampere LEDs om
                     robot.left_ampere.enableLed(true);
                     robot.right_ampere.enableLed(true);
