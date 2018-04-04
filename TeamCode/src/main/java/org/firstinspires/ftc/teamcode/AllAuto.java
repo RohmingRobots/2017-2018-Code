@@ -178,6 +178,8 @@ public class AllAuto extends LinearOpMode {
          */
         robot.init(hardwareMap);
 
+        int home_sequence = 1;
+
         double voltage = robot.Battery.getVoltage();
         telemetry.addData("Voltage", voltage);
 
@@ -366,27 +368,35 @@ public class AllAuto extends LinearOpMode {
                     if (vuMark == RelicRecoveryVuMark.CENTER){
                         telemetry.addData("VuMark", "center");
                     }
-                    if (now > 0.5){
-                        robot.UpperArm.MoveToPosition(0.5);
-                    }
-                    if (now > 3.0) {
-                        robot.UpperArm.MoveHome();
-                    }
-                    if (robot.UpperArm.Limit.getState()==false) {
-                        mode++;
-                        resetClock();
-                        startAngle = angles.firstAngle;
-                        robot.MoveStop();
+
+                    switch (home_sequence) {
+                        case 1:
+                            if (now > 0.5) {
+                                robot.UpperArm.MoveToPosition(0.3);
+                                home_sequence++;
+                            }
+                            break;
+                        case 2:
+                            if (robot.UpperArm.CurrentPosition > 0.1) {
+                                robot.UpperArm.MoveHome();
+                                home_sequence++;
+                            }
+                            break;
+                        case 3:
+                            if (robot.UpperArm.Limit.getState()==false) {
+                                //raises arm
+                                robot.UpperArm.MoveToPosition(0.2, 0.5);
+                                mode++;
+                                resetClock();
+                                startAngle = angles.firstAngle;
+                                robot.MoveStop();
+                            }
+                            break;
                     }
                     break;
 
                 /* jewel scoring steps part 1 */
                 case 11:
-                    //raises arm
-                    if (now > 0.7) {
-                        robot.UpperArm.MoveToPosition(0.2);
-                    }
-
                     //turns ampere LEDs om
                     robot.left_ampere.enableLed(true);
                     robot.right_ampere.enableLed(true);
