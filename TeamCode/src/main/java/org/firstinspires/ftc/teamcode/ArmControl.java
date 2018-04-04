@@ -34,10 +34,10 @@ public class ArmControl {
     //declaring all my variables in one place for my sake
     private double HomePosition = 0;        /* position value at home */
     public double CurrentPosition = 0;      /* current position relative to home */
-    private double LastPosition = 0;        /* last position relative to home, used to calculate velocity */
-    private double CurrentVelocity = 0;     /* velocity of arm */
     private double FinalTarget = 0;         /* final target position */
-    private double CurrentTarget = 0;       /* target position */
+    private double FinalTime = 0;           /* time to move to final target */
+    private double CurrentTarget = 0;       /* current target position */
+    private double CurrentTime = 0;         /* current time to target */
     private boolean Homed = false;          /* arm has been at home - home position valid */
     private boolean AtHome = false;         /* home switch active - currently at home */
     private double ErrorSum = 0.0;          /* integral error */
@@ -46,7 +46,6 @@ public class ArmControl {
     private double MAX_NEG_POWER = 0.0;
     private double INTEGRAL_GAIN = 0.0;
     private double MAX_POSITION = 1.5;
-    private double boost = 0.0;
 
     private ElapsedTime OurTime = new ElapsedTime();
 
@@ -78,9 +77,12 @@ public class ArmControl {
             Potentiometer = hwMap.analogInput.get("upper pot");
 
             // Set power values
-            MAX_POS_POWER = 0.8;
-            MAX_NEG_POWER = 0.2;
-            INTEGRAL_GAIN = 0.0;
+//            MAX_POS_POWER = 0.5;
+//            MAX_NEG_POWER = 0.2;
+//            INTEGRAL_GAIN = 0.5;
+            MAX_POS_POWER = 0.5;    // 0.8
+            MAX_NEG_POWER = 0.2;    // 0.2
+            INTEGRAL_GAIN = 0.5;    // 0.0
         } else {
             LeftMotor = hwMap.dcMotor.get("LL");
             RightMotor = hwMap.dcMotor.get("LR");
@@ -121,25 +123,34 @@ public class ArmControl {
     public void MoveUp() {
         FinalTarget += 0.01;
         if (FinalTarget > MAX_POSITION) FinalTarget = MAX_POSITION;
+        FinalTime = 0.0;
     }
 
     public void MoveDown() {
         FinalTarget -= 0.01;
         if (FinalTarget < 0.0) FinalTarget = 0.0;
+        FinalTime = 0.0;
     }
 
     public void MoveHome() {
         FinalTarget = 0.0;
+        FinalTime = 0.0;
     }
 
     public void HoldCurrentPosition() {
         FinalTarget = CurrentPosition;
+        FinalTime = 0.0;
     }
 
     public void MoveToPosition(double target) {
+        MoveToPosition(target, 0.0);
+    }
+
+    public void MoveToPosition(double target, double time) {
         FinalTarget = target;
         if (FinalTarget > MAX_POSITION) FinalTarget = MAX_POSITION;
         if (FinalTarget < 0.0) FinalTarget = 0.0;
+        FinalTime = time;
     }
 
     /* Call this method when you want to update the arm motors */
@@ -160,18 +171,17 @@ public class ArmControl {
         }
 
         /* incrementally change target value */
-        if (CurrentTarget < FinalTarget - 0.01) CurrentTarget += 0.02;
-        if (CurrentTarget > FinalTarget + 0.01) CurrentTarget -= 0.02;
-        if (FinalTarget < 0.01) CurrentTarget = 0.0;
-        if (CurrentTarget > MAX_POSITION) CurrentTarget = MAX_POSITION;
-        if (CurrentTarget < 0.0) CurrentTarget = 0.0;
+        CurrentTime = OurTime.seconds();
+        if (CurrentTime < FinalTime) {
+            CurrentTarget = CurrentTarget + (FinalTarget-CurrentTarget)*CurrentTime/FinalTime;
+            FinalTime = FinalTime - CurrentTime;
+        } else {
+            CurrentTarget = FinalTarget;
+            FinalTime = 0.0;
+        }
 
         /* determine current position relative to home */
         CurrentPosition = Potentiometer.getVoltage() - HomePosition;
-
-        /* determine velocity */
-        CurrentVelocity = 1000.0 * (CurrentPosition - LastPosition) / OurTime.milliseconds();
-        LastPosition = CurrentPosition;
 
         /*********** control code **********/
         error = CurrentTarget - CurrentPosition;
@@ -186,21 +196,11 @@ public class ArmControl {
                 ErrorSum = 0.5;
         }
 
-        if (CurrentPosition > 0.4) {
-            if (FinalTarget == 0.6 || Homed) {
-                //boost = CurrentPosition / 4;
-                boost = 0.0;
-            }
-        }
-        else {
-            boost = 0.0;
-        }
-
         /* determine proportional gain */
         if (error > 0.0 ) {
-            Power = MAX_POS_POWER * 5 * error /*- boost*/;
+            Power = MAX_POS_POWER * 5 * error;
         } else {
-            Power = MAX_NEG_POWER * 5 * error /*+ boost*/;
+            Power = MAX_NEG_POWER * 5 * error;
         }
 
         /* determine integral gain */
@@ -208,7 +208,7 @@ public class ArmControl {
 
         /* limit power */
         if (Power>1.0) Power = 1.0;
-        if (Power<-1.0 - boost) Power = -1.0 - boost;
+        if (Power<-1.0) Power = -1.0;
 
         /* prevent negative power when...
             at home position or never homed

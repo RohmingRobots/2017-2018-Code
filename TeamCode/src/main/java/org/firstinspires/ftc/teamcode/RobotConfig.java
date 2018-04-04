@@ -184,7 +184,7 @@ public class RobotConfig
         UpperArm.init(hwMap,true);
 
         // **** IMU objects ****
-        Battery = hwMap.voltageSensor.get("Lower hub 2");
+        Battery = hwMap.voltageSensor.get("Lower hub 3");
     }
 
     /* forward is positive speed, backward is negative speed */
