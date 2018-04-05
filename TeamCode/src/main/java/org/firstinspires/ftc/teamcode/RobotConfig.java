@@ -234,6 +234,13 @@ public class RobotConfig
         RotateLeftRight(-speed);
     }
 
+
+    /* Call this method when you want to update the arm motors */
+    public void ArmUpdate(OpMode om, boolean active) {
+        LowerArm.Update(om, 0.0, active);
+        UpperArm.Update(om, -LowerArm.Angle, active);
+    }
+
     /***
      *
      * waitForTick implements a periodic delay. However, this acts like a metronome with a regular
