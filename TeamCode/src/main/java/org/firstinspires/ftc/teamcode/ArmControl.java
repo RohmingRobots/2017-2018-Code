@@ -135,8 +135,11 @@ public class ArmControl {
     }
 
     public void MoveHome() {
-        FinalTarget = 0.0;
-        FinalTime = 0.0;
+        MoveToPosition(0.0);
+    }
+
+    public void MoveHome(double time) {
+        MoveToPosition(0.0, time);
     }
 
     public void HoldCurrentPosition() {
