@@ -52,7 +52,7 @@ public class teleop extends LinearOpMode {
         index_grabber_right = 0;
         index_claw = 0;
         index_arm = 0;
-        telemetry.addData("Version", "Super");
+        telemetry.addData("Version", "World");
         telemetry.update();
 
         //waits for that giant PLAY button to be pressed on RC
@@ -174,42 +174,25 @@ public class teleop extends LinearOpMode {
             robot.Claw.setPosition(robot.CLAW[index_claw]);
 
             /********** Arm code **********/
-            /*if (egamepad2.dpad_down.pressed) {
-                robot.LowerArm.MoveHome();
-                robot.UpperArm.MoveHome();
-
-
-            }*/
-
-
+            /* Only call MoveToPosition method once per move */
             if (egamepad2.dpad_up.pressed) {
                 index_arm = (index_arm < 3) ? index_arm + 1 : 3;
+                robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 0.5);
+                robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.5);
             }
             if (egamepad2.dpad_down.pressed) {
                 index_arm = (index_arm > 0) ? index_arm - 1 : 0;
+                robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 0.5);
+                robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.5);
             }
-
             if (egamepad2.dpad_left.pressed) {
-             index_arm = 0;
+                index_arm = 0;
+                robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 0.5);
+                robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.5);
             }
             if (egamepad2.dpad_right.pressed) {
 
             }
-            robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 0.2);
-            robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.2);
-            /*if (egamepad2.dpad_up.pressed) {
-                robot.LowerArm.MoveToPosition(0.3);
-                robot.UpperArm.MoveToPosition(0.7);
-            }
-
-            (if (egamepad2.y.pressed) {
-                robot.LowerArm.MoveToPosition(1.9);
-            }
-            if (egamepad2.y.released) {
-                robot.UpperArm.MoveToPosition(0.6);
-            }
-            */
-
 
             robot.LowerArm.Update(this);
             robot.UpperArm.Update(this);
