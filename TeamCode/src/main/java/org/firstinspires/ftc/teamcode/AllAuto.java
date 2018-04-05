@@ -185,6 +185,7 @@ public class AllAuto extends LinearOpMode {
 
     /* Mode 'stuff' */
     //modes lists which steps and in what order to accomplish them
+    int home_sequence = 0;
     int step = 0;
     int mode = 0;
     int [] modes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 100};
@@ -357,36 +358,47 @@ public class AllAuto extends LinearOpMode {
                         if (vuMark == RelicRecoveryVuMark.UNKNOWN) {
                             telemetry.addData("VuMark", "not visible");
                         }
-                        if (vuMark == RelicRecoveryVuMark.LEFT){
+                        if (vuMark == RelicRecoveryVuMark.LEFT) {
                             telemetry.addData("VuMark", "left");
                         }
-                        if (vuMark == RelicRecoveryVuMark.RIGHT){
+                        if (vuMark == RelicRecoveryVuMark.RIGHT) {
                             telemetry.addData("VuMark", "right");
                         }
-                        if (vuMark == RelicRecoveryVuMark.CENTER){
+                        if (vuMark == RelicRecoveryVuMark.CENTER) {
                             telemetry.addData("VuMark", "center");
                         }
-                        if (now > 0.3){
-                            robot.UpperArm.MoveToPosition(0.5);
-                        }
-                        if (now > 3.0) {
-                            robot.UpperArm.MoveHome();
-                        }
-                        if (robot.UpperArm.Limit.getState()==false) {
-                            mode++;
-                            resetClock();
-                            startAngle = angles.firstAngle;
-                            robot.MoveStop();
+
+                        switch (home_sequence) {
+                            case 0:
+                                /* lift arm up, through gate, after glyph grabbed */
+                                if (now > 0.5) {
+                                    robot.UpperArm.MoveToPosition(0.3);
+                                    home_sequence++;
+                                }
+                                break;
+                            case 1:
+                                /* wait until arm has gone through gate, then send arm home */
+                                if (robot.UpperArm.CurrentPosition > 0.1) {
+                                    robot.UpperArm.MoveHome();
+                                    home_sequence++;
+                                }
+                                break;
+                            case 2:
+                                /* wait until arm home, then lift up to allow amperes to extend */
+                                if (robot.UpperArm.Limit.getState()==false) {
+// skip jewel part
+//                                    robot.UpperArm.MoveToPosition(0.2, 0.5);
+//                                    step++;
+                                    mode++;
+                                    resetClock();
+                                    robot.MoveStop();
+                                }
+                                break;
                         }
                     }
 
                     /* jewel selection step 1 */
                     if (step == 1) {
-                        //raises arm
-                        if (now > 0.7) {
-                            robot.UpperArm.MoveToPosition(0.2);
-                        }
-
                         //turns ampere LEDs om
                         robot.left_ampere.enableLed(true);
                         robot.right_ampere.enableLed(true);
