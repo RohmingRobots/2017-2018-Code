@@ -67,7 +67,10 @@ public class SensorTest extends LinearOpMode {
             telemetry.addData("Limits: ","%b %b",
                     robot.LowerArm.Limit.getState(), robot.UpperArm.Limit.getState());
             telemetry.addData("Pots: ","%.2f %.2f",
-                    robot.LowerArm.Potentiometer.getVoltage(), robot.UpperArm.Potentiometer.getVoltage());
+                    robot.LowerArm.CurrentPosition, robot.UpperArm.CurrentPosition);
+            telemetry.addLine("AAAAAAAAAAA");
+            telemetry.addData("Lower", robot.LowerArm.CurrentPosition);
+
 
             /* Display servo positions */
             //AJB doesn't work when PWM disabled

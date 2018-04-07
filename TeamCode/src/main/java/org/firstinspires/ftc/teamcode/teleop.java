@@ -77,6 +77,7 @@ public class teleop extends LinearOpMode {
             telemetry.addData("Lower", robot.LowerArm.CurrentPosition);
             telemetry.addData("Upper", robot.UpperArm.CurrentPosition);
             telemetry.addData("Speed", speed);
+            telemetry.addLine("AAAAAAAAAAA");
             telemetry.update();
 
             /**------------------------------------------------------------------------**/

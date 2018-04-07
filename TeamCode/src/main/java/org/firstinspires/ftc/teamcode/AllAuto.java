@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 
 
 //naming the teleop thing
-@Autonomous(name="AllAuto", group ="Drive")
+@Autonomous(name="AllAuto bad", group ="Drive")
 public class AllAuto extends LinearOpMode {
 
     OpenGLMatrix lastLocation = null;

@@ -96,8 +96,8 @@ public class RobotConfig
     */
     ArmControl  LowerArm = new ArmControl();
     ArmControl  UpperArm = new ArmControl();
-    public double[] LOWERARM = {0.0, 0.0, 0.2, 0.3};
-    public double[] UPPERARM = {0.0, 0.2, 0.5, 0.7};
+    public double[] LOWERARM = {0.0, 0.0, 0.3, 0.47};
+    public double[] UPPERARM = {0.0, 0.2, 0.4, 0.55};
 
     /* Public
     * IMU objects
