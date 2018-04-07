@@ -133,11 +133,8 @@ public class ArmControl {
     }
 
     public void MoveHome() {
-        MoveToPosition(0.0);
-    }
-
-    public void MoveHome(double time) {
-        MoveToPosition(0.0, time);
+        FinalTarget = 0.0;
+        FinalTime = 0.0;
     }
 
     public void HoldCurrentPosition() {
@@ -190,7 +187,6 @@ public class ArmControl {
         error = CurrentTarget - CurrentPosition;
         if (error > 0.2) error = 0.2;
         if (error < -0.2) error = -0.2;
-
 
         /* update integral */
         ErrorSum += error*OurTime.milliseconds()/1000.0;
