@@ -74,8 +74,6 @@ public class RobotConfig
     */
     public CRServo AWL = null;
     public CRServo AWR = null;
-    public Servo RG = null;
-    public Servo LG = null;
     public Servo AFL = null;
     public Servo AFR = null;
     public ColorSensor left_ampere = null;
@@ -98,8 +96,8 @@ public class RobotConfig
     */
     ArmControl  LowerArm = new ArmControl();
     ArmControl  UpperArm = new ArmControl();
-    public double[] LOWERARM = {0.0, 0.0, 0.35, 0.50};
-    public double[] UPPERARM = {0.0, 0.2, 0.45, 0.70};
+    public double[] LOWERARM = {0.0, 0.0, 0.2, 0.3};
+    public double[] UPPERARM = {0.0, 0.2, 0.5, 0.7};
 
     /* Public
     * IMU objects
@@ -159,9 +157,6 @@ public class RobotConfig
         AWL.setPower(0.0);
         AWR.setPower(0.0);
 
-        LG = hwMap.servo.get("LG");
-        RG = hwMap.servo.get("RG");
-
         // Define and Initialize Motors
         AFL = hwMap.servo.get("AFL");
         AFR = hwMap.servo.get("AFR");
@@ -170,7 +165,7 @@ public class RobotConfig
         // set initial positions
         AFL.setPosition(AMPERE_FLICKER_LEFT[0]);
         AFR.setPosition(AMPERE_FLICKER_RIGHT[0]);
-        LG.setDirection(Servo.Direction.REVERSE);
+
         // Define and Initialize color sensors
         left_ampere = hwMap.colorSensor.get("left_ampere");
         right_ampere = hwMap.colorSensor.get("right_ampere");
