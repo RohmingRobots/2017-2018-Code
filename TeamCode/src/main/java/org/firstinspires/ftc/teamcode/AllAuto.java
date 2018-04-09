@@ -555,7 +555,7 @@ public class AllAuto extends LinearOpMode {
                             robot.MoveRight(STRAFFE_SPEED);
                         }
                         else {
-                            robot.MoveLeft(STRAFFE_SPEED * 1.2);
+                            robot.MoveLeft(STRAFFE_SPEED);
                         }
                     }
                     else {
@@ -622,7 +622,7 @@ public class AllAuto extends LinearOpMode {
                     if (FI) {
                         if (step == -1) {
                             robot.MoveBackward(MOVE_SPEED);
-                            if (now > 0.5) {
+                            if (now > 0.3) {
                                 step++;
                                 resetClock();
                                 robot.MoveStop();
@@ -805,10 +805,10 @@ public class AllAuto extends LinearOpMode {
                 case 9:
                     //backs up for a set time
                     robot.MoveBackward(MOVE_SPEED * 0.8);
-                    if (now > 0.2) {
+                    if (now > 0.15) {
+                        robot.MoveStop();
                         mode++;
                         resetClock();
-                        robot.MoveStop();
                         step = 0;
                     }
                     break;
