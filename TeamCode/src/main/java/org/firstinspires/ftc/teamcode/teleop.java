@@ -33,6 +33,13 @@ public class teleop extends LinearOpMode {
         int index_grabber_right;
         int index_claw;
         int index_arm;
+        int index_LG = 0;
+        int index_RG = 0;
+        double[] GUIDESLEFT = {1, 0.2};
+        double[] GUIDESRIGHT = {0.94, 0.14};
+        double[] AMPERE_FLICKER_LEFT = {0.0, 0.6, 1.0};
+        double[] AMPERE_FLICKER_RIGHT = {0.0, 0.6, 1.0};
+
 
         //navigation color sensor variables
         boolean leftcolor = false;
@@ -192,7 +199,10 @@ public class teleop extends LinearOpMode {
                 robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.5);
             }
             if (egamepad2.dpad_right.pressed) {
-
+                index_RG = (index_RG < 1) ? index_RG + 1 : 0;
+                index_LG = (index_LG < 1) ? index_LG + 1 : 0;
+                robot.LG.setPosition(GUIDESLEFT[index_LG]);
+                robot.RG.setPosition(GUIDESRIGHT[index_RG]);
             }
 
             robot.LowerArm.Update(this);
