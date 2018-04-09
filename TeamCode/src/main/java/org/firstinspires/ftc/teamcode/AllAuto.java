@@ -541,7 +541,7 @@ public class AllAuto extends LinearOpMode {
                     //robot.AWR.setPower(-AMPERE_POWER);
 
                     //strafes in the direction of the stone, which depends on team color
-                    if (now < 0.35){
+                    if (now < 0.37){
                         robot.MoveForward(MOVE_SPEED * 0.75);
                     }
                     else if (now > 0.5) {
@@ -774,7 +774,7 @@ public class AllAuto extends LinearOpMode {
 
                     //moves forward for a set time
                     robot.MoveForward(MOVE_SPEED/1.2);
-                    if (now > 0.3) {
+                    if (now > 0.4) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -786,7 +786,7 @@ public class AllAuto extends LinearOpMode {
                 case 9:
                     //backs up for a set time
                     robot.MoveBackward(MOVE_SPEED/1.2);
-                    if (now > 0.1) {
+                    if (now > 0.2) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
