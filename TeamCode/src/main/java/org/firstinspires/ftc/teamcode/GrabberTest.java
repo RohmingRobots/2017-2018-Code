@@ -41,6 +41,10 @@ public class GrabberTest extends LinearOpMode {
         index_grabber_left = 0;
         index_grabber_right = 0;
         index_claw = 0;
+        int index_LG = 0;
+        int index_RG = 0;
+        double[] GUIDESLEFT = {1, 0.2};
+        double[] GUIDESRIGHT = {0.94, 0.14};
 
         telemetry.addLine("Grabber Test");
         telemetry.addLine("gamepad 1");
@@ -61,27 +65,31 @@ public class GrabberTest extends LinearOpMode {
             egamepad2.UpdateEdge();
 
             /* display information */
-            telemetry.addData("Grabbers ", "%.2f %.2f", robot.GGL.getPosition(),robot.GGR.getPosition());
+            telemetry.addData("Grabbers ", "%.2f %.2f", robot.LG.getPosition(),robot.RG.getPosition());
             telemetry.addData("Claw     ", "%.2f", robot.Claw.getPosition());
             telemetry.addData("IsPressed" , "%b", pressed);
             telemetry.update();
 
             // grabbers -------------------------------------------------------------
-            /*if (egamepad1.dpad_down.pressed) {
-                robot.GGL.setPosition(robot.GGL.getPosition() - increment);
+           /* if (egamepad1.dpad_down.pressed) {
+                robot.LG .setPosition(robot.LG.getPosition() - increment);
             }
             if (egamepad1.dpad_up.pressed) {
-                robot.GGL.setPosition(robot.GGL.getPosition() + increment);
+                robot.LG.setPosition(robot.LG.getPosition() + increment);
             }
 
             if (egamepad1.dpad_left.pressed) {
-                robot.GGR.setPosition(robot.GGR.getPosition() - increment);
-            }
+                robot.RG.setPosition(robot.RG.getPosition() - increment);
+                }
+          */
             if (egamepad1.dpad_right.pressed) {
-                robot.GGR.setPosition(robot.GGR.getPosition() + increment);
+                index_RG = (index_RG < 1) ? index_RG + 1 : 0;
+                index_LG = (index_LG < 1) ? index_LG + 1 : 0;
+                robot.LG.setPosition(GUIDESLEFT[index_LG]);
+                robot.RG.setPosition(GUIDESRIGHT[index_RG]);
             }
 
-            if (egamepad1.y.pressed) {
+          /*  if (egamepad1.y.pressed) {
                 robot.Claw.setPosition(robot.Claw.getPosition() + increment);
             }
             if (egamepad1.a.pressed) {
