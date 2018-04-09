@@ -6,6 +6,7 @@ package org.firstinspires.ftc.teamcode;
  */
 
 
+import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -33,6 +34,11 @@ public class teleop extends LinearOpMode {
         int index_grabber_right;
         int index_claw;
         int index_arm;
+        int index_guide = 0;
+        int close_guides = 0;
+        double[] GUIDESLEFT = {1, 0.2};
+        double[] GUIDESRIGHT = {0.94, 0.14};
+
 
         //navigation color sensor variables
         boolean leftcolor = false;
@@ -52,6 +58,7 @@ public class teleop extends LinearOpMode {
         index_grabber_right = 0;
         index_claw = 0;
         index_arm = 0;
+        index_guide = 0;
         telemetry.addData("Version", "World");
         telemetry.update();
 
@@ -77,6 +84,7 @@ public class teleop extends LinearOpMode {
             telemetry.addData("Lower", robot.LowerArm.CurrentPosition);
             telemetry.addData("Upper", robot.UpperArm.CurrentPosition);
             telemetry.addData("Speed", speed);
+            telemetry.addLine("AAAAAAAAAAA");
             telemetry.update();
 
             /**------------------------------------------------------------------------**/
@@ -173,13 +181,29 @@ public class teleop extends LinearOpMode {
             }
             robot.Claw.setPosition(robot.CLAW[index_claw]);
 
+            //*******Guides**********/
+            if (egamepad2.dpad_right.pressed) {
+                index_guide = (index_guide < 1) ? index_guide + 1 : 0;
+                robot.LG.setPosition(GUIDESLEFT[index_guide]);
+                robot.RG.setPosition(GUIDESRIGHT[index_guide]);
+            }
+
             /********** Arm code **********/
             /* Only call MoveToPosition method once per move */
             if (egamepad2.dpad_up.pressed) {
                 index_arm = (index_arm < 3) ? index_arm + 1 : 3;
                 robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 0.5);
                 robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.5);
+                close_guides = 1;
             }
+            //closing guides when arm is up/
+            if ( (close_guides==1) && (robot.UpperArm.CurrentPosition > .1)) {
+                index_guide=0;
+                robot.LG.setPosition(GUIDESLEFT[index_guide]);
+                robot.RG.setPosition(GUIDESRIGHT[index_guide]);
+                close_guides = 0;
+            }
+
             if (egamepad2.dpad_down.pressed) {
                 index_arm = (index_arm > 0) ? index_arm - 1 : 0;
                 robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 0.5);
@@ -189,9 +213,6 @@ public class teleop extends LinearOpMode {
                 index_arm = 0;
                 robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 0.5);
                 robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.5);
-            }
-            if (egamepad2.dpad_right.pressed) {
-
             }
 
             robot.LowerArm.Update(this);

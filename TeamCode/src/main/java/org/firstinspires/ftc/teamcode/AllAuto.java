@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 
 
 //naming the teleop thing
-@Autonomous(name="AllAuto", group ="Drive")
+@Autonomous(name="AllAuto bad", group ="Drive")
 public class AllAuto extends LinearOpMode {
 
     OpenGLMatrix lastLocation = null;
@@ -188,6 +188,16 @@ public class AllAuto extends LinearOpMode {
     int home_sequence = 0;
     int step = 0;
     int mode = 0;
+
+    int [] modesRAFI = {1, 11, 12, 13, 2, 30, 40, 50, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesRABI = {1, 11, 12, 13, 2, 30, 41, 51, 20, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesBAFI = {1, 11, 12, 13, 2, 31, 40, 52, 6, 70, 71, -1, 8, 9, 100};
+    int [] modesBABI = {1, 11, 12, 13, 2, 31, 41, 53, 20, 6, 70, 71, -1, 8, 9, 100};
+    int [] modes = {};
+    /* List of what the mode numbers do so you don't have to hunt them down elsewhere */
+    /* except for the jewel scoring, the first number is the step number and the second number is
+       which version of the step for when it varies based on location
+
     int [] modes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 100};
     /* List of what the mode numbers do so you don't have to hunt them down elsewhere
       1: Vumark detection + jewel selection
@@ -203,6 +213,7 @@ public class AllAuto extends LinearOpMode {
     */
     
     /* Troublshooting and Hotwiring modes
+
     -2 : Grab glyph
     -1 : Release glyph
      0 : Wait 1 sec
