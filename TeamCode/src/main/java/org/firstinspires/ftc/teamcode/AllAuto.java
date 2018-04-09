@@ -309,6 +309,8 @@ public class AllAuto extends LinearOpMode {
             telemetry.addData("right_color blue", robot.right_color.blue());
             telemetry.addData("leftcolor", leftcolor);
             telemetry.addData("rightcolor", rightcolor);
+            telemetry.addData("mode", mode);
+            telemetry.addData("step", step);
             telemetry.update();
 
             /* sets the requirements for the left color sensor to be seeing the line it is looking
@@ -380,15 +382,7 @@ public class AllAuto extends LinearOpMode {
                                 /* wait until arm has gone through gate, then send arm home */
                                 if (robot.UpperArm.CurrentPosition > 0.1) {
                                     robot.UpperArm.MoveHome();
-                                    home_sequence++;
-                                }
-                                break;
-                            case 2:
-                                /* wait until arm home, then lift up to allow amperes to extend */
-                                if (robot.UpperArm.Limit.getState()==false) {
-// skip jewel part
-//                                    robot.UpperArm.MoveToPosition(0.2, 0.5);
-//                                    step++;
+                                    //step++;
                                     mode++;
                                     resetClock();
                                     robot.MoveStop();
@@ -553,7 +547,7 @@ public class AllAuto extends LinearOpMode {
                     //robot.AWR.setPower(-AMPERE_POWER);
 
                     //strafes in the direction of the stone, which depends on team color
-                    if (now < 0.37){
+                    if (now < 0.4 && redteam){
                         robot.MoveForward(MOVE_SPEED * 0.75);
                     }
                     else if (now > 0.5) {
@@ -561,13 +555,12 @@ public class AllAuto extends LinearOpMode {
                             robot.MoveRight(STRAFFE_SPEED);
                         }
                         else {
-                            robot.MoveLeft(STRAFFE_SPEED);
+                            robot.MoveLeft(STRAFFE_SPEED * 1.2);
                         }
                     }
                     else {
                         robot.MoveStop();
                     }
-
 
                     //strafes for a set time
                     if (now > 1.8) {
@@ -590,9 +583,9 @@ public class AllAuto extends LinearOpMode {
                         robot.MoveForward(MOVE_SPEED);
                     }
                     else {
-                        robot.MoveForward(MOVE_SPEED /1.8);
+                        robot.MoveForward(MOVE_SPEED * 0.5);
                     }
-                    if ((FI && now > 0.85) || (!FI && (leftcolor || rightcolor))) {
+                    if ((FI && now > 1.1) || (!FI && (leftcolor || rightcolor))) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -627,8 +620,22 @@ public class AllAuto extends LinearOpMode {
 
                     /* triangulate 'n strafe (FI) */
                     if (FI) {
+                        if (step == -1) {
+                            robot.MoveBackward(MOVE_SPEED);
+                            if (now > 0.5) {
+                                step++;
+                                resetClock();
+                                robot.MoveStop();
+                            }
+                        }
+
                         /* triangulate */
-                        if (step == 0) {
+                        else if (step == 0) {
+                            if (now > 5) {
+                                step --;
+                                resetClock();
+                            }
+
                             //stops if both see the line
                             if (leftcolor && rightcolor) {
                                 step++;
@@ -656,7 +663,7 @@ public class AllAuto extends LinearOpMode {
 
                             //drives forward if it doesn't see anything
                             else {
-                                robot.MoveForward(MOVE_SPEED / 1.8);
+                                robot.MoveForward(MOVE_SPEED * 0.5);
                             }
                         }
                         else{
@@ -702,7 +709,7 @@ public class AllAuto extends LinearOpMode {
                     }
 
                     /* strafe right to column (RABI) */
-                    if (redteam && !FI){
+                    else if (redteam){
                         if (step == 0 && (vuMark == RelicRecoveryVuMark.CENTER || vuMark == RelicRecoveryVuMark.RIGHT)) {
                             //strafe right until the left sensor gets to the line on the other side
                             robot.MoveRight(STRAFFE_SPEED);
@@ -738,7 +745,7 @@ public class AllAuto extends LinearOpMode {
                     }
 
                     /* strafe left till column (BABI) */
-                    if (!redteam && !FI){
+                    else {
                         if (step == 0 && (vuMark == RelicRecoveryVuMark.CENTER || vuMark == RelicRecoveryVuMark.RIGHT)) {
                             //strafe left until the right sensor gets to the line on the other side
                             robot.MoveLeft(STRAFFE_SPEED);
@@ -785,7 +792,7 @@ public class AllAuto extends LinearOpMode {
                     robot.GGR.setPosition(robot.GRABBER_RIGHT[0]);
 
                     //moves forward for a set time
-                    robot.MoveForward(MOVE_SPEED/1.2);
+                    robot.MoveForward(MOVE_SPEED * 0.8);
                     if (now > 0.4) {
                         mode++;
                         resetClock();
@@ -797,7 +804,7 @@ public class AllAuto extends LinearOpMode {
                 /* move backward 5 inches */
                 case 9:
                     //backs up for a set time
-                    robot.MoveBackward(MOVE_SPEED/1.2);
+                    robot.MoveBackward(MOVE_SPEED * 0.8);
                     if (now > 0.2) {
                         mode++;
                         resetClock();
