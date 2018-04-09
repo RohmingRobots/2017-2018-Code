@@ -6,6 +6,7 @@ package org.firstinspires.ftc.teamcode;
  */
 
 
+import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -37,8 +38,6 @@ public class teleop extends LinearOpMode {
         int index_RG = 0;
         double[] GUIDESLEFT = {1, 0.2};
         double[] GUIDESRIGHT = {0.94, 0.14};
-        double[] AMPERE_FLICKER_LEFT = {0.0, 0.6, 1.0};
-        double[] AMPERE_FLICKER_RIGHT = {0.0, 0.6, 1.0};
 
 
         //navigation color sensor variables
@@ -181,12 +180,25 @@ public class teleop extends LinearOpMode {
             }
             robot.Claw.setPosition(robot.CLAW[index_claw]);
 
+            //*******Guides**********/
+            if (egamepad2.dpad_right.pressed) {
+                index_RG = (index_RG < 1) ? index_RG + 1 : 0;
+                index_LG = (index_LG < 1) ? index_LG + 1 : 0;
+                robot.LG.setPosition(GUIDESLEFT[index_LG]);
+                robot.RG.setPosition(GUIDESRIGHT[index_RG]);
+            }
+
             /********** Arm code **********/
             /* Only call MoveToPosition method once per move */
             if (egamepad2.dpad_up.pressed) {
                 index_arm = (index_arm < 3) ? index_arm + 1 : 3;
                 robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 0.5);
                 robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.5);
+
+
+                //robot.LG.setPosition(1);
+              //robot.RG.setPosition(.94);
+
             }
             if (egamepad2.dpad_down.pressed) {
                 index_arm = (index_arm > 0) ? index_arm - 1 : 0;
@@ -197,12 +209,6 @@ public class teleop extends LinearOpMode {
                 index_arm = 0;
                 robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 0.5);
                 robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.5);
-            }
-            if (egamepad2.dpad_right.pressed) {
-                index_RG = (index_RG < 1) ? index_RG + 1 : 0;
-                index_LG = (index_LG < 1) ? index_LG + 1 : 0;
-                robot.LG.setPosition(GUIDESLEFT[index_LG]);
-                robot.RG.setPosition(GUIDESRIGHT[index_RG]);
             }
 
             robot.LowerArm.Update(this);
