@@ -53,14 +53,20 @@ public class RobotConfig
     * GGR - gripper grabber right servo motor
     * GGL - gripper grabber right servo motor
     * Claw - top grabber
+    * RG - right glyph guide
+    * LG - left glyph guide
     */
     public Servo GGR = null;
     public Servo GGL = null;
     public Servo Claw = null;
+    public Servo RG = null;
+    public Servo LG = null;
     /* open full, closed full, partial open */
     public double[] GRABBER_LEFT = {0.745, .255, .375};
     public double[] GRABBER_RIGHT = {0.44, .89, .765};
-    public double[] CLAW = {0.9, 0.1};
+    public double[] CLAW = {0.7, 0.0};      // original claw {0.9, 0.1};
+    public double[] GUIDESLEFT = {1, 0.2};
+    public double[] GUIDESRIGHT = {0.94, 0.14};
 
     /* Public members - Ampere (side arm) subassembly
     * Devices
@@ -74,8 +80,6 @@ public class RobotConfig
     */
     public CRServo AWL = null;
     public CRServo AWR = null;
-    public Servo RG = null;
-    public Servo LG = null;
     public Servo AFL = null;
     public Servo AFR = null;
     public ColorSensor left_ampere = null;
@@ -139,17 +143,24 @@ public class RobotConfig
         BR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         BL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        // **** Gripper grabbers ****
+        // **** Gripper grabbers & guides ****
         // Define and Initialize Motors
         GGR = hwMap.servo.get("GGR");
         GGL = hwMap.servo.get("GGL");
         Claw = hwMap.servo.get("Claw");
+        LG = hwMap.servo.get("LG");
+        RG = hwMap.servo.get("RG");
+        // reverse those motors
+        LG.setDirection(Servo.Direction.REVERSE);
         // set initial positions
         GGL.setPosition(GRABBER_LEFT[0]);
         GGR.setPosition(GRABBER_RIGHT[0]);
-        Claw.setPosition(CLAW[0]);
+// don't initialize position, let it set on arm        Claw.setPosition(CLAW[0]);
+        LG.setPosition(GUIDESLEFT[0]);
+        RG.setPosition(GUIDESRIGHT[0]);
 
         // **** Ampere (side arms and flippers) ****
+        // Side arms
         // Define and Initialize Motors
         AWL = hwMap.crservo.get("AWL");
         AWR = hwMap.crservo.get("AWR");
@@ -158,10 +169,7 @@ public class RobotConfig
         // set all motors to zero power
         AWL.setPower(0.0);
         AWR.setPower(0.0);
-
-        LG = hwMap.servo.get("LG");
-        RG = hwMap.servo.get("RG");
-
+        // Flippers
         // Define and Initialize Motors
         AFL = hwMap.servo.get("AFL");
         AFR = hwMap.servo.get("AFR");
@@ -170,7 +178,7 @@ public class RobotConfig
         // set initial positions
         AFL.setPosition(AMPERE_FLICKER_LEFT[0]);
         AFR.setPosition(AMPERE_FLICKER_RIGHT[0]);
-        LG.setDirection(Servo.Direction.REVERSE);
+        // Color sensors
         // Define and Initialize color sensors
         left_ampere = hwMap.colorSensor.get("left_ampere");
         right_ampere = hwMap.colorSensor.get("right_ampere");
