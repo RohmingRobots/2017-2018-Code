@@ -81,7 +81,7 @@ public class ArmControl {
             Potentiometer = hwMap.analogInput.get("upper pot");
 
             // Set power values
-            INTEGRAL_GAIN = 1.0;    // 0.0
+            INTEGRAL_GAIN = 1.0;
 
             // Set arm constants
             HIGH_MAX_POWER = 0.5;
@@ -90,6 +90,8 @@ public class ArmControl {
             INITIAL_ANGLE = -10.0;
             POSITION_TO_ANGLE = 90.0;
         } else {
+            //LOWER
+            // Define and Initialize Motors
             LeftMotor = hwMap.dcMotor.get("LL");
             RightMotor = hwMap.dcMotor.get("LR");
             // reverse those motors
@@ -103,7 +105,7 @@ public class ArmControl {
             Potentiometer = hwMap.analogInput.get("lower pot");
 
             // Set power values
-            INTEGRAL_GAIN = 0.0;    // not needed??
+            INTEGRAL_GAIN = 0.0;
 
             // Set arm constants
             HIGH_MAX_POWER = 0.8;
@@ -238,7 +240,8 @@ public class ArmControl {
         /* prevent negative power when...
             at home position or never homed
         */
-        if (AtHome || !Homed) {
+//        if (AtHome || !Homed) {
+        if (AtHome) {
             if (Power < 0.0) {
                 ErrorSum = 0.0;     // zero integral
                 Power = 0.0;

@@ -50,45 +50,45 @@ public class ArmCodeTest extends LinearOpMode {
             egamepad1.UpdateEdge();
             egamepad2.UpdateEdge();
 
-            /* TeleOp code */
+            /********** Arm code **********/
             /* Only call MoveToPosition method once per move */
-            if (index_arm != -1) {
-                if (egamepad2.dpad_up.pressed) {
+            if (egamepad2.dpad_up.pressed) {
+                if (gamepad2.a) {
+                    /* allow full extension */
+                    index_arm = (index_arm < 6) ? index_arm + 1 : 6;
+                } else {
                     index_arm = (index_arm < 3) ? index_arm + 1 : 3;
+                }
+                if (index_arm>3) {
+                    robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 2.0);
+                    robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 2.0);
+                } else {
                     robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 0.5);
                     robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.5);
                 }
-                if (egamepad2.dpad_down.pressed) {
-                    index_arm = (index_arm > 0) ? index_arm - 1 : 0;
+            }
+            if (egamepad2.dpad_down.pressed) {
+                index_arm = (index_arm > 0) ? index_arm - 1 : 0;
+                robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 0.5);
+                robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.5);
+                if (index_arm>3) {
+                    robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 2.0);
+                    robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 2.0);
+                } else {
                     robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 0.5);
                     robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.5);
                 }
-                if (egamepad2.dpad_left.pressed) {
+            }
+            if (egamepad2.dpad_left.pressed) {
+                if (index_arm>3) {
+                    index_arm = 3;
+                    robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 2.0);
+                    robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 2.0);
+                } else {
                     index_arm = 0;
                     robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 0.5);
                     robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.5);
                 }
-            }
-
-            if (egamepad2.a.pressed) {
-                index_arm = 0;
-                robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 2.0);
-                robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 2.0);
-            }
-            if (egamepad2.b.pressed) {
-                index_arm = -1;
-                robot.LowerArm.MoveToPosition(1.0, 2.0);
-                robot.UpperArm.MoveToPosition(1.0, 2.0);
-            }
-            if (egamepad2.x.pressed) {
-                index_arm = -1;
-                robot.LowerArm.MoveToPosition(1.5, 2.0);
-                robot.UpperArm.MoveToPosition(1.5, 2.0);
-            }
-            if (egamepad2.y.pressed) {
-                index_arm = -1;
-                robot.LowerArm.MoveToPosition(2.0, 2.0);
-                robot.UpperArm.MoveToPosition(2.0, 2.0);
             }
 
             robot.ArmUpdate(this, true);
