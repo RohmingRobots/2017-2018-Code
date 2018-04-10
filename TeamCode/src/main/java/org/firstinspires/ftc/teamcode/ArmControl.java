@@ -42,8 +42,6 @@ public class ArmControl {
     private boolean AtHome = false;         /* home switch active - currently at home */
     private double ErrorSum = 0.0;          /* integral error */
     public double Power = 0.0;              /* power to send to motors */
-//    private double MAX_POS_POWER = 0.0;
-//    private double MAX_NEG_POWER = 0.0;
     private double HIGH_MAX_POWER = 0.0;
     private double LOW_MAX_POWER = 0.0;
     private double INITIAL_ANGLE = 0.0;
@@ -83,8 +81,6 @@ public class ArmControl {
             Potentiometer = hwMap.analogInput.get("upper pot");
 
             // Set power values
-//            MAX_POS_POWER = 0.5;    // 0.8
-//            MAX_NEG_POWER = 0.2;    // 0.2
             INTEGRAL_GAIN = 1.0;    // 0.0
 
             // Set arm constants
@@ -107,8 +103,6 @@ public class ArmControl {
             Potentiometer = hwMap.analogInput.get("lower pot");
 
             // Set power values
-//            MAX_POS_POWER = 0.8;
-//            MAX_NEG_POWER = 0.1;
             INTEGRAL_GAIN = 0.0;    // not needed??
 
             // Set arm constants
@@ -121,9 +115,6 @@ public class ArmControl {
         // Set all motors to zero power
         LeftMotor.setPower(0);
         RightMotor.setPower(0);
-        // Set all motors to run with encoders.
-//        LeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        RightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // ****** DO NOT CHANGE ****** Set all motors to run WITHOUT encoders.
         LeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         RightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -236,11 +227,6 @@ public class ArmControl {
             }
         }
         Power = max_power * 5 * error;
-//        if (error > 0.0 ) {
-//            Power = MAX_POS_POWER * 5 * error;
-//        } else {
-//            Power = MAX_NEG_POWER * 5 * error;
-//        }
 
         /* determine integral gain */
         Power += ErrorSum*INTEGRAL_GAIN;
