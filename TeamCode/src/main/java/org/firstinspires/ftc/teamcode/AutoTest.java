@@ -521,7 +521,7 @@ public class AutoTest extends LinearOpMode {
     void AutoUpdate() {
         if ( !opModeIsActive() ) return;
 
-        robot.UpperArm.Update(null);
+        robot.ArmUpdate(this, true);
         sleep(40);
     }
 }

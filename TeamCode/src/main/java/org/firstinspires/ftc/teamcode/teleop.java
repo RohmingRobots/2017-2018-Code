@@ -212,8 +212,7 @@ public class teleop extends LinearOpMode {
                 robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.5);
             }
 
-            robot.LowerArm.Update(this);
-            robot.UpperArm.Update(this);
+            robot.ArmUpdate(this, true);
 
             //let the robot have a little rest, sleep is healthy
             sleep(40);

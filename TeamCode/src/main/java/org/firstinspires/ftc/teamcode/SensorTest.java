@@ -87,6 +87,8 @@ public class SensorTest extends LinearOpMode {
             telemetry.addData("  ampere left ","%3d %3d", robot.left_ampere.red(),robot.left_ampere.blue());
             telemetry.addData("  ampere right","%3d %3d", robot.right_ampere.red(),robot.right_ampere.blue());
 
+            robot.ArmUpdate(this, false);
+
             telemetry.update();
 
             //let the robot have a little rest, sleep is healthy
