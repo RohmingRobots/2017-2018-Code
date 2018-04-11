@@ -42,8 +42,12 @@ public class ArmControl {
     private boolean AtHome = false;         /* home switch active - currently at home */
     private double ErrorSum = 0.0;          /* integral error */
     public double Power = 0.0;              /* power to send to motors */
-    private double MAX_POS_POWER = 0.0;
-    private double MAX_NEG_POWER = 0.0;
+    private double HIGH_MAX_POWER = 0.0;
+    private double LOW_MAX_POWER = 0.0;
+    private double INITIAL_ANGLE = 0.0;
+    private double POSITION_TO_ANGLE = 0.0;
+    private double RelativeAngle = 0.0;
+    public double Angle = 0.0;
     private double INTEGRAL_GAIN = 0.0;
     private double MAX_POSITION = 1.5;
 
@@ -77,13 +81,17 @@ public class ArmControl {
             Potentiometer = hwMap.analogInput.get("upper pot");
 
             // Set power values
-//            MAX_POS_POWER = 0.5;
-//            MAX_NEG_POWER = 0.2;
-//            INTEGRAL_GAIN = 0.5;
-            MAX_POS_POWER = 0.45;    // 0.8
-            MAX_NEG_POWER = 0.2;    // 0.2
-            INTEGRAL_GAIN = 0.5;    // 0.0
+            INTEGRAL_GAIN = 1.0;
+
+            // Set arm constants
+            HIGH_MAX_POWER = 0.5;
+            LOW_MAX_POWER = 0.2;
+            MAX_POSITION = 2.0;
+            INITIAL_ANGLE = -10.0;
+            POSITION_TO_ANGLE = 90.0;
         } else {
+            //LOWER
+            // Define and Initialize Motors
             LeftMotor = hwMap.dcMotor.get("LL");
             RightMotor = hwMap.dcMotor.get("LR");
             // reverse those motors
@@ -97,16 +105,18 @@ public class ArmControl {
             Potentiometer = hwMap.analogInput.get("lower pot");
 
             // Set power values
-            MAX_POS_POWER = 0.6;
-            MAX_NEG_POWER = 0.1;
-            INTEGRAL_GAIN = 0.0;    // not needed??
+            INTEGRAL_GAIN = 0.0;
+
+            // Set arm constants
+            HIGH_MAX_POWER = 0.8;
+            LOW_MAX_POWER = 0.1;
+            MAX_POSITION = 2.0;
+            INITIAL_ANGLE = -5.0;
+            POSITION_TO_ANGLE = 90.0;
         }
         // Set all motors to zero power
         LeftMotor.setPower(0);
         RightMotor.setPower(0);
-        // Set all motors to run with encoders.
-//        LeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        RightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // ****** DO NOT CHANGE ****** Set all motors to run WITHOUT encoders.
         LeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         RightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -157,8 +167,9 @@ public class ArmControl {
     }
 
     /* Call this method when you want to update the arm motors */
-    public void Update(OpMode om) {
+    protected void Update(OpMode om, double offset, boolean active) {
         double error;
+        double max_power;
 
         /* Check to see if on home switch */
         AtHome = false;
@@ -169,12 +180,11 @@ public class ArmControl {
             HomePosition = Potentiometer.getVoltage();
 
             ErrorSum = 0.0;     // zero integral
-            //adds a lil' version thing to the telemetry so you know you're using the right version
-//            om.telemetry.addLine("At Home");
         }
 
         /* incrementally change target value */
         CurrentTime = OurTime.seconds();
+        OurTime.reset();
         if (CurrentTime < FinalTime) {
             CurrentTarget = CurrentTarget + (FinalTarget-CurrentTarget)*CurrentTime/FinalTime;
             FinalTime = FinalTime - CurrentTime;
@@ -186,6 +196,10 @@ public class ArmControl {
         /* determine current position relative to home */
         CurrentPosition = Potentiometer.getVoltage() - HomePosition;
 
+        /* determine relative and absolute arm angles */
+        RelativeAngle = POSITION_TO_ANGLE*CurrentPosition + INITIAL_ANGLE;
+        Angle = RelativeAngle + offset;
+
         /*********** control code **********/
         error = CurrentTarget - CurrentPosition;
         if (error > 0.2) error = 0.2;
@@ -193,7 +207,7 @@ public class ArmControl {
 
 
         /* update integral */
-        ErrorSum += error*OurTime.milliseconds()/1000.0;
+        ErrorSum += error*CurrentTime;
         /* limit integral gain if never homed */
         if (!Homed) {
             if (ErrorSum > 0.5)
@@ -202,10 +216,19 @@ public class ArmControl {
 
         /* determine proportional gain */
         if (error > 0.0 ) {
-            Power = MAX_POS_POWER * 5 * error;
+            if (Angle < 120.0) {
+                max_power = (LOW_MAX_POWER-HIGH_MAX_POWER)*Angle/120.0 + HIGH_MAX_POWER;
+            } else {
+                max_power = LOW_MAX_POWER;
+            }
         } else {
-            Power = MAX_NEG_POWER * 5 * error;
+            if (Angle < 60.0) {
+                max_power = LOW_MAX_POWER;
+            } else {
+                max_power = (HIGH_MAX_POWER-LOW_MAX_POWER)*(Angle-60.0)/120.0 + LOW_MAX_POWER;
+            }
         }
+        Power = max_power * 5 * error;
 
         /* determine integral gain */
         Power += ErrorSum*INTEGRAL_GAIN;
@@ -217,7 +240,8 @@ public class ArmControl {
         /* prevent negative power when...
             at home position or never homed
         */
-        if (AtHome || !Homed) {
+//        if (AtHome || !Homed) {
+        if (AtHome) {
             if (Power < 0.0) {
                 ErrorSum = 0.0;     // zero integral
                 Power = 0.0;
@@ -247,13 +271,13 @@ public class ArmControl {
             }
         }
 
-        OurTime.reset();
-
-        RightMotor.setPower(Power);
-        LeftMotor.setPower(Power);
+        if (active) {
+            RightMotor.setPower(Power);
+            LeftMotor.setPower(Power);
+        }
 
         if (om!=null)
-            om.telemetry.addData("Power Error Sum", "%.2f %.2f %.2f", Power, error, ErrorSum);
+            om.telemetry.addData("Power Error Angle", "%.2f %.2f %5.0f", Power, error, Angle);
     }
 
     public void SetPower(double power) {

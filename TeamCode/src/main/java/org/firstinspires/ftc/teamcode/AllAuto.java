@@ -862,8 +862,7 @@ public class AllAuto extends LinearOpMode {
             }  // end of switch
 
             //updates the arms
-            robot.LowerArm.Update(this);
-            robot.UpperArm.Update(this);
+            robot.ArmUpdate(this, true);
 
 //            telemetry.update();
             sleep(40);
