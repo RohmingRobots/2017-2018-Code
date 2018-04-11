@@ -81,6 +81,7 @@ public class ArmControl {
             Potentiometer = hwMap.analogInput.get("upper pot");
 
             // Set power values
+
             INTEGRAL_GAIN = 1.0;
 
             // Set arm constants
@@ -89,6 +90,11 @@ public class ArmControl {
             MAX_POSITION = 2.0;
             INITIAL_ANGLE = -10.0;
             POSITION_TO_ANGLE = 90.0;
+
+//            MAX_POS_POWER = 0.5;
+//            MAX_NEG_POWER = 0.2;
+//            INTEGRAL_GAIN = 0.5;
+
         } else {
             //LOWER
             // Define and Initialize Motors
@@ -105,14 +111,7 @@ public class ArmControl {
             Potentiometer = hwMap.analogInput.get("lower pot");
 
             // Set power values
-            INTEGRAL_GAIN = 0.0;
 
-            // Set arm constants
-            HIGH_MAX_POWER = 0.8;
-            LOW_MAX_POWER = 0.1;
-            MAX_POSITION = 2.0;
-            INITIAL_ANGLE = -5.0;
-            POSITION_TO_ANGLE = 90.0;
         }
         // Set all motors to zero power
         LeftMotor.setPower(0);

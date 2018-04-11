@@ -102,9 +102,11 @@ public class RobotConfig
     */
     ArmControl  LowerArm = new ArmControl();
     ArmControl  UpperArm = new ArmControl();
+
     /************************* 0-3 glyph positions, 4-6 relic positions */
     public double[] LOWERARM = {0.0, 0.0, 0.35, 0.50, 1.0, 1.5, 2.0};
     public double[] UPPERARM = {0.0, 0.2, 0.45, 0.70, 1.0, 1.5, 2.0};
+
 
     /* Public
     * IMU objects
@@ -170,7 +172,7 @@ public class RobotConfig
         // set all motors to zero power
         AWL.setPower(0.0);
         AWR.setPower(0.0);
-        // Flippers
+
         // Define and Initialize Motors
         AFL = hwMap.servo.get("AFL");
         AFR = hwMap.servo.get("AFR");
@@ -179,7 +181,7 @@ public class RobotConfig
         // set initial positions
         AFL.setPosition(AMPERE_FLICKER_LEFT[0]);
         AFR.setPosition(AMPERE_FLICKER_RIGHT[0]);
-        // Color sensors
+
         // Define and Initialize color sensors
         left_ampere = hwMap.colorSensor.get("left_ampere");
         right_ampere = hwMap.colorSensor.get("right_ampere");

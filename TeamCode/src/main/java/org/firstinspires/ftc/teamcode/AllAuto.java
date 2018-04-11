@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 
 
 //naming the teleop thing
-@Autonomous(name="AllAuto bad", group ="Drive")
+@Autonomous(name="AllAuto", group ="Drive")
 public class AllAuto extends LinearOpMode {
 
     OpenGLMatrix lastLocation = null;
@@ -188,16 +188,6 @@ public class AllAuto extends LinearOpMode {
     int home_sequence = 0;
     int step = 0;
     int mode = 0;
-
-    int [] modesRAFI = {1, 11, 12, 13, 2, 30, 40, 50, 6, 70, 71, -1, 8, 9, 100};
-    int [] modesRABI = {1, 11, 12, 13, 2, 30, 41, 51, 20, 6, 70, 71, -1, 8, 9, 100};
-    int [] modesBAFI = {1, 11, 12, 13, 2, 31, 40, 52, 6, 70, 71, -1, 8, 9, 100};
-    int [] modesBABI = {1, 11, 12, 13, 2, 31, 41, 53, 20, 6, 70, 71, -1, 8, 9, 100};
-    int [] modes = {};
-    /* List of what the mode numbers do so you don't have to hunt them down elsewhere */
-    /* except for the jewel scoring, the first number is the step number and the second number is
-       which version of the step for when it varies based on location
-
     int [] modes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 100};
     /* List of what the mode numbers do so you don't have to hunt them down elsewhere
       1: Vumark detection + jewel selection
@@ -213,7 +203,6 @@ public class AllAuto extends LinearOpMode {
     */
     
     /* Troublshooting and Hotwiring modes
-
     -2 : Grab glyph
     -1 : Release glyph
      0 : Wait 1 sec
@@ -320,6 +309,8 @@ public class AllAuto extends LinearOpMode {
             telemetry.addData("right_color blue", robot.right_color.blue());
             telemetry.addData("leftcolor", leftcolor);
             telemetry.addData("rightcolor", rightcolor);
+            telemetry.addData("mode", mode);
+            telemetry.addData("step", step);
             telemetry.update();
 
             /* sets the requirements for the left color sensor to be seeing the line it is looking
@@ -391,15 +382,7 @@ public class AllAuto extends LinearOpMode {
                                 /* wait until arm has gone through gate, then send arm home */
                                 if (robot.UpperArm.CurrentPosition > 0.1) {
                                     robot.UpperArm.MoveHome();
-                                    home_sequence++;
-                                }
-                                break;
-                            case 2:
-                                /* wait until arm home, then lift up to allow amperes to extend */
-                                if (robot.UpperArm.Limit.getState()==false) {
-// skip jewel part
-//                                    robot.UpperArm.MoveToPosition(0.2, 0.5);
-//                                    step++;
+                                    //step++;
                                     mode++;
                                     resetClock();
                                     robot.MoveStop();
@@ -564,21 +547,26 @@ public class AllAuto extends LinearOpMode {
                     //robot.AWR.setPower(-AMPERE_POWER);
 
                     //strafes in the direction of the stone, which depends on team color
-                    if (now < 0.35){
+                    if (now < 0.4 && redteam){
                         robot.MoveForward(MOVE_SPEED * 0.75);
                     }
                     else if (now > 0.5) {
                         if (redteam){
-                            robot.MoveRight(STRAFFE_SPEED);
+                            robot.FR.setPower(-STRAFFE_SPEED * 1.05 + (turnAngle + 90)/200);
+                            robot.FL.setPower(STRAFFE_SPEED * 1.05 - (turnAngle + 90)/200);
+                            robot.BL.setPower(-STRAFFE_SPEED * 0.95 - (turnAngle + 90)/200);
+                            robot.BR.setPower(STRAFFE_SPEED * 0.95 + (turnAngle + 90)/200);
                         }
                         else {
-                            robot.MoveLeft(STRAFFE_SPEED);
+                            robot.FR.setPower(STRAFFE_SPEED * 1.05 + (turnAngle - 90)/200);
+                            robot.FL.setPower(-STRAFFE_SPEED * 1.15 - (turnAngle - 90)/200);
+                            robot.BL.setPower(STRAFFE_SPEED * 0.95 - (turnAngle - 90)/200);
+                            robot.BR.setPower(-STRAFFE_SPEED * 1.05 + (turnAngle - 90)/200);
                         }
                     }
                     else {
                         robot.MoveStop();
                     }
-
 
                     //strafes for a set time
                     if (now > 1.8) {
@@ -600,10 +588,35 @@ public class AllAuto extends LinearOpMode {
                     if (FI) {
                         robot.MoveForward(MOVE_SPEED);
                     }
-                    else {
-                        robot.MoveForward(MOVE_SPEED /1.8);
+                    else /*if (Math.abs(Math.abs(turnAngle) - 90) < 5)*/ {
+                        robot.MoveForward(MOVE_SPEED * 0.5);
                     }
-                    if ((FI && now > 0.85) || (!FI && (leftcolor || rightcolor))) {
+                    /*else {
+                        if (now < 0.5) {
+                            if (redteam) {
+                                robot.MoveLeft(STRAFFE_SPEED);
+                            }
+                            else {
+                                robot.MoveRight(STRAFFE_SPEED);
+                            }
+                        }
+                        else if(now > 0.5) {
+                            if (!redteam && turnAngle - 90 > 5) {
+                                robot.RotateLeft(ROTATE_SPEED * ((turnAngle - 20)/90));
+                            }
+                            else if (!redteam && turnAngle - 90 < -5) {
+                                robot.RotateRight(ROTATE_SPEED * ((160 - turnAngle)/90));
+                            }
+                            else if (redteam && turnAngle + 90 > 5) {
+                                robot.RotateLeft(ROTATE_SPEED * ((160 + turnAngle)/90));
+                            }
+                            else if (redteam && turnAngle + 90 < -5) {
+                                robot.RotateRight(ROTATE_SPEED * ((-20 - turnAngle)/90));
+                            }
+                        }
+                    }*/
+
+                    if ((FI && now > 1.1) || (!FI && (leftcolor || rightcolor))) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -638,8 +651,22 @@ public class AllAuto extends LinearOpMode {
 
                     /* triangulate 'n strafe (FI) */
                     if (FI) {
+                        if (step == -1) {
+                            robot.MoveBackward(MOVE_SPEED);
+                            if (now > 0.3) {
+                                step++;
+                                resetClock();
+                                robot.MoveStop();
+                            }
+                        }
+
                         /* triangulate */
-                        if (step == 0) {
+                        else if (step == 0) {
+                            if (now > 5) {
+                                step --;
+                                resetClock();
+                            }
+
                             //stops if both see the line
                             if (leftcolor && rightcolor) {
                                 step++;
@@ -667,7 +694,7 @@ public class AllAuto extends LinearOpMode {
 
                             //drives forward if it doesn't see anything
                             else {
-                                robot.MoveForward(MOVE_SPEED / 1.8);
+                                robot.MoveForward(MOVE_SPEED * 0.5);
                             }
                         }
                         else{
@@ -713,7 +740,7 @@ public class AllAuto extends LinearOpMode {
                     }
 
                     /* strafe right to column (RABI) */
-                    if (redteam && !FI){
+                    else if (redteam){
                         if (step == 0 && (vuMark == RelicRecoveryVuMark.CENTER || vuMark == RelicRecoveryVuMark.RIGHT)) {
                             //strafe right until the left sensor gets to the line on the other side
                             robot.MoveRight(STRAFFE_SPEED);
@@ -749,7 +776,7 @@ public class AllAuto extends LinearOpMode {
                     }
 
                     /* strafe left till column (BABI) */
-                    if (!redteam && !FI){
+                    else {
                         if (step == 0 && (vuMark == RelicRecoveryVuMark.CENTER || vuMark == RelicRecoveryVuMark.RIGHT)) {
                             //strafe left until the right sensor gets to the line on the other side
                             robot.MoveLeft(STRAFFE_SPEED);
@@ -796,8 +823,8 @@ public class AllAuto extends LinearOpMode {
                     robot.GGR.setPosition(robot.GRABBER_RIGHT[0]);
 
                     //moves forward for a set time
-                    robot.MoveForward(MOVE_SPEED/1.2);
-                    if (now > 0.3) {
+                    robot.MoveForward(MOVE_SPEED * 0.8);
+                    if (now > 0.4) {
                         mode++;
                         resetClock();
                         robot.MoveStop();
@@ -808,11 +835,11 @@ public class AllAuto extends LinearOpMode {
                 /* move backward 5 inches */
                 case 9:
                     //backs up for a set time
-                    robot.MoveBackward(MOVE_SPEED/1.2);
-                    if (now > 0.1) {
+                    robot.MoveBackward(MOVE_SPEED * 0.8);
+                    if (now > 0.15) {
+                        robot.MoveStop();
                         mode++;
                         resetClock();
-                        robot.MoveStop();
                         step = 0;
                     }
                     break;
