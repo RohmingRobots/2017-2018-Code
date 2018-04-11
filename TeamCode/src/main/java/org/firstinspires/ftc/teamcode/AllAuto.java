@@ -552,10 +552,16 @@ public class AllAuto extends LinearOpMode {
                     }
                     else if (now > 0.5) {
                         if (redteam){
-                            robot.MoveRight(STRAFFE_SPEED);
+                            robot.FR.setPower(-STRAFFE_SPEED * 1.05 + (turnAngle + 90)/200);
+                            robot.FL.setPower(STRAFFE_SPEED * 1.05 - (turnAngle + 90)/200);
+                            robot.BL.setPower(-STRAFFE_SPEED * 0.95 - (turnAngle + 90)/200);
+                            robot.BR.setPower(STRAFFE_SPEED * 0.95 + (turnAngle + 90)/200);
                         }
                         else {
-                            robot.MoveLeft(STRAFFE_SPEED);
+                            robot.FR.setPower(STRAFFE_SPEED * 1.05 + (turnAngle - 90)/200);
+                            robot.FL.setPower(-STRAFFE_SPEED * 1.15 - (turnAngle - 90)/200);
+                            robot.BL.setPower(STRAFFE_SPEED * 0.95 - (turnAngle - 90)/200);
+                            robot.BR.setPower(-STRAFFE_SPEED * 1.05 + (turnAngle - 90)/200);
                         }
                     }
                     else {
@@ -582,9 +588,34 @@ public class AllAuto extends LinearOpMode {
                     if (FI) {
                         robot.MoveForward(MOVE_SPEED);
                     }
-                    else {
+                    else /*if (Math.abs(Math.abs(turnAngle) - 90) < 5)*/ {
                         robot.MoveForward(MOVE_SPEED * 0.5);
                     }
+                    /*else {
+                        if (now < 0.5) {
+                            if (redteam) {
+                                robot.MoveLeft(STRAFFE_SPEED);
+                            }
+                            else {
+                                robot.MoveRight(STRAFFE_SPEED);
+                            }
+                        }
+                        else if(now > 0.5) {
+                            if (!redteam && turnAngle - 90 > 5) {
+                                robot.RotateLeft(ROTATE_SPEED * ((turnAngle - 20)/90));
+                            }
+                            else if (!redteam && turnAngle - 90 < -5) {
+                                robot.RotateRight(ROTATE_SPEED * ((160 - turnAngle)/90));
+                            }
+                            else if (redteam && turnAngle + 90 > 5) {
+                                robot.RotateLeft(ROTATE_SPEED * ((160 + turnAngle)/90));
+                            }
+                            else if (redteam && turnAngle + 90 < -5) {
+                                robot.RotateRight(ROTATE_SPEED * ((-20 - turnAngle)/90));
+                            }
+                        }
+                    }*/
+
                     if ((FI && now > 1.1) || (!FI && (leftcolor || rightcolor))) {
                         mode++;
                         resetClock();
