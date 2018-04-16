@@ -67,6 +67,22 @@ public class AllAuto extends LinearOpMode {
         return false;
     }
 
+    public boolean inputJewels() {
+        //ask to do jewels
+        telemetry.addLine("Do Jewels:");
+        telemetry.addLine("Y for yes, X for no");
+        telemetry.update();
+
+        //waits for x or b to be pressed
+        while (!gamepad1.x && !gamepad1.y) {
+        }
+
+        //color selection
+        if (gamepad1.x)
+            return false;
+        return true;
+    }
+
     //Multiple Modes setter
     // in case I want to modify it more easily for one position
     // public void chooseModes() {
@@ -83,6 +99,7 @@ public class AllAuto extends LinearOpMode {
 
     public void displaySelections() {
         //displays the selected color and position
+        telemetry.addData("Version", "Worlds 4-13-2018");
         telemetry.addData("Status", "Initialized");
         if (FI)
             telemetry.addData("Position", "FI");
@@ -149,6 +166,7 @@ public class AllAuto extends LinearOpMode {
     //start position variables
     boolean FI;
     boolean redteam;
+    boolean do_jewels;
 
     //time based variables
     double lastReset = 0;
@@ -268,6 +286,7 @@ public class AllAuto extends LinearOpMode {
            and tell the drivers what it got set to for confirmation */
         redteam = inputTeamColor();
         FI = inputPosition();
+        do_jewels = inputJewels();
         displaySelections();
 
         /* in case I want to modify it more easily for one position */
@@ -374,25 +393,28 @@ public class AllAuto extends LinearOpMode {
                             case 0:
                                 /* lift arm up, through gate, after glyph grabbed */
                                 if (now > 0.5) {
-                                    robot.UpperArm.MoveToPosition(0.3);
+                                    robot.UpperArm.MoveToPosition(0.2);
                                     home_sequence++;
                                 }
                                 break;
                             case 1:
                                 /* wait until arm has gone through gate, then send arm home */
                                 if (robot.UpperArm.CurrentPosition > 0.1) {
-                                    robot.UpperArm.MoveHome();
-                                    //step++;
-                                    mode++;
+                                    robot.UpperArm.MoveToPosition(0.1);
+                                    robot.UpperArm.MoveHome(2.0);
+                                    if (do_jewels) {
+                                        step++;
+                                    } else {
+                                        mode++;
+                                    }
                                     resetClock();
                                     robot.MoveStop();
                                 }
                                 break;
                         }
                     }
-
                     /* jewel selection step 1 */
-                    if (step == 1) {
+                    else if (step == 1) {
                         //turns ampere LEDs om
                         robot.left_ampere.enableLed(true);
                         robot.right_ampere.enableLed(true);
@@ -426,9 +448,8 @@ public class AllAuto extends LinearOpMode {
                             robot.MoveStop();
                         }
                     }
-
                     /* jewel selection step 2 */
-                    if (step == 2) {
+                    else if (step == 2) {
                         //stops the winches
                         telemetry.addLine("Stop");
                         robot.AWL.setPower(0.0);
@@ -436,16 +457,14 @@ public class AllAuto extends LinearOpMode {
 
                         /* checks if both color sensors detect a difference in the change of values and
                            returns true if the side is red and the side is blue */
-                        if (    (robot.left_ampere.red() - leftamperered) > 10 +
-                                (robot.right_ampere.red() - rightamperered) &&
-                                (robot.right_ampere.blue() - rightampereblue) > 10 +
-                                        (robot.left_ampere.blue() - leftampereblue)) {
+                        leftampere = false;
+                        rightampere = false;
+                        if ( ((robot.left_ampere.red() - leftamperered) > 10 + (robot.right_ampere.red() - rightamperered)) &&
+                                ((robot.right_ampere.blue() - rightampereblue) > 10 + (robot.left_ampere.blue() - leftampereblue)) ) {
                             leftampere = true;
                         }
-                        if (    (robot.right_ampere.red() - rightamperered) > 10 +
-                                (robot.left_ampere.red() - leftamperered) &&
-                                (robot.left_ampere.blue() - leftampereblue) > 10 +
-                                        (robot.right_ampere.blue() - rightampereblue)) {
+                        if (  ((robot.right_ampere.red() - rightamperered) > 10 + (robot.left_ampere.red() - leftamperered)) &&
+                                ((robot.left_ampere.blue() - leftampereblue) > 10 + (robot.right_ampere.blue() - rightampereblue)) ) {
                             rightampere = true;
                         }
 
@@ -478,9 +497,8 @@ public class AllAuto extends LinearOpMode {
                             robot.MoveStop();
                         }
                     }
-
                     /* jewel selection step 3 */
-                    if (step == 3) {
+                    else if (step == 3) {
                         //reels back in the amperes
                         telemetry.addLine("Retract");
                         robot.AWL.setPower(-AMPERE_POWER);
@@ -496,7 +514,7 @@ public class AllAuto extends LinearOpMode {
 
                         //gives time for jewel servos to fold in
                         if (now > 6.0) {
-                            robot.UpperArm.MoveHome();
+//                            robot.UpperArm.MoveHome();
                             mode++;
                             resetClock();
                             step = 0;

@@ -64,37 +64,15 @@ public class GrabberTest extends LinearOpMode {
             egamepad2.UpdateEdge();
 
             /* display information */
+            telemetry.addData("Guides   ", "%.2f %.2f", robot.LG.getPosition(),robot.RG.getPosition());
             telemetry.addData("Grabbers ", "%.2f %.2f", robot.GGL.getPosition(),robot.GGR.getPosition());
             telemetry.addData("Claw     ", "%.2f", robot.Claw.getPosition());
             telemetry.addData("IsPressed" , "%b", pressed);
             telemetry.update();
 
 
-            // grabbers -------------------------------------------------------------
-            /*if (egamepad1.dpad_down.pressed) {
-                robot.GGL.setPosition(robot.GGL.getPosition() - increment);
-            }
-            if (egamepad1.dpad_up.pressed) {
-                robot.GGL.setPosition(robot.GGL.getPosition() + increment);
-            }
-
-            if (egamepad1.dpad_left.pressed) {
-                robot.GGR.setPosition(robot.GGR.getPosition() - increment);
-            }
-            if (egamepad1.dpad_right.pressed) {
-                robot.GGR.setPosition(robot.GGR.getPosition() + increment);
-            }
-
-            if (egamepad1.y.pressed) {
-                robot.Claw.setPosition(robot.Claw.getPosition() + increment);
-            }
-            if (egamepad1.a.pressed) {
-                robot.Claw.setPosition(robot.Claw.getPosition() - increment);
-            }
-*/
-             /********** Grabber code **********/
-            /*if (egamepad2.left_bumper.released) {
->>>>>>> WORLDS!-AUTO
+            /********** Grabber code **********/
+            if (egamepad2.left_bumper.released) {
                 index_grabber_left = (index_grabber_left < 2) ? index_grabber_left + 1 : 0;
             }
             if (egamepad2.right_bumper.released) {

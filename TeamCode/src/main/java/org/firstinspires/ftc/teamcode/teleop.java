@@ -60,7 +60,7 @@ public class teleop extends LinearOpMode {
         index_guide = 0;
         close_guides = 0;
 
-        telemetry.addData("Version", "Worlds 1.0");
+        telemetry.addData("Version", "Worlds 4-13-2018");
 
         telemetry.update();
 
@@ -158,27 +158,28 @@ public class teleop extends LinearOpMode {
             /**------------------------------------------------------------------------**/
 
             /********** Grabber code **********/
-            if (egamepad2.left_bumper.released) {
+            if (egamepad2.left_bumper.pressed) {
                 index_grabber_left = (index_grabber_left < 2) ? index_grabber_left + 1 : 0;
             }
-            if (egamepad2.right_bumper.released) {
+            if (egamepad2.right_bumper.pressed) {
                 index_grabber_right = (index_grabber_right < 2) ? index_grabber_right + 1 : 0;
             }
-            if (egamepad2.b.released) {
+            if (egamepad2.b.pressed) {
                 index_grabber_left = 2;
                 index_grabber_right = 2;
             }
-            if (egamepad2.x.released) {
+            if (egamepad2.x.pressed) {
                 index_grabber_left = 1;
                 index_grabber_right = 1;
             }
             robot.GGL.setPosition(robot.GRABBER_LEFT[index_grabber_left]);
             robot.GGR.setPosition(robot.GRABBER_RIGHT[index_grabber_right]);
 
-            if (egamepad2.a.released) {
-                index_claw = (index_claw < 1) ? index_claw + 1 : 0;
-                robot.Claw.setPosition(robot.CLAW[index_claw]);
-            }
+//
+//            if (egamepad2.a.pressed) {
+//                index_claw = (index_claw < 1) ? index_claw + 1 : 0;
+//                robot.Claw.setPosition(robot.CLAW[index_claw]);
+//            }
 
 
             //*******Guides**********/

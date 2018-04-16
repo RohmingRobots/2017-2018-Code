@@ -26,8 +26,8 @@ public class AmpereTest extends LinearOpMode {
     int leftampereblue = 0;
     int rightamperered = 0;
     int rightampereblue = 0;
-    boolean leftampere;
-    boolean rightampere;
+    boolean leftampere = false;
+    boolean rightampere = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -36,7 +36,6 @@ public class AmpereTest extends LinearOpMode {
         double AMPERE_POWER = 0.8;
         double increment;
         int index_left_flipper, index_right_flipper;
-        int blue_left_right, red_left_right;
 
         robot.init(hardwareMap);
 
@@ -47,6 +46,10 @@ public class AmpereTest extends LinearOpMode {
         increment = 0.05;
         index_left_flipper = 0;
         index_right_flipper = 0;
+
+        //turns ampere LEDs om
+        robot.left_ampere.enableLed(true);
+        robot.right_ampere.enableLed(true);
 
         telemetry.addLine("Ampere Test");
         telemetry.addLine("gamepad 1");
@@ -72,39 +75,6 @@ public class AmpereTest extends LinearOpMode {
             /* update extended gamepad */
             egamepad1.UpdateEdge();
             egamepad2.UpdateEdge();
-
-            /* display information */
-            /*telemetry.addData("AW   ","%.2f %.2f", robot.AWL.getPower(), robot.AWR.getPower());
-            telemetry.addData("AF   ","%.2f %.2f", robot.AFL.getPosition(), robot.AFR.getPosition());
-            telemetry.addData("Blue ","%3d %3d", robot.left_ampere.blue(),robot.right_ampere.blue());
-            telemetry.addData("Red  ","%3d %3d", robot.left_ampere.red(),robot.right_ampere.red());
-            if (robot.left_ampere.blue() > robot.right_ampere.blue()+5) {
-                // left is BLUE
-                telemetry.addLine("BLUE left");
-                blue_left_right = -1;
-            } else if (robot.left_ampere.blue()+5 < robot.right_ampere.blue()) {
-                // right is BLUE
-                telemetry.addLine("BLUE right");
-                blue_left_right = 1;
-            } else {
-                // no clear blue
-                telemetry.addLine("BLUE ???");
-                blue_left_right = 0;
-            }
-            if (robot.left_ampere.red() > robot.right_ampere.red()+5) {
-                // left is RED
-                telemetry.addLine("RED left");
-                red_left_right = -1;
-            } else if (robot.left_ampere.red()+5 < robot.right_ampere.red()+5) {
-                // right is RED
-                telemetry.addLine("RED right");
-                red_left_right = 1;
-            } else {
-                // no clear red
-                telemetry.addLine("RED ???");
-                red_left_right = 0;
-            }
-            telemetry.update();*/
 
             // side arms
             if (egamepad1.dpad_down.pressed) {
@@ -163,34 +133,26 @@ public class AmpereTest extends LinearOpMode {
             }
 
             /* checks if both color sensors detect a difference in the change of values and
-                       returns true if the side is red and false if the side is blue */
-            if (egamepad1.dpad_right.released) {
-                if (3 < ((robot.left_ampere.red() - leftamperered) -
-                        (robot.right_ampere.red()-rightamperered))) {
-                    leftampere = true;
-                }
-                if (-3 > ((robot.left_ampere.red() - leftamperered) -
-                        (robot.right_ampere.red()-rightamperered))) {
-                    rightampere = true;
-                }
-                if (3 < ((robot.left_ampere.blue() - leftampereblue) -
-                        (robot.right_ampere.blue()-rightampereblue))) {
-                    leftampere = false;
-                }
-                if (-3 > ((robot.left_ampere.red() - leftamperered) -
-                        (robot.right_ampere.red()-rightamperered))) {
-                    rightampere = false;
-                }
+               returns true if the side is red and the side is blue */
+            leftampere = false;
+            rightampere = false;
+            if ( ((robot.left_ampere.red() - leftamperered) > 10 + (robot.right_ampere.red() - rightamperered)) &&
+                 ((robot.right_ampere.blue() - rightampereblue) > 10 + (robot.left_ampere.blue() - leftampereblue)) ) {
+                leftampere = true;
+            }
+            if (  ((robot.right_ampere.red() - rightamperered) > 10 + (robot.left_ampere.red() - leftamperered)) &&
+                  ((robot.left_ampere.blue() - leftampereblue) > 10 + (robot.right_ampere.blue() - rightampereblue)) ) {
+                rightampere = true;
             }
 
             telemetry.addData("leftamperered", leftamperered);
             telemetry.addData("leftampereblue", leftampereblue);
             telemetry.addData("rightamperered", rightamperered);
             telemetry.addData("rightampereblue", rightampereblue);
-            telemetry.addData("robot.left_ampere.red()", robot.left_ampere.red());
-            telemetry.addData("robot.left_ampere.blue()", robot.left_ampere.blue());
-            telemetry.addData("robot.right_ampere.red()", robot.right_ampere.red());
-            telemetry.addData("robot.right_ampere.blue()", robot.right_ampere.blue());
+            telemetry.addData("left_color red", robot.left_ampere.red());
+            telemetry.addData("left_color blue", robot.left_ampere.blue());
+            telemetry.addData("right_color red", robot.right_ampere.red());
+            telemetry.addData("right_color blue", robot.right_ampere.blue());
             telemetry.addData("leftampere", leftampere);
             telemetry.addData("rightampere", rightampere);
             telemetry.update();

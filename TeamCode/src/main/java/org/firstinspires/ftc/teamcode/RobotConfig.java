@@ -104,8 +104,8 @@ public class RobotConfig
     ArmControl  UpperArm = new ArmControl();
 
     /************************* 0-3 glyph positions, 4-6 relic positions */
-    public double[] LOWERARM = {0.0, 0.0, 0.35, 0.50, 1.0, 1.5, 2.0};
-    public double[] UPPERARM = {0.0, 0.2, 0.45, 0.70, 1.0, 1.5, 2.0};
+    public double[] LOWERARM = {0.0, 0.0, 0.40, 0.50, 1.0, 1.5, 2.0};
+    public double[] UPPERARM = {0.0, 0.2, 0.50, 0.70, 1.0, 1.5, 2.0};
 
 
     /* Public
