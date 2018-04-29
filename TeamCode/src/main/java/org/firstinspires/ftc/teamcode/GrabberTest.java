@@ -67,11 +67,13 @@ public class GrabberTest extends LinearOpMode {
             telemetry.addData("Guides   ", "%.2f %.2f", robot.LG.getPosition(),robot.RG.getPosition());
             telemetry.addData("Grabbers ", "%.2f %.2f", robot.GGL.getPosition(),robot.GGR.getPosition());
             telemetry.addData("Claw     ", "%.2f", robot.Claw.getPosition());
-            telemetry.addData("IsPressed" , "%b", pressed);
+                    telemetry.addData("IsPressed" , "%b", pressed);
+            telemetry.addData("HOOF", robot.ANTIREDNEK.getPosition() );
             telemetry.update();
 
 
             /********** Grabber code **********/
+            /*
             if (egamepad2.left_bumper.released) {
                 index_grabber_left = (index_grabber_left < 2) ? index_grabber_left + 1 : 0;
             }
@@ -101,6 +103,10 @@ public class GrabberTest extends LinearOpMode {
                 robot.RG.setPosition(robot.GUIDESRIGHT[index_guide]);
             }
 
+            if (gamepad1.y) {
+                robot.ANTIREDNEK.setPosition(robot.ANTIREDNEK.getPosition() + 1);}
+            if (gamepad1.b){
+                robot.ANTIREDNEK.setPosition(robot.ANTIREDNEK.getPosition() - 1 ) ;}
 
             /* test code */
             if (gamepad2.left_trigger > 0.5 && !pressed) {
