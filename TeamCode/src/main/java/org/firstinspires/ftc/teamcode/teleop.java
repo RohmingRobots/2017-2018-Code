@@ -84,6 +84,7 @@ public class teleop extends LinearOpMode {
             telemetry.addData("leftcolor", leftcolor);
             telemetry.addData("rightcolor", rightcolor);
             telemetry.addData("Speed", speed);
+            telemetry.addData("HOOF", robot.ANTIREDNEK.getPosition() );
             telemetry.update();
 
             /**------------------------------------------------------------------------**/
@@ -217,7 +218,10 @@ public class teleop extends LinearOpMode {
                 robot.LowerArm.MoveToPosition(robot.LOWERARM[index_arm], 0.5);
                 robot.UpperArm.MoveToPosition(robot.UPPERARM[index_arm], 0.5);
             }
-
+            if (gamepad1.y) {
+                robot.ANTIREDNEK.setPosition(1);}
+            if (gamepad1.b){
+                robot.ANTIREDNEK.setPosition(0.3) ;}
 
             robot.ArmUpdate(this, true);
 

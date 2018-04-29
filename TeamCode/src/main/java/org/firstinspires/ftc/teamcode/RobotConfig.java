@@ -82,6 +82,7 @@ public class RobotConfig
     public CRServo AWR = null;
     public Servo AFL = null;
     public Servo AFR = null;
+    public Servo ANTIREDNEK = null;
     public ColorSensor left_ampere = null;
     public ColorSensor right_ampere = null;
     /* open full, closed full, partial open */
@@ -104,8 +105,8 @@ public class RobotConfig
     ArmControl  UpperArm = new ArmControl();
 
     /************************* 0-3 glyph positions, 4-6 relic positions */
-    public double[] LOWERARM = {0.0, 0.0, 0.40, 0.50, 1.0, 1.5, 2.0};
-    public double[] UPPERARM = {0.0, 0.2, 0.50, 0.70, 1.0, 1.5, 2.0};
+    public double[] LOWERARM = {0.0, 0.0, 0.09, 0.3, 1.0, 1.5, 2.0};
+    public double[] UPPERARM = {0.0, 0.2, 0.5, 0.73, 1.0, 1.5, 2.0};
 
 
     /* Public
@@ -162,11 +163,13 @@ public class RobotConfig
         LG.setPosition(GUIDESLEFT[0]);
         RG.setPosition(GUIDESRIGHT[0]);
 
+
         // **** Ampere (side arms and flippers) ****
         // Side arms
         // Define and Initialize Motors
         AWL = hwMap.crservo.get("AWL");
         AWR = hwMap.crservo.get("AWR");
+        ANTIREDNEK = hwMap.servo.get("ANTIREDNEK");
         // reverse those motors
         AWR.setDirection(CRServo.Direction.REVERSE);
         // set all motors to zero power
