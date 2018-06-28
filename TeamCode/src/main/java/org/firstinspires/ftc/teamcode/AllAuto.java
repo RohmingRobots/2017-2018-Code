@@ -23,6 +23,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.Arms.DualArmControl;
 
 import java.lang.annotation.Target;
 
@@ -30,6 +31,10 @@ import java.lang.annotation.Target;
 //naming the teleop thing
 @Autonomous(name="AllAuto", group ="Drive")
 public class AllAuto extends LinearOpMode {
+
+    /* Sub Assemblies
+     */
+    DualArmControl Arms = new DualArmControl();
 
     OpenGLMatrix lastLocation = null;
     VuforiaLocalizer vuforia;
@@ -251,6 +256,10 @@ public class AllAuto extends LinearOpMode {
          */
         robot.init(hardwareMap);
 
+        /* Initialize sub assemblies
+         */
+        Arms.Initialize(this);
+
         double voltage = robot.Battery.getVoltage();
         telemetry.addData("Voltage", voltage);
 
@@ -417,15 +426,15 @@ public class AllAuto extends LinearOpMode {
                             case 0:
                                 /* lift arm up, through gate, after glyph grabbed */
                                 if (now > 0.5) {
-                                    robot.UpperArm.MoveToPosition(0.2);
+                                    Arms.UpperArm.MoveToPosition(0.2);
                                     home_sequence++;
                                 }
                                 break;
                             case 1:
                                 /* wait until arm has gone through gate, then send arm home */
-                                if (robot.UpperArm.CurrentPosition > 0.1) {
-                                    robot.UpperArm.MoveToPosition(0.1);
-                                    robot.UpperArm.MoveHome(2.0);
+                                if (Arms.UpperArm.getCurrentPosition() > 0.1) {
+                                    Arms.UpperArm.MoveToPosition(0.1);
+                                    Arms.UpperArm.MoveHome(2.0);
                                     if (do_jewels) {
                                         step++;
                                     } else {
@@ -935,7 +944,7 @@ public class AllAuto extends LinearOpMode {
             }  // end of switch
 
             //updates the arms
-            robot.ArmUpdate(this, true);
+            Arms.Update(true);
 
 //            telemetry.update();
             sleep(40);

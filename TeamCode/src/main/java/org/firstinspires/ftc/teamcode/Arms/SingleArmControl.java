@@ -1,39 +1,32 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Arms;
 
-/**
- * Created by ablauch on 2/15/2018.
- */
-
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-/********** Arm Control class **********/
-public class ArmControl {
-    private boolean UpperLower = true;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-    /* Private members - use ArmControl methods
-    * Devices
-    * -------
-    * Make sure to control both left and right arms in unison
-    * LR - lower right arm DC motor
-    * LL - lower left arm DC motor (must be reverse of LR)
-    * UR - upper right arm DC motor
-    * UL - upper left arm DC motor (must be same of UR)
-    */
+
+/* Sub Assembly Class
+ */
+public class SingleArmControl {
+    /* Declare private class object
+    * */
+    private Telemetry telemetry = null;         /* local copy of telemetry object from opmode class */
+    private HardwareMap hardwareMap = null;     /* local copy of HardwareMap object from opmode class */
+    private String name = "Single Arm Control";
+
+    private boolean UpperLower = true;      /* which arm to control (true=>upper, false=>lower) */
+
     private DcMotor RightMotor = null;
     private DcMotor LeftMotor = null;
 
-    /* Arm sensors */
-    public DigitalChannel Limit = null;         /* home switch */
-    public AnalogInput Potentiometer = null;    /* potentiometers */
-
     //declaring all my variables in one place for my sake
     private double HomePosition = 0;        /* position value at home */
-    public double CurrentPosition = 0;      /* current position relative to home */
+    private double CurrentPosition = 0;     /* current position relative to home */
     private double FinalTarget = 0;         /* final target position */
     private double FinalTime = 0;           /* time to move to final target */
     private double CurrentTarget = 0;       /* current target position */
@@ -41,44 +34,65 @@ public class ArmControl {
     private boolean Homed = false;          /* arm has been at home - home position valid */
     private boolean AtHome = false;         /* home switch active - currently at home */
     private double ErrorSum = 0.0;          /* integral error */
-    public double Power = 0.0;              /* power to send to motors */
+    private double Power = 0.0;             /* power to send to motors */
     private double HIGH_MAX_POWER = 0.0;
     private double LOW_MAX_POWER = 0.0;
     private double INITIAL_ANGLE = 0.0;
     private double POSITION_TO_ANGLE = 0.0;
     private double RelativeAngle = 0.0;
-    public double Angle = 0.0;
+    private double Angle = 0.0;
     private double INTEGRAL_GAIN = 0.0;
     private double MAX_POSITION = 1.5;
 
     private ElapsedTime OurTime = new ElapsedTime();
 
-    /* Constructor */
-    public ArmControl() {
+
+    /* Declare public class objects
+    * */
+    /* Arm sensors */
+    public DigitalChannel Limit = null;         /* home switch */
+    public AnalogInput Potentiometer = null;    /* potentiometers */
+
+    /* getter methods
+     * */
+    public double getCurrentPosition() {
+        return CurrentPosition;
+    }
+    public double getPower() {
+        return Power;
+    }
+    public double getAngle() {
+        return Angle;
     }
 
-    /* Initialize standard Hardware interfaces */
-    public void init(HardwareMap ahwMap, boolean upper_lower) {
-        HardwareMap hwMap  = null;
+    /* Subassembly constructor */
+    public SingleArmControl() {
+    }
 
-        // save reference to HW Map
-        hwMap = ahwMap;
+    /* Initialization method - to be called before any other methods are used */
+    public void Initialize(LinearOpMode opMode, boolean upper_lower) {
+        /* Set local copies from opmode class */
+        telemetry = opMode.telemetry;
+        hardwareMap = opMode.hardwareMap;
+
+        telemetry.addLine(name + " initialize");
+
+        /* Map hardware devices */
         UpperLower = upper_lower;
-
         if (UpperLower) {
             //UPPER
             // Define and Initialize Motors
-            LeftMotor = hwMap.dcMotor.get("UL");
-            RightMotor = hwMap.dcMotor.get("UR");
+            LeftMotor = hardwareMap.dcMotor.get("UL");
+            RightMotor = hardwareMap.dcMotor.get("UR");
             // reverse those motors
             RightMotor.setDirection(DcMotor.Direction.REVERSE);
 
             // Define and initialize switch
-            Limit = hwMap.digitalChannel.get("upper limit");
+            Limit = hardwareMap.digitalChannel.get("upper limit");
             Limit.setMode(DigitalChannel.Mode.INPUT);           // false = pressed
 
             // Define and initialize potentiometers
-            Potentiometer = hwMap.analogInput.get("upper pot");
+            Potentiometer = hardwareMap.analogInput.get("upper pot");
 
             // Set power values
             INTEGRAL_GAIN = 1.0;
@@ -92,17 +106,17 @@ public class ArmControl {
         } else {
             //LOWER
             // Define and Initialize Motors
-            LeftMotor = hwMap.dcMotor.get("LL");
-            RightMotor = hwMap.dcMotor.get("LR");
+            LeftMotor = hardwareMap.dcMotor.get("LL");
+            RightMotor = hardwareMap.dcMotor.get("LR");
             // reverse those motors
             RightMotor.setDirection(DcMotor.Direction.REVERSE);
 
             // Define and initialize switch
-            Limit = hwMap.digitalChannel.get("lower limit");
+            Limit = hardwareMap.digitalChannel.get("lower limit");
             Limit.setMode(DigitalChannel.Mode.INPUT);           // false = pressed
 
             // Define and initialize potentiometers
-            Potentiometer = hwMap.analogInput.get("lower pot");
+            Potentiometer = hardwareMap.analogInput.get("lower pot");
 
             // Set power values
             INTEGRAL_GAIN = 0.0;
@@ -128,6 +142,11 @@ public class ArmControl {
         HomePosition = Potentiometer.getVoltage();
 
         ErrorSum = 0.0;     // zero integral
+    }
+
+    /* Cleanup method - to be called when done with subassembly to 'turn off' everything */
+    public void Cleanup() {
+        telemetry.addLine(name + " cleanup");
     }
 
     public void MoveUp() {
@@ -166,8 +185,8 @@ public class ArmControl {
         FinalTime = time;
     }
 
-    /* Call this method when you want to update the arm motors */
-    protected void Update(OpMode om, double offset, boolean active) {
+    /* Call this method when you want to update the arm control (must be done on a periodic basis */
+    public void Update(double offset, boolean active) {
         double error;
         double max_power;
 
@@ -249,8 +268,8 @@ public class ArmControl {
         }
 
         /* when target is zero ...
-        * kill power, let braking bring it down
-        */
+         * kill power, let braking bring it down
+         */
         if (CurrentTarget < 0.01) {
             if (UpperLower){
                 // upper arm braking is sufficient to bring it down in a controlled manner
@@ -276,12 +295,12 @@ public class ArmControl {
             LeftMotor.setPower(Power);
         }
 
-        if (om!=null)
-            om.telemetry.addData("Power Error Angle", "%.2f %.2f %5.0f", Power, error, Angle);
+        telemetry.addData("Power Error Angle", "%.2f %.2f %5.0f", Power, error, Angle);
     }
 
     public void SetPower(double power) {
         RightMotor.setPower(power);
         LeftMotor.setPower(power);
     }
+
 }

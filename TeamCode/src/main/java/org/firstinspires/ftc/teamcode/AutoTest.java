@@ -23,10 +23,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.Arms.DualArmControl;
 
 //naming the teleop thing
 @Autonomous(name="Auto Test", group ="Test")
 public class AutoTest extends LinearOpMode {
+
+    /* Sub Assemblies
+     */
+    DualArmControl Arms = new DualArmControl();
+
     VuforiaLocalizer vuforia;
     RobotConfig robot = new RobotConfig();
     private ElapsedTime runtime = new ElapsedTime();
@@ -66,6 +72,10 @@ public class AutoTest extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
+
+        /* Initialize sub assemblies
+         */
+        Arms.Initialize(this);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
@@ -383,7 +393,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Arm Lift");
         telemetry.update();
-        robot.UpperArm.MoveToPosition(position);
+        Arms.UpperArm.MoveToPosition(position);
         AutoDelaySec(time_sec);
     }
 
@@ -391,7 +401,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Arm Home");
         telemetry.update();
-        robot.UpperArm.MoveHome();
+        Arms.UpperArm.MoveHome();
 
         double timeStart = 0;
         double timeNow = 0;
@@ -399,7 +409,7 @@ public class AutoTest extends LinearOpMode {
         do {
             AutoUpdate();
             timeNow = runtime.seconds() - timeStart;
-        } while ( (timeNow<time_sec) && opModeIsActive() && (robot.UpperArm.Limit.getState()==true));
+        } while ( (timeNow<time_sec) && opModeIsActive() && (Arms.UpperArm.Limit.getState()==true));
     }
 
     void AutoAmpereExtend(double time_sec) {
@@ -521,7 +531,7 @@ public class AutoTest extends LinearOpMode {
     void AutoUpdate() {
         if ( !opModeIsActive() ) return;
 
-        robot.ArmUpdate(this, true);
+        Arms.Update(true);
         sleep(40);
     }
 }

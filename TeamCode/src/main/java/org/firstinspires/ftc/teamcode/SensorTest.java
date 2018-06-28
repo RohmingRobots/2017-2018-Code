@@ -9,12 +9,18 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.teamcode.Arms.DualArmControl;
+
 /**
  * Created by ablauch on 2/21/2018.
  */
 
 @TeleOp(name="Sensor Test", group="Test")
 public class SensorTest extends LinearOpMode {
+
+    /* Sub Assemblies
+     */
+    DualArmControl Arms = new DualArmControl();
 
     RobotConfig robot = new RobotConfig();
 
@@ -29,6 +35,10 @@ public class SensorTest extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
+
+        /* Initialize sub assemblies
+         */
+        Arms.Initialize(this);
 
         /* turn on color sensor LEDs &/
         robot.left_color.enableLed(true);
@@ -65,9 +75,9 @@ public class SensorTest extends LinearOpMode {
             /* Display arm sensors */
             telemetry.addLine("Arm (lower, upper)");
             telemetry.addData("Limits: ","%b %b",
-                    robot.LowerArm.Limit.getState(), robot.UpperArm.Limit.getState());
+                    Arms.LowerArm.Limit.getState(), Arms.UpperArm.Limit.getState());
             telemetry.addData("Pots: ","%.2f %.2f",
-                    robot.LowerArm.CurrentPosition, robot.UpperArm.CurrentPosition);
+                    Arms.LowerArm.getCurrentPosition(), Arms.UpperArm.getCurrentPosition());
 
             /* Display servo positions */
             //AJB doesn't work when PWM disabled
@@ -84,7 +94,7 @@ public class SensorTest extends LinearOpMode {
             telemetry.addData("  ampere left ","%3d %3d", robot.left_ampere.red(),robot.left_ampere.blue());
             telemetry.addData("  ampere right","%3d %3d", robot.right_ampere.red(),robot.right_ampere.blue());
 
-            robot.ArmUpdate(this, false);
+            Arms.Update(false);
 
             telemetry.update();
 

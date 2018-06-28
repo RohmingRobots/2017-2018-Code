@@ -1,24 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cCompassSensor;
-import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.CompassSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.I2cAddr;
-import com.qualcomm.robotcore.hardware.I2cDevice;
-import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.qualcomm.robotcore.hardware.configuration.I2cSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -97,17 +85,6 @@ public class RobotConfig
     */
     public ColorSensor left_color = null;
     public ColorSensor right_color = null;
-
-    /* Public - arm control subassembly
-    * arm control class
-    */
-    ArmControl  LowerArm = new ArmControl();
-    ArmControl  UpperArm = new ArmControl();
-
-    /************************* 0-3 glyph positions, 4-6 relic positions */
-    public double[] LOWERARM = {0.0, 0.0, 0.09, 0.3, 1.0, 1.5, 2.0};
-    public double[] UPPERARM = {0.0, 0.2, 0.5, 0.73, 1.0, 1.5, 2.0};
-
 
     /* Public
     * IMU objects
@@ -200,10 +177,6 @@ public class RobotConfig
         left_color.enableLed(false);
         right_color.enableLed(false);
 
-        // **** Initialize Arms ****
-        LowerArm.init(hwMap,false);
-        UpperArm.init(hwMap,true);
-
         // **** IMU objects ****
         Battery = hwMap.voltageSensor.get("Lower hub 3");
     }
@@ -253,12 +226,6 @@ public class RobotConfig
         RotateLeftRight(-speed);
     }
 
-
-    /* Call this method when you want to update the arm motors */
-    public void ArmUpdate(OpMode om, boolean active) {
-        LowerArm.Update(om, 0.0, active);
-        UpperArm.Update(om, -LowerArm.Angle, active);
-    }
 
     /***
      *
