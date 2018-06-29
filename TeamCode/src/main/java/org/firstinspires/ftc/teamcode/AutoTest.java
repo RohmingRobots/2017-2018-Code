@@ -20,6 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.SubAssemblyAmpere.AmpereControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
 
@@ -31,6 +32,7 @@ public class AutoTest extends LinearOpMode {
      */
     DualArmControl Arms = new DualArmControl();
     GrabberControl Grabber = new GrabberControl();
+    AmpereControl Ampere = new AmpereControl();
 
     VuforiaLocalizer vuforia;
     RobotConfig robot = new RobotConfig();
@@ -76,6 +78,7 @@ public class AutoTest extends LinearOpMode {
          */
         Arms.Initialize(this);
         Grabber.Initialize(this);
+        Ampere.Initialize(this);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
@@ -414,8 +417,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Ampere Extend");
         telemetry.update();
-        robot.AWL.setPower(AMPERE_POWER);
-        robot.AWR.setPower(AMPERE_POWER);
+        Ampere.Extend(AMPERE_POWER);
         AutoDelaySec(time_sec);
     }
 
@@ -423,8 +425,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Ampere Retract");
         telemetry.update();
-        robot.AWL.setPower(-AMPERE_POWER);
-        robot.AWR.setPower(-AMPERE_POWER);
+        Ampere.Retract(AMPERE_POWER);
         AutoDelaySec(time_sec);
     }
 
@@ -432,8 +433,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Ampere Stop");
         telemetry.update();
-        robot.AWL.setPower(0.0);
-        robot.AWR.setPower(0.0);
+        Ampere.Extend(0.0);
         AutoDelaySec(time_sec);
     }
 
@@ -441,8 +441,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Flipper Extend");
         telemetry.update();
-        robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[2]);
-        robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[2]);
+        Ampere.SetPosition(2);
         AutoDelaySec(time_sec);
     }
 
@@ -450,33 +449,32 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Flipper Retract");
         telemetry.update();
-        robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
-        robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+        Ampere.SetPosition(0);
         AutoDelaySec(time_sec);
     }
 
     void AutoFlippersColorEnable(boolean enable) {
         if ( !opModeIsActive() ) return;
-        robot.left_ampere.enableLed(enable);
-        robot.right_ampere.enableLed(enable);
+        Ampere.ColorLeft.enableLed(enable);
+        Ampere.ColorRight.enableLed(enable);
     }
 
     void AutoFlippersColorRecord() {
         if ( !opModeIsActive() ) return;
-        left_blue = robot.left_ampere.blue();
-        right_blue = robot.right_ampere.blue();
-        left_red = robot.left_ampere.red();
-        right_red = robot.right_ampere.red();
+        left_blue = Ampere.ColorLeft.blue();
+        right_blue = Ampere.ColorRight.blue();
+        left_red = Ampere.ColorLeft.red();
+        right_red = Ampere.ColorRight.red();
     }
 
     void AutoFlippersColorFlick(boolean red, double time_sec) {
         if (!opModeIsActive()) return;
         telemetry.addLine("Flipper Flick");
 
-        left_blue = robot.left_ampere.blue() - left_blue;
-        left_red = robot.left_ampere.red() - left_red;
-        right_blue = robot.right_ampere.blue() - right_blue;
-        right_red = robot.right_ampere.red() - right_red;
+        left_blue = Ampere.ColorLeft.blue() - left_blue;
+        left_red = Ampere.ColorLeft.red() - left_red;
+        right_blue = Ampere.ColorRight.blue() - right_blue;
+        right_red = Ampere.ColorRight.red() - right_red;
 
         if ((left_blue - left_red) >= 3) {
             left_blue = 1;
@@ -502,14 +500,14 @@ public class AutoTest extends LinearOpMode {
 
         if ( (left_blue>0) && (right_red>0) ) {
             if (red)
-                robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[1]);
+                Ampere.SetPositionLeft(1);
             else
-                robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[1]);
+                Ampere.SetPositionRight(1);
         } else if ( (left_red>0) && (right_blue>0) ) {
             if (red)
-                robot.AFR.setPosition(robot.AMPERE_FLICKER_LEFT[1]);
+                Ampere.SetPositionLeft(1);
             else
-                robot.AFL.setPosition(robot.AMPERE_FLICKER_RIGHT[1]);
+                Ampere.SetPositionRight(1);
         }
         AutoDelaySec(time_sec);
     }

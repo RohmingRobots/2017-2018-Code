@@ -36,12 +36,7 @@ public class teleop extends LinearOpMode {
         double back_right;
         double speed = 2.5;
         double reverse = 1.0;
-        int index_grabber_left;
-        int index_grabber_right;
-        int index_claw;
-        int index_arm;
 
-        int index_guide;
         int close_guides;
 
 
@@ -63,10 +58,6 @@ public class teleop extends LinearOpMode {
         egamepad1 = new GamepadEdge(gamepad1);
         egamepad2 = new GamepadEdge(gamepad2);
 
-        index_grabber_left = 0;
-        index_grabber_right = 0;
-        index_claw = 0;
-        index_guide = 0;
         close_guides = 0;
 
         telemetry.addData("Version", "Worlds 4-13-2018");

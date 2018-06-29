@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.SubAssemblyAmpere;
 /* version history 2.0
      -10/21/17 (1.0) working and good
      -10/23/17 (1.3) adding speed changing by lbumper/ltrigger
@@ -10,12 +10,18 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.GamepadEdge;
+import org.firstinspires.ftc.teamcode.RobotConfig;
+import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
+
 
 //naming the teleop thing
 @TeleOp(name="Ampere Test", group="Test")
 public class AmpereTest extends LinearOpMode {
 
-    RobotConfig robot = new RobotConfig();
+    /* Sub Assemblies
+     */
+    AmpereControl Ampere = new AmpereControl();
 
     /* Declare extended gamepad */
     GamepadEdge egamepad1;
@@ -31,25 +37,23 @@ public class AmpereTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-
         ElapsedTime OurTime = new ElapsedTime();
         double AMPERE_POWER = 0.8;
         double increment;
-        int index_left_flipper, index_right_flipper;
 
-        robot.init(hardwareMap);
+        /* Initialize sub assemblies
+         */
+        Ampere.Initialize(this);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
         egamepad2 = new GamepadEdge(gamepad2);
 
         increment = 0.05;
-        index_left_flipper = 0;
-        index_right_flipper = 0;
 
         //turns ampere LEDs om
-        robot.left_ampere.enableLed(true);
-        robot.right_ampere.enableLed(true);
+        Ampere.ColorLeft.enableLed(true);
+        Ampere.ColorRight.enableLed(true);
 
         telemetry.addLine("Ampere Test");
         telemetry.addLine("gamepad 1");
@@ -75,30 +79,22 @@ public class AmpereTest extends LinearOpMode {
             // side arms
             if (egamepad1.dpad_down.pressed) {
                 // retract
-                robot.AWL.setPower(-AMPERE_POWER);
-                robot.AWR.setPower(-AMPERE_POWER);
+                Ampere.Retract(AMPERE_POWER);
             } else if (egamepad1.dpad_down.released){
                 // stop
-                robot.AWL.setPower(0.0);
-                robot.AWR.setPower(0.0);
+                Ampere.Extend(0.0);
             }
             if (egamepad1.dpad_up.pressed) {
                 // extend
-                robot.AWL.setPower(AMPERE_POWER);
-                robot.AWR.setPower(AMPERE_POWER);
+                Ampere.Extend(AMPERE_POWER);
             } else if (egamepad1.dpad_up.released){
                 // stop
-                robot.AWL.setPower(0.0);
-                robot.AWR.setPower(0.0);
+                Ampere.Extend(0.0);
             }
 
             // flippers
-            if (egamepad1.x.released) {
-                index_left_flipper = index_left_flipper+1;
-                if (index_left_flipper > 2) {
-                    index_left_flipper = 0;
-                }
-                robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[index_left_flipper]);
+/*            if (egamepad1.x.released) {
+                Ampere.IncrementLeft();
             }
             if (egamepad1.left_stick_button.released) {
                 robot.AFL.setPosition(robot.AFL.getPosition()+increment);
@@ -107,11 +103,7 @@ public class AmpereTest extends LinearOpMode {
                 robot.AFL.setPosition(robot.AFL.getPosition()-increment);
             }
             if (egamepad1.b.released) {
-                index_right_flipper = index_right_flipper+1;
-                if (index_right_flipper > 2) {
-                    index_right_flipper = 0;
-                }
-                robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[index_right_flipper]);
+                Ampere.IncrementRight();
             }
             if (egamepad1.right_stick_button.released) {
                 robot.AFR.setPosition(robot.AFR.getPosition()+increment);
@@ -119,25 +111,26 @@ public class AmpereTest extends LinearOpMode {
             if (egamepad1.right_bumper.released) {
                 robot.AFR.setPosition(robot.AFR.getPosition()-increment);
             }
+*/
 
             if (egamepad1.dpad_left.released) {
                 //calibrates to light of open air
-                leftamperered = robot.left_ampere.red();
-                leftampereblue = robot.left_ampere.blue();
-                rightamperered = robot.right_ampere.red();
-                rightampereblue = robot.right_ampere.blue();
+                leftamperered = Ampere.ColorLeft.red();
+                leftampereblue = Ampere.ColorLeft.blue();
+                rightamperered = Ampere.ColorRight.red();
+                rightampereblue = Ampere.ColorRight.blue();
             }
 
             /* checks if both color sensors detect a difference in the change of values and
                returns true if the side is red and the side is blue */
             leftampere = false;
             rightampere = false;
-            if ( ((robot.left_ampere.red() - leftamperered) > 10 + (robot.right_ampere.red() - rightamperered)) &&
-                 ((robot.right_ampere.blue() - rightampereblue) > 10 + (robot.left_ampere.blue() - leftampereblue)) ) {
+            if ( ((Ampere.ColorLeft.red() - leftamperered) > 10 + (Ampere.ColorRight.red() - rightamperered)) &&
+                 ((Ampere.ColorRight.blue() - rightampereblue) > 10 + (Ampere.ColorLeft.blue() - leftampereblue)) ) {
                 leftampere = true;
             }
-            if (  ((robot.right_ampere.red() - rightamperered) > 10 + (robot.left_ampere.red() - leftamperered)) &&
-                  ((robot.left_ampere.blue() - leftampereblue) > 10 + (robot.right_ampere.blue() - rightampereblue)) ) {
+            if (  ((Ampere.ColorRight.red() - rightamperered) > 10 + (Ampere.ColorLeft.red() - leftamperered)) &&
+                  ((Ampere.ColorLeft.blue() - leftampereblue) > 10 + (Ampere.ColorRight.blue() - rightampereblue)) ) {
                 rightampere = true;
             }
 
@@ -145,10 +138,10 @@ public class AmpereTest extends LinearOpMode {
             telemetry.addData("leftampereblue", leftampereblue);
             telemetry.addData("rightamperered", rightamperered);
             telemetry.addData("rightampereblue", rightampereblue);
-            telemetry.addData("left_color red", robot.left_ampere.red());
-            telemetry.addData("left_color blue", robot.left_ampere.blue());
-            telemetry.addData("right_color red", robot.right_ampere.red());
-            telemetry.addData("right_color blue", robot.right_ampere.blue());
+            telemetry.addData("left_color red", Ampere.ColorLeft.red());
+            telemetry.addData("left_color blue", Ampere.ColorLeft.blue());
+            telemetry.addData("right_color red", Ampere.ColorRight.red());
+            telemetry.addData("right_color blue", Ampere.ColorRight.blue());
             telemetry.addData("leftampere", leftampere);
             telemetry.addData("rightampere", rightampere);
             telemetry.update();

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
+import org.firstinspires.ftc.teamcode.SubAssemblyAmpere.AmpereControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
 
 /**
@@ -20,6 +21,7 @@ public class SensorTest extends LinearOpMode {
     /* Sub Assemblies
      */
     DualArmControl Arms = new DualArmControl();
+    AmpereControl Ampere = new AmpereControl();
 
     RobotConfig robot = new RobotConfig();
 
@@ -38,6 +40,7 @@ public class SensorTest extends LinearOpMode {
         /* Initialize sub assemblies
          */
         Arms.Initialize(this);
+        Ampere.Initialize(this);
 
         /* turn on color sensor LEDs &/
         robot.left_color.enableLed(true);
@@ -77,8 +80,8 @@ public class SensorTest extends LinearOpMode {
             telemetry.addLine("Color Sensors (red/blue)");
             telemetry.addData("   track left ","%3d %3d", robot.left_color.red(),robot.left_color.blue());
             telemetry.addData("   track right","%3d %3d", robot.right_color.red(),robot.right_color.blue());
-            telemetry.addData("  ampere left ","%3d %3d", robot.left_ampere.red(),robot.left_ampere.blue());
-            telemetry.addData("  ampere right","%3d %3d", robot.right_ampere.red(),robot.right_ampere.blue());
+            telemetry.addData("  ampere left ","%3d %3d", Ampere.ColorLeft.red(),Ampere.ColorLeft.blue());
+            telemetry.addData("  ampere right","%3d %3d", Ampere.ColorRight.red(),Ampere.ColorRight.blue());
 
             Arms.Update(false);
 

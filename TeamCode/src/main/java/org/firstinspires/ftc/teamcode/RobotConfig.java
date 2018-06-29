@@ -35,27 +35,6 @@ public class RobotConfig
     public DcMotor  BL = null;
     public DcMotor  BR = null;
 
-    /* Public members - Ampere (side arm) subassembly
-    * Devices
-    * -------
-    * AWL - continuous servo motor for left arm winch
-    * AWR - continuous servo motor for right arm winch
-    * AFL - left arm flipper servo motor
-    * AFR - right arm flipper servo motor
-    * left_ampere - color sensor on left side arm
-    * right_ampere - color sensor on right side arm
-    */
-    public CRServo AWL = null;
-    public CRServo AWR = null;
-    public Servo AFL = null;
-    public Servo AFR = null;
-    public Servo ANTIREDNEK = null;
-    public ColorSensor left_ampere = null;
-    public ColorSensor right_ampere = null;
-    /* open full, closed full, partial open */
-    public double[] AMPERE_FLICKER_LEFT = {0.0, 0.6, 1.0};
-    public double[] AMPERE_FLICKER_RIGHT = {0.0, 0.6, 1.0};
-
     /* Public members - color tracking subassembly
     * Devices
     * -------
@@ -64,6 +43,8 @@ public class RobotConfig
     */
     public ColorSensor left_color = null;
     public ColorSensor right_color = null;
+
+    public Servo ANTIREDNEK = null;
 
     /* Public
     * IMU objects
@@ -103,33 +84,7 @@ public class RobotConfig
         BR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         BL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        // **** Ampere (side arms and flippers) ****
-        // Side arms
-        // Define and Initialize Motors
-        AWL = hwMap.crservo.get("AWL");
-        AWR = hwMap.crservo.get("AWR");
         ANTIREDNEK = hwMap.servo.get("ANTIREDNEK");
-        // reverse those motors
-        AWR.setDirection(CRServo.Direction.REVERSE);
-        // set all motors to zero power
-        AWL.setPower(0.0);
-        AWR.setPower(0.0);
-
-        // Define and Initialize Motors
-        AFL = hwMap.servo.get("AFL");
-        AFR = hwMap.servo.get("AFR");
-        // reverse those motors
-        AFR.setDirection(Servo.Direction.REVERSE);
-        // set initial positions
-        AFL.setPosition(AMPERE_FLICKER_LEFT[0]);
-        AFR.setPosition(AMPERE_FLICKER_RIGHT[0]);
-
-        // Define and Initialize color sensors
-        left_ampere = hwMap.colorSensor.get("left_ampere");
-        right_ampere = hwMap.colorSensor.get("right_ampere");
-        //turns all LEDs off
-        left_ampere.enableLed(false);
-        right_ampere.enableLed(false);
 
         // **** Color sensors ****
         // Define and Initialize color sensors

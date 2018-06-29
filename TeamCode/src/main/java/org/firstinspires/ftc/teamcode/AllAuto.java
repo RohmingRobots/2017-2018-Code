@@ -20,6 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.SubAssemblyAmpere.AmpereControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
 
@@ -32,6 +33,7 @@ public class AllAuto extends LinearOpMode {
      */
     DualArmControl Arms = new DualArmControl();
     GrabberControl Grabber = new GrabberControl();
+    AmpereControl Ampere = new AmpereControl();
 
     OpenGLMatrix lastLocation = null;
     VuforiaLocalizer vuforia;
@@ -257,6 +259,7 @@ public class AllAuto extends LinearOpMode {
          */
         Arms.Initialize(this);
         Grabber.Initialize(this);
+        Ampere.Initialize(this);
 
         double voltage = robot.Battery.getVoltage();
         telemetry.addData("Voltage", voltage);
@@ -269,8 +272,8 @@ public class AllAuto extends LinearOpMode {
         /* Turns off all the color sensor lights */
         robot.left_color.enableLed(false);
         robot.right_color.enableLed(false);
-        robot.left_ampere.enableLed(false);
-        robot.right_ampere.enableLed(false);
+        Ampere.ColorLeft.enableLed(false);
+        Ampere.ColorRight.enableLed(false);
 
         /* initialize IMU */
         // Send telemetry message to signify robot waiting;
@@ -394,13 +397,12 @@ public class AllAuto extends LinearOpMode {
 
                         if (now > 0.2) {
                             //turns ampere LEDs om
-                            robot.left_ampere.enableLed(true);
-                            robot.right_ampere.enableLed(true);
+                            Ampere.ColorLeft.enableLed(true);
+                            Ampere.ColorRight.enableLed(true);
 
                             //winches out the ampere
                             telemetry.addLine("Extend");
-                            robot.AWL.setPower(AMPERE_POWER);
-                            robot.AWR.setPower(AMPERE_POWER);
+                            Ampere.Extend(AMPERE_POWER);
                         }
 
                         /* VuForia update code */
@@ -446,27 +448,25 @@ public class AllAuto extends LinearOpMode {
                     /* jewel selection step 1 */
                     else if (step == 1) {
                         //turns ampere LEDs om
-                        robot.left_ampere.enableLed(true);
-                        robot.right_ampere.enableLed(true);
+                        Ampere.ColorLeft.enableLed(true);
+                        Ampere.ColorRight.enableLed(true);
 
                         //winches out the ampere
                         telemetry.addLine("Extend");
-                        robot.AWL.setPower(AMPERE_POWER);
-                        robot.AWR.setPower(AMPERE_POWER);
+                        Ampere.Extend(AMPERE_POWER);
 
                         //waits 4 seconds
                         if (now > 3.0) {
                             //extends flickers
-                            robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[2]);
-                            robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[2]);
+                            Ampere.SetPosition(2);
 
                             //if it hasn't calibrated yet. this makes sure it only runs this bit once
                             if (leftamperered==0) {
                                 //calibrates to light of open air
-                                leftamperered = robot.left_ampere.red();
-                                leftampereblue = robot.left_ampere.blue();
-                                rightamperered = robot.right_ampere.red();
-                                rightampereblue = robot.right_ampere.blue();
+                                leftamperered = Ampere.ColorLeft.red();
+                                leftampereblue = Ampere.ColorLeft.blue();
+                                rightamperered = Ampere.ColorRight.red();
+                                rightampereblue = Ampere.ColorRight.blue();
                             }
                         }
 
@@ -482,19 +482,18 @@ public class AllAuto extends LinearOpMode {
                     else if (step == 2) {
                         //stops the winches
                         telemetry.addLine("Stop");
-                        robot.AWL.setPower(0.0);
-                        robot.AWR.setPower(0.0);
+                        Ampere.Extend(0.0);
 
                         /* checks if both color sensors detect a difference in the change of values and
                            returns true if the side is red and the side is blue */
                         leftampere = false;
                         rightampere = false;
-                        if ( ((robot.left_ampere.red() - leftamperered) > 10 + (robot.right_ampere.red() - rightamperered)) &&
-                                ((robot.right_ampere.blue() - rightampereblue) > 10 + (robot.left_ampere.blue() - leftampereblue)) ) {
+                        if ( ((Ampere.ColorLeft.red() - leftamperered) > 10 + (Ampere.ColorRight.red() - rightamperered)) &&
+                                ((Ampere.ColorRight.blue() - rightampereblue) > 10 + (Ampere.ColorLeft.blue() - leftampereblue)) ) {
                             leftampere = true;
                         }
-                        if (  ((robot.right_ampere.red() - rightamperered) > 10 + (robot.left_ampere.red() - leftamperered)) &&
-                                ((robot.left_ampere.blue() - leftampereblue) > 10 + (robot.right_ampere.blue() - rightampereblue)) ) {
+                        if (  ((Ampere.ColorRight.red() - rightamperered) > 10 + (Ampere.ColorLeft.red() - leftamperered)) &&
+                                ((Ampere.ColorLeft.blue() - leftampereblue) > 10 + (Ampere.ColorRight.blue() - rightampereblue)) ) {
                             rightampere = true;
                         }
 
@@ -505,26 +504,25 @@ public class AllAuto extends LinearOpMode {
                            so it will move on without scoring the wrong jewel */
                             if (leftampere) {
                                 if (redteam) {
-                                    robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+                                    Ampere.SetPositionRight(0);
                                 } else {
-                                    robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
+                                    Ampere.SetPositionLeft(0);
                                 }
                             } else if (rightampere) {
                                 if (redteam) {
-                                    robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
+                                    Ampere.SetPositionLeft(0);
                                 } else {
-                                    robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+                                    Ampere.SetPositionRight(0);
                                 }
                             }
 
                             //reels back in the amperes
                             telemetry.addLine("Retract");
-                            robot.AWL.setPower(-AMPERE_POWER);
-                            robot.AWR.setPower(-AMPERE_POWER);
+                            Ampere.Retract(AMPERE_POWER);
 
                             //turns LEDs of
-                            robot.left_ampere.enableLed(false);
-                            robot.right_ampere.enableLed(false);
+                            Ampere.ColorLeft.enableLed(false);
+                            Ampere.ColorRight.enableLed(false);
 
                             //moves on without knocking one of if it isn't certain it saw it properly
                             step++;
@@ -536,15 +534,13 @@ public class AllAuto extends LinearOpMode {
                     else if (step == 3) {
                         //reels back in the amperes
                         telemetry.addLine("Retract");
-                        robot.AWL.setPower(-AMPERE_POWER);
-                        robot.AWR.setPower(-AMPERE_POWER);
+                        Ampere.Retract(AMPERE_POWER);
 
                         //gives time to get past the jewels
                         if (now > 2.2) {
                             //folds in the servos
                             telemetry.addLine("Fold in");
-                            robot.AFL.setPosition(robot.AMPERE_FLICKER_LEFT[0]);
-                            robot.AFR.setPosition(robot.AMPERE_FLICKER_RIGHT[0]);
+                            Ampere.SetPosition(0);
                         }
 
                         //gives time for jewel servos to fold in
