@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Arms;
+package org.firstinspires.ftc.teamcode.SubAssemblyArms;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;

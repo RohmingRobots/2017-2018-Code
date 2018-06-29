@@ -35,27 +35,6 @@ public class RobotConfig
     public DcMotor  BL = null;
     public DcMotor  BR = null;
 
-    /* Public members - gripper grabber subassembly
-    * Devices
-    * -------
-    * GGR - gripper grabber right servo motor
-    * GGL - gripper grabber right servo motor
-    * Claw - top grabber
-    * RG - right glyph guide
-    * LG - left glyph guide
-    */
-    public Servo GGR = null;
-    public Servo GGL = null;
-    public Servo Claw = null;
-    public Servo RG = null;
-    public Servo LG = null;
-    /* open full, closed full, partial open */
-    public double[] GRABBER_LEFT = {0.745, .255, .375};
-    public double[] GRABBER_RIGHT = {0.44, .89, .765};
-    public double[] CLAW = {0.7, 0.0};      // original claw {0.9, 0.1};
-    public double[] GUIDESLEFT = {1, 0.2};
-    public double[] GUIDESRIGHT = {0.94, 0.14};
-
     /* Public members - Ampere (side arm) subassembly
     * Devices
     * -------
@@ -123,23 +102,6 @@ public class RobotConfig
         FR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         BR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         BL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        // **** Gripper grabbers & guides ****
-        // Define and Initialize Motors
-        GGR = hwMap.servo.get("GGR");
-        GGL = hwMap.servo.get("GGL");
-        Claw = hwMap.servo.get("Claw");
-        LG = hwMap.servo.get("LG");
-        RG = hwMap.servo.get("RG");
-        // reverse those motors
-        LG.setDirection(Servo.Direction.REVERSE);
-        // set initial positions
-        GGL.setPosition(GRABBER_LEFT[0]);
-        GGR.setPosition(GRABBER_RIGHT[0]);
-// don't initialize position, let it set on arm        Claw.setPosition(CLAW[0]);
-        LG.setPosition(GUIDESLEFT[0]);
-        RG.setPosition(GUIDESRIGHT[0]);
-
 
         // **** Ampere (side arms and flippers) ****
         // Side arms

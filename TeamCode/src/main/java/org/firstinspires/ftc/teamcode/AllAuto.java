@@ -8,9 +8,6 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -23,9 +20,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.Arms.DualArmControl;
-
-import java.lang.annotation.Target;
+import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
+import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
 
 
 //naming the teleop thing
@@ -35,6 +31,7 @@ public class AllAuto extends LinearOpMode {
     /* Sub Assemblies
      */
     DualArmControl Arms = new DualArmControl();
+    GrabberControl Grabber = new GrabberControl();
 
     OpenGLMatrix lastLocation = null;
     VuforiaLocalizer vuforia;
@@ -259,6 +256,7 @@ public class AllAuto extends LinearOpMode {
         /* Initialize sub assemblies
          */
         Arms.Initialize(this);
+        Grabber.Initialize(this);
 
         double voltage = robot.Battery.getVoltage();
         telemetry.addData("Voltage", voltage);
@@ -392,8 +390,7 @@ public class AllAuto extends LinearOpMode {
                     /* vuMark detection */
                     if (step == 0) {
                         //closes grabbers
-                        robot.GGL.setPosition(robot.GRABBER_LEFT[1]);
-                        robot.GGR.setPosition(robot.GRABBER_RIGHT[1]);
+                        Grabber.SetPosition(1);
 
                         if (now > 0.2) {
                             //turns ampere LEDs om
@@ -874,8 +871,7 @@ public class AllAuto extends LinearOpMode {
                     robot.right_color.enableLed(false);
 
                     //opens grabbers
-                    robot.GGL.setPosition(robot.GRABBER_LEFT[0]);
-                    robot.GGR.setPosition(robot.GRABBER_RIGHT[0]);
+                    Grabber.SetPosition(0);
 
                     //moves forward for a set time
                     robot.MoveForward(MOVE_SPEED * 0.8);

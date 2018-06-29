@@ -64,10 +64,6 @@ public class AmpereTest extends LinearOpMode {
 
         waitForStart();
 
-        /* close grabbers so side arms can extend */
-        robot.GGL.setPosition(robot.GRABBER_LEFT[1]);
-        robot.GGR.setPosition(robot.GRABBER_RIGHT[1]);
-
         OurTime.reset();
 
         //telling the code to run until you press that giant STOP button on RC

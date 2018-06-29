@@ -7,9 +7,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 
-import org.firstinspires.ftc.teamcode.Arms.DualArmControl;
+import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
 
 /**
  * Created by ablauch on 2/21/2018.
@@ -46,11 +45,6 @@ public class SensorTest extends LinearOpMode {
         robot.left_ampere.enableLed(true);
         robot.right_ampere.enableLed(true);
 
-        /* Disable servos to allow manual motion */
-        ((ServoImplEx) robot.GGL).setPwmDisable();
-        ((ServoImplEx) robot.GGR).setPwmDisable();
-        ((ServoImplEx) robot.Claw).setPwmDisable();
-
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
         egamepad2 = new GamepadEdge(gamepad2);
@@ -78,14 +72,6 @@ public class SensorTest extends LinearOpMode {
                     Arms.LowerArm.Limit.getState(), Arms.UpperArm.Limit.getState());
             telemetry.addData("Pots: ","%.2f %.2f",
                     Arms.LowerArm.getCurrentPosition(), Arms.UpperArm.getCurrentPosition());
-
-            /* Display servo positions */
-            //AJB doesn't work when PWM disabled
-//            telemetry.addLine("Servos (left/right)");
-//            telemetry.addData("Grabbers: ","%.2f %.2f",
-//                    robot.GGL.getPosition(), robot.GGR.getPosition());
-//            telemetry.addData("Claw: ","%.2f",
-//                    robot.Claw.getPosition());
 
             /* Display color sensors */
             telemetry.addLine("Color Sensors (red/blue)");

@@ -8,17 +8,18 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
-import org.firstinspires.ftc.teamcode.Arms.DualArmControl;
+import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
+import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
 
 //naming the teleop thing
-@TeleOp(name="TeleOp", group="Drive")
+@TeleOp(name = "TeleOp", group = "Drive")
 public class teleop extends LinearOpMode {
 
     /* Sub Assemblies
      */
     DualArmControl Arms = new DualArmControl();
+    GrabberControl Grabber = new GrabberControl();
 
     RobotConfig robot = new RobotConfig();
 
@@ -44,7 +45,6 @@ public class teleop extends LinearOpMode {
         int close_guides;
 
 
-
         //navigation color sensor variables
         boolean leftcolor = false;
         boolean rightcolor = false;
@@ -57,6 +57,7 @@ public class teleop extends LinearOpMode {
         /* Initialize sub assemblies
          */
         Arms.Initialize(this);
+        Grabber.Initialize(this);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
@@ -92,7 +93,7 @@ public class teleop extends LinearOpMode {
             telemetry.addData("leftcolor", leftcolor);
             telemetry.addData("rightcolor", rightcolor);
             telemetry.addData("Speed", speed);
-            telemetry.addData("HOOF", robot.ANTIREDNEK.getPosition() );
+            telemetry.addData("HOOF", robot.ANTIREDNEK.getPosition());
             telemetry.update();
 
             /**------------------------------------------------------------------------**/
@@ -168,50 +169,37 @@ public class teleop extends LinearOpMode {
 
             /********** Grabber code **********/
             if (egamepad2.left_bumper.pressed) {
-                index_grabber_left = (index_grabber_left < 2) ? index_grabber_left + 1 : 0;
+                Grabber.IncrementLeft();
             }
             if (egamepad2.right_bumper.pressed) {
-                index_grabber_right = (index_grabber_right < 2) ? index_grabber_right + 1 : 0;
+                Grabber.IncrementRight();
             }
             if (egamepad2.b.pressed) {
-                index_grabber_left = 2;
-                index_grabber_right = 2;
+                Grabber.SetPosition(2);
             }
             if (egamepad2.x.pressed) {
-                index_grabber_left = 1;
-                index_grabber_right = 1;
+                Grabber.SetPosition(1);
             }
-            robot.GGL.setPosition(robot.GRABBER_LEFT[index_grabber_left]);
-            robot.GGR.setPosition(robot.GRABBER_RIGHT[index_grabber_right]);
-
-//
-//            if (egamepad2.a.pressed) {
-//                index_claw = (index_claw < 1) ? index_claw + 1 : 0;
-//                robot.Claw.setPosition(robot.CLAW[index_claw]);
-//            }
+            if (egamepad2.a.pressed) {
+                Grabber.ToggleClaw();
+            }
 
 
             //*******Guides**********/
             if (egamepad2.dpad_right.pressed) {
-                index_guide = (index_guide < 1) ? index_guide + 1 : 0;
-                robot.LG.setPosition(robot.GUIDESLEFT[index_guide]);
-                robot.RG.setPosition(robot.GUIDESRIGHT[index_guide]);
+                Grabber.ToggleGuides();
             }
 
 
             /********** Arm code **********/
-            /* Only call MoveToPosition method once per move */
             if (egamepad2.dpad_up.pressed) {
                 Arms.IncrementPosition();
                 close_guides = 1;
             }
             //closing guides when arm is up/
-            if ( (close_guides==1) && (Arms.UpperArm.getCurrentPosition() > .1)) {
-                index_guide=0;
-                robot.LG.setPosition(robot.GUIDESLEFT[index_guide]);
-                robot.RG.setPosition(robot.GUIDESRIGHT[index_guide]);
+            if ((close_guides == 1) && (Arms.UpperArm.getCurrentPosition() > .1)) {
                 close_guides = 0;
-
+                Grabber.CloseGuides();
             }
             if (egamepad2.dpad_down.pressed) {
                 Arms.DecrementPosition();
@@ -220,15 +208,18 @@ public class teleop extends LinearOpMode {
                 Arms.SetPosition(0);
             }
             if (gamepad1.y) {
-                robot.ANTIREDNEK.setPosition(1);}
-            if (gamepad1.b){
-                robot.ANTIREDNEK.setPosition(0.3) ;}
+                robot.ANTIREDNEK.setPosition(1);
+            }
+            if (gamepad1.b) {
+                robot.ANTIREDNEK.setPosition(0.3);
+            }
 
-            Arms.Update( true);
+            /* update sub assemblies */
+            Arms.Update(true);
+
 
             //let the robot have a little rest, sleep is healthy
             sleep(40);
-
         }
     }
 }

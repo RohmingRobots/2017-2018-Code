@@ -7,14 +7,11 @@ package org.firstinspires.ftc.teamcode;
 
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -23,7 +20,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.Arms.DualArmControl;
+import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
+import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
 
 //naming the teleop thing
 @Autonomous(name="Auto Test", group ="Test")
@@ -32,6 +30,7 @@ public class AutoTest extends LinearOpMode {
     /* Sub Assemblies
      */
     DualArmControl Arms = new DualArmControl();
+    GrabberControl Grabber = new GrabberControl();
 
     VuforiaLocalizer vuforia;
     RobotConfig robot = new RobotConfig();
@@ -76,6 +75,7 @@ public class AutoTest extends LinearOpMode {
         /* Initialize sub assemblies
          */
         Arms.Initialize(this);
+        Grabber.Initialize(this);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
@@ -374,8 +374,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Glyph Release");
         telemetry.update();
-        robot.GGL.setPosition(robot.GRABBER_LEFT[0]);
-        robot.GGR.setPosition(robot.GRABBER_RIGHT[0]);
+        Grabber.SetPosition(0);
         AutoDelaySec(time_sec);
         robot.MoveStop();
     }
@@ -384,8 +383,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Glyph Grab");
         telemetry.update();
-        robot.GGL.setPosition(robot.GRABBER_LEFT[1]);
-        robot.GGR.setPosition(robot.GRABBER_RIGHT[1]);
+        Grabber.SetPosition(1);
         AutoDelaySec(time_sec);
     }
 
