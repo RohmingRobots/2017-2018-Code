@@ -23,7 +23,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.GamepadEdge;
-import org.firstinspires.ftc.teamcode.RobotConfig;
 
 /********** ^^ copy this ^^ **********/
 
@@ -35,8 +34,6 @@ public class vuforia extends LinearOpMode {
     OpenGLMatrix lastLocation = null;
     VuforiaLocalizer vuforia;
     /********** ^^ copy this ^^ **********/
-
-    RobotConfig robot = new RobotConfig();
 
     /* Declare extended gamepad */
     GamepadEdge egamepad1;

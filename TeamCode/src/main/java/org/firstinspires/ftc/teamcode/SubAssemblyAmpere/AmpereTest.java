@@ -11,8 +11,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.GamepadEdge;
-import org.firstinspires.ftc.teamcode.RobotConfig;
-import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
 
 
 //naming the teleop thing
@@ -41,6 +39,16 @@ public class AmpereTest extends LinearOpMode {
         double AMPERE_POWER = 0.8;
         double increment;
 
+        telemetry.addLine("Ampere Test");
+        telemetry.addLine("gamepad 1");
+        telemetry.addLine("d-up   - extend side arms");
+        telemetry.addLine("d-down - retract side arms");
+        telemetry.addLine("x      - cycle through left flipper");
+        telemetry.addLine("b      - cycle through right flipper");
+        telemetry.addLine("stick button  - increment flipper");
+        telemetry.addLine("bumper button - decrement flipper");
+        telemetry.addLine("y      - autonomous test");
+
         /* Initialize sub assemblies
          */
         Ampere.Initialize(this);
@@ -55,15 +63,7 @@ public class AmpereTest extends LinearOpMode {
         Ampere.ColorLeft.enableLed(true);
         Ampere.ColorRight.enableLed(true);
 
-        telemetry.addLine("Ampere Test");
-        telemetry.addLine("gamepad 1");
-        telemetry.addLine("d-up   - extend side arms");
-        telemetry.addLine("d-down - retract side arms");
-        telemetry.addLine("x      - cycle through left flipper");
-        telemetry.addLine("b      - cycle through right flipper");
-        telemetry.addLine("stick button  - increment flipper");
-        telemetry.addLine("bumper button - decrement flipper");
-        telemetry.addLine("y      - autonomous test");
+        //waits for that giant PLAY button to be pressed on RC
         telemetry.update();
 
         waitForStart();

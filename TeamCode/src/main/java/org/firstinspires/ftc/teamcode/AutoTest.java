@@ -22,6 +22,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.SubAssemblyAmpere.AmpereControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
+import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
 
 //naming the teleop thing
@@ -33,9 +34,9 @@ public class AutoTest extends LinearOpMode {
     DualArmControl Arms = new DualArmControl();
     GrabberControl Grabber = new GrabberControl();
     AmpereControl Ampere = new AmpereControl();
+    DriveControl Drive = new DriveControl();
 
     VuforiaLocalizer vuforia;
-    RobotConfig robot = new RobotConfig();
     private ElapsedTime runtime = new ElapsedTime();
 
     /* VuMark variable */
@@ -66,19 +67,14 @@ public class AutoTest extends LinearOpMode {
         boolean do_jewels = false;
         boolean do_motion = false;
 
-        // Send telemetry message to signify robot waiting;
-        telemetry.addLine("Auto Test");    //
-
-        /* Initialize the hardware variables.
-         * The init() method of the hardware class does all the work here
-         */
-        robot.init(hardwareMap);
+        telemetry.addLine("Auto Test");
 
         /* Initialize sub assemblies
          */
         Arms.Initialize(this);
         Grabber.Initialize(this);
         Ampere.Initialize(this);
+        Drive.Initialize(this);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
@@ -98,7 +94,6 @@ public class AutoTest extends LinearOpMode {
         imu.initialize(imu_parameters);
 
         telemetry.addData("Initialize","VuForia");
-        telemetry.update();
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters vuforia_parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         vuforia_parameters.vuforiaLicenseKey = "AQepDXf/////AAAAGcvzfI2nd0MHnzIGZ7JtquJk3Yx64l7jwu6XImRkNmBkhjVdVcI47QZ7xQq0PvugAb3+ppJxL4n+pNcnt1+PYpQHVETBEPk5WkofitFuYL8zzXEbs7uLY0dMUepnOiJcLSiVISKWWDyc8BJkKcK3a/KmB2sHaE1Lp2LJ+skW43+pYeqtgJE8o8xStowxPJB0OaSFXXw5dGUurK+ykmPam5oE+t+6hi9o/pO1EOHZFoqKl6tj/wsdu9+3I4lqGMsRutKH6s1rKLfip8s3MdlxqnlRKFmMDFewprELOwm+zpjmrJ1cqdlzzWQ6i/EMOzhcOzrPmH3JiH4CocA/Kcck12IuqvN4l6iAIjntb8b0G8zL";
@@ -147,7 +142,7 @@ public class AutoTest extends LinearOpMode {
             do_motion = true;
         egamepad1.UpdateEdge();
 
-        double voltage = robot.Battery.getVoltage();
+        double voltage = Drive.Battery.getVoltage();
         telemetry.addData("Voltage", voltage);
 
         /* Initializes the movement speeds which are scaled based on the starting voltage */
@@ -293,7 +288,7 @@ public class AutoTest extends LinearOpMode {
         startAngle = angles.firstAngle;
 
         if (target>0) {
-            robot.RotateRight(speed);
+            Drive.RotateRight(speed);
             do {
                 AutoUpdate();
                 angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -305,7 +300,7 @@ public class AutoTest extends LinearOpMode {
             } while ( (turnAngle < target) && opModeIsActive() );
         }
         if (target<0) {
-            robot.RotateLeft(speed);
+            Drive.RotateLeft(speed);
             do {
                 AutoUpdate();
                 angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -316,61 +311,61 @@ public class AutoTest extends LinearOpMode {
                 telemetry.update();
             } while ( (turnAngle > target) && opModeIsActive() );
         }
-        robot.MoveStop();
+        Drive.MoveStop();
     }
 
     void AutoRotateRight(double speed, double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Rotate Right");
         telemetry.update();
-        robot.RotateRight(speed);
+        Drive.RotateRight(speed);
         AutoDelaySec(time_sec);
-        robot.MoveStop();
+        Drive.MoveStop();
     }
 
     void AutoRotateLeft(double speed, double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Rotate Left");
         telemetry.update();
-        robot.RotateLeft(speed);
+        Drive.RotateLeft(speed);
         AutoDelaySec(time_sec);
-        robot.MoveStop();
+        Drive.MoveStop();
     }
 
     void AutoMoveForward(double speed, double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Move Forward");
         telemetry.update();
-        robot.MoveForward(speed);
+        Drive.MoveForward(speed);
         AutoDelaySec(time_sec);
-        robot.MoveStop();
+        Drive.MoveStop();
     }
 
     void AutoMoveBackward(double speed, double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Move Backward");
         telemetry.update();
-        robot.MoveBackward(speed);
+        Drive.MoveBackward(speed);
         AutoDelaySec(time_sec);
-        robot.MoveStop();
+        Drive.MoveStop();
     }
 
     void AutoMoveLeft(double speed, double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Move Left");
         telemetry.update();
-        robot.MoveLeft(speed);
+        Drive.MoveLeft(speed);
         AutoDelaySec(time_sec);
-        robot.MoveStop();
+        Drive.MoveStop();
     }
 
     void AutoMoveRight(double speed, double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Move Right");
         telemetry.update();
-        robot.MoveRight(speed);
+        Drive.MoveRight(speed);
         AutoDelaySec(time_sec);
-        robot.MoveStop();
+        Drive.MoveStop();
     }
 
     void AutoGlyphRelease(double time_sec) {
@@ -379,7 +374,7 @@ public class AutoTest extends LinearOpMode {
         telemetry.update();
         Grabber.SetPosition(0);
         AutoDelaySec(time_sec);
-        robot.MoveStop();
+        Drive.MoveStop();
     }
 
     void AutoGlyphGrab(double time_sec) {

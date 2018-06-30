@@ -20,6 +20,12 @@ public class ArmsTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
+        telemetry.addLine("Arms Test");
+        telemetry.addLine("gamepad 2");
+        telemetry.addLine("dpad left - home");
+        telemetry.addLine("dpad up   - next higher position");
+        telemetry.addLine("dpad down - next lower position");
+
         /* Initialize sub assemblies
          */
         Arms.Initialize(this);
@@ -28,12 +34,7 @@ public class ArmsTest extends LinearOpMode {
         egamepad1 = new GamepadEdge(gamepad1);
         egamepad2 = new GamepadEdge(gamepad2);
 
-        //adds a lil' version thing to the telemetry so you know you're using the right version
-        telemetry.addData("Version", "Dual 2.0");
-        telemetry.addLine("gamepad 2");
-        telemetry.addLine("dpad left - home");
-        telemetry.addLine("dpad up   - next higher position");
-        telemetry.addLine("dpad down - next lower position");
+        //waits for that giant PLAY button to be pressed on RC
         telemetry.update();
 
         //waits for that giant PLAY button to be pressed on RC

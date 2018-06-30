@@ -8,13 +8,8 @@ package org.firstinspires.ftc.teamcode.SubAssemblyGrabber;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.GamepadEdge;
-import org.firstinspires.ftc.teamcode.RobotConfig;
-import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
-
-import java.util.concurrent.TimeUnit;
 
 
 //naming the teleop thing
@@ -32,14 +27,6 @@ public class GrabberTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        /* Initialize sub assemblies
-         */
-        Grabber.Initialize(this);
-
-        /* Instantiate extended gamepad */
-        egamepad1 = new GamepadEdge(gamepad1);
-        egamepad2 = new GamepadEdge(gamepad2);
-
         telemetry.addLine("Grabber Test");
         telemetry.addLine("gamepad 2");
         telemetry.addLine("left bumper - increment left grabber");
@@ -48,8 +35,18 @@ public class GrabberTest extends LinearOpMode {
         telemetry.addLine("x - grabbers closed");
         telemetry.addLine("a - increment claw");
         telemetry.addLine("dpad right - increment guides");
+
+        /* Initialize sub assemblies
+         */
+        Grabber.Initialize(this);
+
+        /* Instantiate extended gamepad */
+        egamepad1 = new GamepadEdge(gamepad1);
+        egamepad2 = new GamepadEdge(gamepad2);
+
         telemetry.update();
 
+        //waits for that giant PLAY button to be pressed on RC
         waitForStart();
 
         //telling the code to run until you press that giant STOP button on RC

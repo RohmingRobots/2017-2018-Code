@@ -4,32 +4,22 @@ package org.firstinspires.ftc.teamcode.TempTest;
  * Created by Nicholas on 2/12/2018.
  */
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.RobotConfig;
+import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
 
 
 //naming the teleop thing
 @Autonomous(name="EncoderDriveTest", group ="Test")
 public class EncoderDriveTest extends LinearOpMode {
-    RobotConfig robot = new RobotConfig();
+
+    /* Sub Assemblies
+     */
+    DriveControl Drive = new DriveControl();
+
     private ElapsedTime runtime = new ElapsedTime();
 
     //mode 'stuff'
@@ -48,7 +38,7 @@ public class EncoderDriveTest extends LinearOpMode {
     }
 
     public void resetEncoders() {
-        robot.FL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+/*        robot.FL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.BL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.FR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.BR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -56,12 +46,17 @@ public class EncoderDriveTest extends LinearOpMode {
         robot.FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.BR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.BL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        */
     }
 
     @Override
     public void runOpMode() throws InterruptedException {
-        VoltageSensor vs = hardwareMap.voltageSensor.get("Lower hub 2");
-        double voltage = vs.getVoltage();
+
+        /* Initialize sub assemblies
+         */
+        Drive.Initialize(this);
+
+        double voltage = Drive.Battery.getVoltage();
         telemetry.addData("Voltage", voltage);
 
         //declaring all my variables in one place for my sake
@@ -69,15 +64,11 @@ public class EncoderDriveTest extends LinearOpMode {
         final double STRAFFE_SPEED = 0.75 + ((13.2-voltage)/12);
         final double ROTATE_SPEED = 0.4 + ((13.2-voltage)/12);
 
-        /* Initialize the hardware variables.
-         * The init() method of the hardware class does all the work here
-         */
-        robot.init(hardwareMap);
-
-        robot.FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+/*        robot.FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.FR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+*/
 
         telemetry.addData("Move Speed", MOVE_SPEED);
         telemetry.addData("Straffe Speed", STRAFFE_SPEED);
@@ -98,8 +89,9 @@ public class EncoderDriveTest extends LinearOpMode {
             //keeps now up to date
             now = runtime.seconds() - lastReset;
 
-            currentDistance = -(robot.FL.getCurrentPosition() + robot.BL.getCurrentPosition() +
+/*            currentDistance = -(robot.FL.getCurrentPosition() + robot.BL.getCurrentPosition() +
                                robot.FR.getCurrentPosition() + robot.BR.getCurrentPosition())/160;
+*/
 
             telemetry.addData("currentDistance", currentDistance);
             telemetry.update();
@@ -108,7 +100,7 @@ public class EncoderDriveTest extends LinearOpMode {
 
                 default:
                     telemetry.addLine("All done");
-                    robot.MoveStop();
+                    Drive.MoveStop();
                     break;
 
                 /* wait one second */
@@ -117,18 +109,18 @@ public class EncoderDriveTest extends LinearOpMode {
                         mode++;
                         resetClock();
                         resetEncoders();
-                        robot.MoveStop();
+                        Drive.MoveStop();
                     }
                     break;
 
                 /* move forward 12 inches */
                 case 1:
-                    robot.MoveForward(MOVE_SPEED);
+                    Drive.MoveForward(MOVE_SPEED);
                     if (currentDistance > 12-6) {
                         mode++;
                         resetClock();
                         //resetEncoders();
-                        robot.MoveStop();
+                        Drive.MoveStop();
                     }
                     break;
 
@@ -137,17 +129,17 @@ public class EncoderDriveTest extends LinearOpMode {
                         mode++;
                         resetClock();
                         resetEncoders();
-                        robot.MoveStop();
+                        Drive.MoveStop();
                     }
                     break;
 
                 case 3:
-                    robot.MoveForward(MOVE_SPEED);
+                    Drive.MoveForward(MOVE_SPEED);
                     if (currentDistance > 30-6) {
                         mode++;
                         resetClock();
                         //resetEncoders();
-                        robot.MoveStop();
+                        Drive.MoveStop();
                     }
                     break;
 

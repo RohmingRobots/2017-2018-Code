@@ -6,10 +6,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.SubAssemblyAmpere.AmpereControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
+import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
 
 /**
  * Created by ablauch on 2/21/2018.
@@ -22,8 +22,7 @@ public class SensorTest extends LinearOpMode {
      */
     DualArmControl Arms = new DualArmControl();
     AmpereControl Ampere = new AmpereControl();
-
-    RobotConfig robot = new RobotConfig();
+    DriveControl Drive = new DriveControl();
 
     /* Declare extended gamepad */
     GamepadEdge egamepad1;
@@ -32,28 +31,24 @@ public class SensorTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        /* Initialize the hardware variables.
-         * The init() method of the hardware class does all the work here
-         */
-        robot.init(hardwareMap);
+        telemetry.addLine("Sensor Test");
 
         /* Initialize sub assemblies
          */
         Arms.Initialize(this);
         Ampere.Initialize(this);
+        Drive.Initialize(this);
 
-        /* turn on color sensor LEDs &/
-        robot.left_color.enableLed(true);
-        robot.right_color.enableLed(true);
-        robot.left_ampere.enableLed(true);
-        robot.right_ampere.enableLed(true);
+        /* turn on color sensor LEDs */
+        Drive.ColorLeft.enableLed(true);
+        Drive.ColorRight.enableLed(true);
+        Ampere.ColorLeft.enableLed(true);
+        Ampere.ColorRight.enableLed(true);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
         egamepad2 = new GamepadEdge(gamepad2);
 
-        //adds a lil' version thing to the telemetry so you know you're using the right version
-        telemetry.addLine("Sensor Test");
         telemetry.update();
 
         //waits for that giant PLAY button to be pressed on RC
@@ -67,7 +62,7 @@ public class SensorTest extends LinearOpMode {
             egamepad2.UpdateEdge();
 
             /* Display battery sensors */
-            telemetry.addData("Battery: ", "%.2f", robot.Battery.getVoltage());
+            telemetry.addData("Battery: ", "%.2f", Drive.Battery.getVoltage());
 
             /* Display arm sensors */
             telemetry.addLine("Arm (lower, upper)");
@@ -78,8 +73,8 @@ public class SensorTest extends LinearOpMode {
 
             /* Display color sensors */
             telemetry.addLine("Color Sensors (red/blue)");
-            telemetry.addData("   track left ","%3d %3d", robot.left_color.red(),robot.left_color.blue());
-            telemetry.addData("   track right","%3d %3d", robot.right_color.red(),robot.right_color.blue());
+            telemetry.addData("   track left ","%3d %3d", Drive.ColorLeft.red(),Drive.ColorLeft.blue());
+            telemetry.addData("   track right","%3d %3d", Drive.ColorRight.red(),Drive.ColorRight.blue());
             telemetry.addData("  ampere left ","%3d %3d", Ampere.ColorLeft.red(),Ampere.ColorLeft.blue());
             telemetry.addData("  ampere right","%3d %3d", Ampere.ColorRight.red(),Ampere.ColorRight.blue());
 

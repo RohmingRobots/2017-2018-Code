@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.SubAssemblyDrive;
 /* version history 2.0
      -10/21/17 (1.0) working and good
      -10/23/17 (1.3) adding speed changing by lbumper/ltrigger
@@ -8,13 +8,16 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Gamepad;
+
+import org.firstinspires.ftc.teamcode.GamepadEdge;
 
 //naming the teleop thing
-@TeleOp(name="Mecanum Test", group="Test")
-public class MecanumTest extends LinearOpMode {
+@TeleOp(name = "Mecanum Test", group = "Test")
+public class DriveTest extends LinearOpMode {
 
-    RobotConfig robot = new RobotConfig();
+    /* Sub Assemblies
+     */
+    DriveControl Drive = new DriveControl();
 
     /* Declare extended gamepad */
     GamepadEdge egamepad1;
@@ -23,27 +26,21 @@ public class MecanumTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         //declaring all my variables in one place for my sake
-        double front_right;
-        double front_left;
-        double back_left;
-        double back_right;
-        double speed = 1;
+        double speed_forward_back, speed_left_right, speed_rotate_left_right;
+        double speed = 1.0;
+        double reverse = 1.0;
 
-        /* Initialize the hardware variables.
-         * The init() method of the hardware class does all the work here
+        telemetry.addLine("Drive Test");
+
+        /* Initialize sub assemblies
          */
-
-        robot.init(hardwareMap);
+        Drive.Initialize(this);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
         egamepad2 = new GamepadEdge(gamepad2);
 
-        boolean updpad;
-        boolean downdpad;
-        boolean leftdpad;
-        boolean rightdpad;
-        double reverse = 1;
+        telemetry.update();
 
         //waits for that giant PLAY button to be pressed on RC
         waitForStart();
@@ -56,19 +53,13 @@ public class MecanumTest extends LinearOpMode {
             egamepad1.UpdateEdge();
             egamepad2.UpdateEdge();
 
-            boolean abutton = egamepad1.a.released;
-
             //adds a lil' version thing to the telemetry so you know you're using the right version
             telemetry.addData("Version", "2.2");
-            telemetry.addData("BRmotor", robot.BR.getPower());
-            telemetry.addData("BLmotor", robot.BL.getPower());
-            telemetry.addData("FLmotor", robot.FL.getPower());
-            telemetry.addData("FRmotor", robot.FR.getPower());
             telemetry.addData("Speed", speed);
             telemetry.update();
 
             //when a button is just released, multiply the speed by -1 so it's reverse
-            if (abutton) {
+            if (egamepad1.a.released) {
                 reverse *= -1;
             }
 
@@ -88,28 +79,19 @@ public class MecanumTest extends LinearOpMode {
             }
 
             // using the right joystick's x axis to rotate left and right
-            front_right = -gamepad1.right_stick_x * 2;
-            front_left = gamepad1.right_stick_x * 2;
-            back_left = gamepad1.right_stick_x * 2;
-            back_right = -gamepad1.right_stick_x * 2;
+            speed_left_right = -gamepad1.right_stick_x * 2;
 
             // using the left joystick's y axis to move forward and backwards
-            front_right -= gamepad1.left_stick_y;
-            front_left -= gamepad1.left_stick_y;
-            back_left -= gamepad1.left_stick_y;
-            back_right -= gamepad1.left_stick_y;
+            speed_forward_back = -gamepad1.left_stick_y;
 
             // using the left joystick's x axis to strafe left and right
-            front_right += -gamepad1.left_stick_x * 2;
-            front_left += gamepad1.left_stick_x * 2;
-            back_left += -gamepad1.left_stick_x * 2;
-            back_right += gamepad1.left_stick_x * 2;
+            speed_rotate_left_right = -gamepad1.left_stick_x * 2;
 
             //takes all those values, divides
-            front_right = front_right / 3.414 * speed * reverse;
-            front_left = front_left / 3.414 * speed * reverse;
-            back_left = back_left / 3.414 * speed * reverse;
-            back_right = back_right / 3.414 * speed * reverse;
+            speed_left_right = speed_left_right / 3.414 * speed * reverse;
+            speed_forward_back = speed_forward_back / 3.414 * speed * reverse;
+            speed_rotate_left_right = speed_rotate_left_right / 3.414 * speed * reverse;
+
 
         /*for later- joysticks have a max input of 1 or -1. divide it by 3,
           which leaves us with a max input of 0.333333. motors have a max input
@@ -120,24 +102,20 @@ public class MecanumTest extends LinearOpMode {
            1 / 3 * 3 * 1, equaling out to 1, our max value.
         */
 
-            if (gamepad1.dpad_left){
-                robot.MoveLeft(speed);
-            } else if (gamepad1.dpad_right){
-                robot.MoveRight(speed);
-            } else if (gamepad1.dpad_up){
-                robot.MoveForward(speed);
-            } else if (gamepad1.dpad_down){
-                robot.MoveBackward(speed);
-            } else if (gamepad1.x){
-                robot.RotateLeft(speed);
-            } else if (gamepad1.b){
-                robot.RotateRight(speed);
+            if (gamepad1.dpad_left) {
+                Drive.MoveLeft(speed);
+            } else if (gamepad1.dpad_right) {
+                Drive.MoveRight(speed);
+            } else if (gamepad1.dpad_up) {
+                Drive.MoveForward(speed);
+            } else if (gamepad1.dpad_down) {
+                Drive.MoveBackward(speed);
+            } else if (gamepad1.x) {
+                Drive.RotateLeft(speed);
+            } else if (gamepad1.b) {
+                Drive.RotateRight(speed);
             } else {
-                //takes all those values, divides
-                robot.FR.setPower(front_right);
-                robot.FL.setPower(front_left);
-                robot.BL.setPower(back_left);
-                robot.BR.setPower(back_right);
+                Drive.MoveCombination(speed_forward_back, speed_left_right, speed_rotate_left_right);
             }
 
             //let the robot have a little rest, sleep is healthy

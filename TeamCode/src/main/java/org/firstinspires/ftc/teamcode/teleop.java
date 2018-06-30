@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
+import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
 
 //naming the teleop thing
@@ -20,8 +21,7 @@ public class teleop extends LinearOpMode {
      */
     DualArmControl Arms = new DualArmControl();
     GrabberControl Grabber = new GrabberControl();
-
-    RobotConfig robot = new RobotConfig();
+    DriveControl Drive = new DriveControl();
 
     /* Declare extended gamepad */
     GamepadEdge egamepad1;
@@ -30,29 +30,21 @@ public class teleop extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         //declaring all my variables in one place for my sake
-        double front_right;
-        double front_left;
-        double back_left;
-        double back_right;
+        double speed_forward_back, speed_left_right, speed_rotate_left_right;
         double speed = 2.5;
         double reverse = 1.0;
 
         int close_guides;
 
-
         //navigation color sensor variables
         boolean leftcolor = false;
         boolean rightcolor = false;
-
-        /* Initialize the hardware variables.
-         * The init() method of the hardware class does all the work here
-         */
-        robot.init(hardwareMap);
 
         /* Initialize sub assemblies
          */
         Arms.Initialize(this);
         Grabber.Initialize(this);
+        Drive.Initialize(this);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
@@ -61,7 +53,6 @@ public class teleop extends LinearOpMode {
         close_guides = 0;
 
         telemetry.addData("Version", "Worlds 4-13-2018");
-
         telemetry.update();
 
         //waits for that giant PLAY button to be pressed on RC
@@ -75,16 +66,12 @@ public class teleop extends LinearOpMode {
             egamepad1.UpdateEdge();
             egamepad2.UpdateEdge();
 
-            //DpadDirection dpadDirection = GetDpadDirection(gamepad1);
-
-            boolean abutton = egamepad1.a.released;
-
             /******Telemetry*****/
             //adds a lil' version thing to the telemetry so you know you're using the right version
             telemetry.addData("leftcolor", leftcolor);
             telemetry.addData("rightcolor", rightcolor);
             telemetry.addData("Speed", speed);
-            telemetry.addData("HOOF", robot.ANTIREDNEK.getPosition());
+//            telemetry.addData("HOOF", robot.ANTIREDNEK.getPosition());
             telemetry.update();
 
             /**------------------------------------------------------------------------**/
@@ -93,7 +80,7 @@ public class teleop extends LinearOpMode {
 
             /******Reverse*****/
             //when a button is just released, multiply the speed by -1 so it's reverse
-            if (abutton) {
+            if (egamepad1.a.released) {
                 reverse *= -1;
             }
 
@@ -115,43 +102,30 @@ public class teleop extends LinearOpMode {
 
             /******Joystick Drive*****/
             // using the right joystick's x axis to rotate left and right
-            front_right = -gamepad1.right_stick_x * 2;
-            front_left = gamepad1.right_stick_x * 2;
-            back_left = gamepad1.right_stick_x * 2;
-            back_right = -gamepad1.right_stick_x * 2;
+            speed_left_right = -gamepad1.right_stick_x * 2;
 
             // using the left joystick's y axis to move forward and backwards
-            front_right -= gamepad1.left_stick_y;
-            front_left -= gamepad1.left_stick_y;
-            back_left -= gamepad1.left_stick_y;
-            back_right -= gamepad1.left_stick_y;
+            speed_forward_back = -gamepad1.left_stick_y;
 
             // using the left joystick's x axis to strafe left and right
-            front_right += -gamepad1.left_stick_x * 2;
-            front_left += gamepad1.left_stick_x * 2;
-            back_left += -gamepad1.left_stick_x * 2;
-            back_right += gamepad1.left_stick_x * 2;
+            speed_rotate_left_right = -gamepad1.left_stick_x * 2;
 
-            front_right = front_right / 3.414 * speed * reverse;
-            front_left = front_left / 3.414 * speed * reverse;
-            back_left = back_left / 3.414 * speed * reverse;
-            back_right = back_right / 3.414 * speed * reverse;
+            //takes all those values, divides
+            speed_left_right = speed_left_right / 3.414 * speed * reverse;
+            speed_forward_back = speed_forward_back / 3.414 * speed * reverse;
+            speed_rotate_left_right = speed_rotate_left_right / 3.414 * speed * reverse;
 
             /******Dpad Drive*****/
             if (gamepad1.dpad_left) {
-                robot.MoveLeft(speed);
+                Drive.MoveLeft(speed);
             } else if (gamepad1.dpad_right) {
-                robot.MoveRight(speed);
+                Drive.MoveRight(speed);
             } else if (gamepad1.dpad_up) {
-                robot.MoveForward(speed);
+                Drive.MoveForward(speed);
             } else if (gamepad1.dpad_down) {
-                robot.MoveBackward(speed);
+                Drive.MoveBackward(speed);
             } else {
-                //takes all those values, divides
-                robot.FR.setPower(front_right);
-                robot.FL.setPower(front_left);
-                robot.BL.setPower(back_left);
-                robot.BR.setPower(back_right);
+                Drive.MoveCombination(speed_forward_back, speed_left_right, speed_rotate_left_right);
             }
 
             /**------------------------------------------------------------------------**/
@@ -198,12 +172,13 @@ public class teleop extends LinearOpMode {
             if (egamepad2.dpad_left.pressed) {
                 Arms.SetPosition(0);
             }
-            if (gamepad1.y) {
+/*            if (gamepad1.y) {
                 robot.ANTIREDNEK.setPosition(1);
             }
             if (gamepad1.b) {
                 robot.ANTIREDNEK.setPosition(0.3);
             }
+*/
 
             /* update sub assemblies */
             Arms.Update(true);

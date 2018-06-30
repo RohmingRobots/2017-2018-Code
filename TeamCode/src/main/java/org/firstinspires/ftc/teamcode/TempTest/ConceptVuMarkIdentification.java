@@ -29,7 +29,6 @@
 package org.firstinspires.ftc.teamcode.TempTest;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.ConceptVuforiaNavigation;
@@ -46,7 +45,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.RobotConfig;
 
 /**
  * This OpMode illustrates the basics of using the Vuforia engine to determine
@@ -79,7 +77,6 @@ public class ConceptVuMarkIdentification extends LinearOpMode {
      * localization engine.
      */
     VuforiaLocalizer vuforia;
-    RobotConfig robot  = new RobotConfig();
 
     @Override public void runOpMode() {
 
@@ -176,16 +173,16 @@ public class ConceptVuMarkIdentification extends LinearOpMode {
 
             telemetry.update();
             if (vuMark == RelicRecoveryVuMark.LEFT){
-                robot.FL.setPower(0.5);
+//                robot.FL.setPower(0.5);
             }
             telemetry.update();
             if (vuMark == RelicRecoveryVuMark.RIGHT){
-                robot.FR.setPower(0.5);
+//                robot.FR.setPower(0.5);
             }
             telemetry.update();
             if (vuMark == RelicRecoveryVuMark.CENTER){
-                robot.FR.setPower(0.5);
-                robot.FL.setPower(0.5);
+//                robot.FR.setPower(0.5);
+//                robot.FL.setPower(0.5);
             }
         }
     }
