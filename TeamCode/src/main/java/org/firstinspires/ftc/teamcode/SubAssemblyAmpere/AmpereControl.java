@@ -87,51 +87,51 @@ public class AmpereControl {
         telemetry.addLine(name + " cleanup");
     }
 
-    public void ExtendLeft(double power){
+    public void ExtendLeft(double power) {
         /* make sure power is within [0,1] */
-        power = Math.min(Math.abs(power),1.0);
+        power = Math.min(Math.abs(power), 1.0);
         AWL.setPower(power);
     }
 
-    public void ExtendRight(double power){
+    public void ExtendRight(double power) {
         /* make sure power is within [0,1] */
-        power = Math.min(Math.abs(power),1.0);
+        power = Math.min(Math.abs(power), 1.0);
         AWR.setPower(power);
     }
 
-    public void Extend(double power){
+    public void Extend(double power) {
         /* make sure power is within [0,1] */
-        power = Math.min(Math.abs(power),1.0);
+        power = Math.min(Math.abs(power), 1.0);
         AWL.setPower(power);
         AWR.setPower(power);
     }
 
-    public void RetractLeft(double power){
+    public void RetractLeft(double power) {
         /* make sure power is within [-1,0] */
-        power = -Math.min(Math.abs(power),1.0);
+        power = -Math.min(Math.abs(power), 1.0);
         AWL.setPower(power);
     }
 
-    public void RetractRight(double power){
+    public void RetractRight(double power) {
         /* make sure power is within [-1,0] */
-        power = -Math.min(Math.abs(power),1.0);
+        power = -Math.min(Math.abs(power), 1.0);
         AWR.setPower(power);
     }
 
-    public void Retract(double power){
+    public void Retract(double power) {
         /* make sure power is within [-1,0] */
-        power = -Math.min(Math.abs(power),1.0);
+        power = -Math.min(Math.abs(power), 1.0);
         AWL.setPower(power);
         AWR.setPower(power);
     }
 
     public void IncrementLeft() {
-        LeftIndex = (LeftIndex < 2) ? LeftIndex + 1 : 0;
+        LeftIndex = (LeftIndex < AMPERE_FLICKER_LEFT.length - 1) ? LeftIndex + 1 : 0;
         AFL.setPosition(AMPERE_FLICKER_LEFT[LeftIndex]);
     }
 
     public void IncrementRight() {
-        RightIndex = (RightIndex < 2) ? RightIndex + 1 : 0;
+        RightIndex = (RightIndex < AMPERE_FLICKER_RIGHT.length - 1) ? RightIndex + 1 : 0;
         AFR.setPosition(AMPERE_FLICKER_RIGHT[RightIndex]);
     }
 
@@ -146,24 +146,24 @@ public class AmpereControl {
     }
 
     public void SetPositionLeft(int index) {
-        if (index<0) index = 0;
-        if (index>2) index = 2;
+        if (index < 0) index = 0;
+        if (index > AMPERE_FLICKER_LEFT.length - 1) index = AMPERE_FLICKER_LEFT.length - 1;
 
         LeftIndex = index;
         AFL.setPosition(AMPERE_FLICKER_LEFT[LeftIndex]);
     }
 
     public void SetPositionRight(int index) {
-        if (index<0) index = 0;
-        if (index>2) index = 2;
+        if (index < 0) index = 0;
+        if (index > AMPERE_FLICKER_RIGHT.length - 1) index = AMPERE_FLICKER_RIGHT.length - 1;
 
         RightIndex = index;
         AFR.setPosition(AMPERE_FLICKER_RIGHT[RightIndex]);
     }
 
     public void SetPosition(int index) {
-        if (index<0) index = 0;
-        if (index>2) index = 2;
+        if (index < 0) index = 0;
+        if (index > AMPERE_FLICKER_LEFT.length - 1) index = AMPERE_FLICKER_LEFT.length - 1;
 
         LeftIndex = index;
         RightIndex = index;

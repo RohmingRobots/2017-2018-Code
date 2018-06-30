@@ -18,6 +18,7 @@ public class DualArmControl {
     private int DualIndex = 0;
     private double[] LOWERARM = {0.0, 0.0, 0.09, 0.3, 1.0, 1.5, 2.0};
     private double[] UPPERARM = {0.0, 0.2, 0.5, 0.73, 1.0, 1.5, 2.0};
+    private double[] MOVETIME = {0.5, 0.5, 0.5, 0.5, 2.0, 2.0, 2.0};
 
     /* Declare public class objects */
     public SingleArmControl LowerArm = new SingleArmControl();
@@ -52,36 +53,21 @@ public class DualArmControl {
     }
 
     public void IncrementPositionExtended() {
-        DualIndex = (DualIndex < 6) ? DualIndex + 1 : 6;
-        if (DualIndex > 3) {
-            LowerArm.MoveToPosition(LOWERARM[DualIndex], 2.0);
-            UpperArm.MoveToPosition(UPPERARM[DualIndex], 2.0);
-        } else {
-            LowerArm.MoveToPosition(LOWERARM[DualIndex], 0.5);
-            UpperArm.MoveToPosition(UPPERARM[DualIndex], 0.5);
-        }
+        DualIndex = (DualIndex < LOWERARM.length - 1) ? DualIndex + 1 : LOWERARM.length - 1;
+        LowerArm.MoveToPosition(LOWERARM[DualIndex], MOVETIME[DualIndex]);
+        UpperArm.MoveToPosition(UPPERARM[DualIndex], MOVETIME[DualIndex]);
     }
 
     public void IncrementPosition() {
         DualIndex = (DualIndex < 3) ? DualIndex + 1 : 3;
-        if (DualIndex > 3) {
-            LowerArm.MoveToPosition(LOWERARM[DualIndex], 2.0);
-            UpperArm.MoveToPosition(UPPERARM[DualIndex], 2.0);
-        } else {
-            LowerArm.MoveToPosition(LOWERARM[DualIndex], 0.5);
-            UpperArm.MoveToPosition(UPPERARM[DualIndex], 0.5);
-        }
+        LowerArm.MoveToPosition(LOWERARM[DualIndex], MOVETIME[DualIndex]);
+        UpperArm.MoveToPosition(UPPERARM[DualIndex], MOVETIME[DualIndex]);
     }
 
     public void DecrementPosition() {
         DualIndex = (DualIndex > 0) ? DualIndex - 1 : 0;
-        if (DualIndex > 3) {
-            LowerArm.MoveToPosition(LOWERARM[DualIndex], 2.0);
-            UpperArm.MoveToPosition(UPPERARM[DualIndex], 2.0);
-        } else {
-            LowerArm.MoveToPosition(LOWERARM[DualIndex], 0.5);
-            UpperArm.MoveToPosition(UPPERARM[DualIndex], 0.5);
-        }
+        LowerArm.MoveToPosition(LOWERARM[DualIndex], MOVETIME[DualIndex]);
+        UpperArm.MoveToPosition(UPPERARM[DualIndex], MOVETIME[DualIndex]);
     }
 
     public void SetPosition(int index) {
@@ -89,13 +75,8 @@ public class DualArmControl {
         if (index>3) index = 3;
 
         DualIndex = index;
-        if (DualIndex>3) {
-            LowerArm.MoveToPosition(LOWERARM[DualIndex], 2.0);
-            UpperArm.MoveToPosition(UPPERARM[DualIndex], 2.0);
-        } else {
-            LowerArm.MoveToPosition(LOWERARM[DualIndex], 0.5);
-            UpperArm.MoveToPosition(UPPERARM[DualIndex], 0.5);
-        }
+        LowerArm.MoveToPosition(LOWERARM[DualIndex], MOVETIME[DualIndex]);
+        UpperArm.MoveToPosition(UPPERARM[DualIndex], MOVETIME[DualIndex]);
     }
 
     /* Call this method when you want to update the arm control (must be done on a periodic basis */
@@ -103,5 +84,4 @@ public class DualArmControl {
         LowerArm.Update(0.0, active);
         UpperArm.Update(-LowerArm.getAngle(), active);
     }
-
 }

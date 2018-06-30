@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.SubAssemblyArms.SingleArmControl;
 
 
 /* Sub Assembly Class
@@ -79,7 +78,7 @@ public class GrabberControl {
     }
 
     public void ToggleGuides() {
-        GuideIndex = (GuideIndex < 1) ? GuideIndex + 1 : 0;
+        GuideIndex = (GuideIndex < GUIDESLEFT.length - 1) ? GuideIndex + 1 : 0;
         LG.setPosition(GUIDESLEFT[GuideIndex]);
         RG.setPosition(GUIDESRIGHT[GuideIndex]);
     }
@@ -91,19 +90,19 @@ public class GrabberControl {
     }
 
     public void OpenGuides() {
-        GuideIndex = 0;
+        GuideIndex = 1;
         LG.setPosition(GUIDESLEFT[GuideIndex]);
         RG.setPosition(GUIDESRIGHT[GuideIndex]);
     }
 
 
     public void IncrementLeft() {
-        LeftIndex = (LeftIndex < 2) ? LeftIndex + 1 : 0;
+        LeftIndex = (LeftIndex < GRABBER_LEFT.length - 1) ? LeftIndex + 1 : 0;
         GGL.setPosition(GRABBER_LEFT[LeftIndex]);
     }
 
     public void IncrementRight() {
-        RightIndex = (RightIndex < 2) ? RightIndex + 1 : 0;
+        RightIndex = (RightIndex < GRABBER_RIGHT.length - 1) ? RightIndex + 1 : 0;
         GGR.setPosition(GRABBER_RIGHT[RightIndex]);
     }
 
@@ -118,8 +117,8 @@ public class GrabberControl {
     }
 
     public void SetPosition(int index) {
-        if (index<0) index = 0;
-        if (index>2) index = 2;
+        if (index < 0) index = 0;
+        if (index > GRABBER_RIGHT.length - 1) index = GRABBER_RIGHT.length - 1;
 
         LeftIndex = index;
         RightIndex = index;
@@ -128,7 +127,7 @@ public class GrabberControl {
     }
 
     public void ToggleClaw() {
-        ClawIndex = (ClawIndex < 1) ? ClawIndex + 1 : 0;
+        ClawIndex = (ClawIndex < CLAW.length - 1) ? ClawIndex + 1 : 0;
         Claw.setPosition(CLAW[ClawIndex]);
     }
 }
