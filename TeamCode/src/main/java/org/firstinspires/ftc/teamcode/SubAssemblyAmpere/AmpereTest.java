@@ -112,8 +112,9 @@ public class AmpereTest extends LinearOpMode {
                 Ampere.incrementRightFlipper(-increment);
             }
 
-            telemetry.addData("Flipper Positions","%.1f %.1f",Ampere.getLeftFlipper(),Ampere.getRightFlipper());
-            telemetry.addData("Flipper Positions","%s %s",Ampere.getLeftFlipperSetpoint(),Ampere.getRightFlipperSetpoint());
+            telemetry.addLine("Flippers (left/right)");
+            telemetry.addData("  positions","%.1f %.1f",Ampere.getLeftFlipper(),Ampere.getRightFlipper());
+            telemetry.addData("  setpoints","%s %s",Ampere.getLeftFlipperSetpoint(),Ampere.getRightFlipperSetpoint());
             telemetry.addLine("Color Sensors (red/blue)");
             telemetry.addData("  ampere left ","%3d %3d", Ampere.ColorLeft.red(),Ampere.ColorLeft.blue());
             telemetry.addData("  ampere right","%3d %3d", Ampere.ColorRight.red(),Ampere.ColorRight.blue());

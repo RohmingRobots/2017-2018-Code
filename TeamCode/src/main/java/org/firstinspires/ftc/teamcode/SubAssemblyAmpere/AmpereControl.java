@@ -56,10 +56,14 @@ public class AmpereControl {
     }
 
     public Setpoints getLeftFlipperSetpoint() {
+        if (AFL.getPosition() != MapLeftValues.get(LeftSetpoint))
+            return null;
         return LeftSetpoint;
     }
 
     public Setpoints getRightFlipperSetpoint() {
+        if (AFR.getPosition() != MapRightValues.get(RightSetpoint))
+            return null;
         return RightSetpoint;
     }
 
