@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TempTest;
+package org.firstinspires.ftc.teamcode.Testing;
 /* version history 2.0
      -10/21/17 (1.0) working and good
      -10/23/17 (1.3) adding speed changing by lbumper/ltrigger
@@ -22,7 +22,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.GamepadEdge;
+import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
 
 /********** ^^ copy this ^^ **********/
 

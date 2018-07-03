@@ -24,6 +24,7 @@ import org.firstinspires.ftc.teamcode.SubAssemblyAmpere.AmpereControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
+import org.firstinspires.ftc.teamcode.Utilities.AutoTransitioner;
 
 
 //naming the teleop thing
@@ -402,7 +403,7 @@ public class AllAuto extends LinearOpMode {
 
                             //winches out the ampere
                             telemetry.addLine("Extend");
-                            Ampere.Extend(AMPERE_POWER);
+                            Ampere.moveWinches(AMPERE_POWER);
                         }
 
                         /* VuForia update code */
@@ -453,12 +454,12 @@ public class AllAuto extends LinearOpMode {
 
                         //winches out the ampere
                         telemetry.addLine("Extend");
-                        Ampere.Extend(AMPERE_POWER);
+                        Ampere.moveWinches(AMPERE_POWER);
 
                         //waits 4 seconds
                         if (now > 3.0) {
                             //extends flickers
-                            Ampere.SetPosition(2);
+                            Ampere.setFlippers(AmpereControl.Setpoints.OPEN);
 
                             //if it hasn't calibrated yet. this makes sure it only runs this bit once
                             if (leftamperered==0) {
@@ -482,7 +483,7 @@ public class AllAuto extends LinearOpMode {
                     else if (step == 2) {
                         //stops the winches
                         telemetry.addLine("Stop");
-                        Ampere.Extend(0.0);
+                        Ampere.moveWinches(0.0);
 
                         /* checks if both color sensors detect a difference in the change of values and
                            returns true if the side is red and the side is blue */
@@ -504,21 +505,21 @@ public class AllAuto extends LinearOpMode {
                            so it will move on without scoring the wrong jewel */
                             if (leftampere) {
                                 if (redteam) {
-                                    Ampere.SetPositionRight(0);
+                                    Ampere.setRightFlipper(AmpereControl.Setpoints.CLOSE);
                                 } else {
-                                    Ampere.SetPositionLeft(0);
+                                    Ampere.setLeftFlipper(AmpereControl.Setpoints.CLOSE);
                                 }
                             } else if (rightampere) {
                                 if (redteam) {
-                                    Ampere.SetPositionLeft(0);
+                                    Ampere.setLeftFlipper(AmpereControl.Setpoints.CLOSE);
                                 } else {
-                                    Ampere.SetPositionRight(0);
+                                    Ampere.setRightFlipper(AmpereControl.Setpoints.CLOSE);
                                 }
                             }
 
                             //reels back in the amperes
                             telemetry.addLine("Retract");
-                            Ampere.Retract(AMPERE_POWER);
+                            Ampere.moveWinches(-AMPERE_POWER);
 
                             //turns LEDs of
                             Ampere.ColorLeft.enableLed(false);
@@ -534,13 +535,13 @@ public class AllAuto extends LinearOpMode {
                     else if (step == 3) {
                         //reels back in the amperes
                         telemetry.addLine("Retract");
-                        Ampere.Retract(AMPERE_POWER);
+                        Ampere.moveWinches(-AMPERE_POWER);
 
                         //gives time to get past the jewels
                         if (now > 2.2) {
                             //folds in the servos
                             telemetry.addLine("Fold in");
-                            Ampere.SetPosition(0);
+                            Ampere.setFlippers(AmpereControl.Setpoints.CLOSE);
                         }
 
                         //gives time for jewel servos to fold in

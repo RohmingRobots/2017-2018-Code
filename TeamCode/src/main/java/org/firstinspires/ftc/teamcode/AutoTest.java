@@ -24,6 +24,7 @@ import org.firstinspires.ftc.teamcode.SubAssemblyAmpere.AmpereControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
+import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
 
 //naming the teleop thing
 @Autonomous(name="Auto Test", group ="Test")
@@ -412,7 +413,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Ampere Extend");
         telemetry.update();
-        Ampere.Extend(AMPERE_POWER);
+        Ampere.moveWinches(AMPERE_POWER);
         AutoDelaySec(time_sec);
     }
 
@@ -420,7 +421,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Ampere Retract");
         telemetry.update();
-        Ampere.Retract(AMPERE_POWER);
+        Ampere.moveWinches(-AMPERE_POWER);
         AutoDelaySec(time_sec);
     }
 
@@ -428,7 +429,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Ampere Stop");
         telemetry.update();
-        Ampere.Extend(0.0);
+        Ampere.moveWinches(0.0);
         AutoDelaySec(time_sec);
     }
 
@@ -436,7 +437,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Flipper Extend");
         telemetry.update();
-        Ampere.SetPosition(2);
+        Ampere.setFlippers(AmpereControl.Setpoints.OPEN);
         AutoDelaySec(time_sec);
     }
 
@@ -444,7 +445,7 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Flipper Retract");
         telemetry.update();
-        Ampere.SetPosition(0);
+        Ampere.setFlippers(AmpereControl.Setpoints.CLOSE);
         AutoDelaySec(time_sec);
     }
 
@@ -495,14 +496,14 @@ public class AutoTest extends LinearOpMode {
 
         if ( (left_blue>0) && (right_red>0) ) {
             if (red)
-                Ampere.SetPositionLeft(1);
+                Ampere.setLeftFlipper(AmpereControl.Setpoints.PARTIAL);
             else
-                Ampere.SetPositionRight(1);
+                Ampere.setRightFlipper(AmpereControl.Setpoints.PARTIAL);
         } else if ( (left_red>0) && (right_blue>0) ) {
             if (red)
-                Ampere.SetPositionLeft(1);
+                Ampere.setLeftFlipper(AmpereControl.Setpoints.PARTIAL);
             else
-                Ampere.SetPositionRight(1);
+                Ampere.setRightFlipper(AmpereControl.Setpoints.PARTIAL);
         }
         AutoDelaySec(time_sec);
     }

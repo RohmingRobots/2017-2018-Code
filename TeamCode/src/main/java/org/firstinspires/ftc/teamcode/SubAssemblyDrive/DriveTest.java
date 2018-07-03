@@ -9,7 +9,7 @@ package org.firstinspires.ftc.teamcode.SubAssemblyDrive;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.GamepadEdge;
+import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
 
 //naming the teleop thing
 @TeleOp(name = "Mecanum Test", group = "Test")

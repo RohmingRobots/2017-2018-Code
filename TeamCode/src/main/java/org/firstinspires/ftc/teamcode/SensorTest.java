@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.SubAssemblyAmpere.AmpereControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
+import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
 
 /**
  * Created by ablauch on 2/21/2018.

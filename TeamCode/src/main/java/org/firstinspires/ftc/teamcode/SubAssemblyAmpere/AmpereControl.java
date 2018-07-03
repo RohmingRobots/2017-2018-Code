@@ -7,6 +7,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Utilities.EnumWrap;
+
+import java.util.EnumMap;
 
 
 /* Sub Assembly Class
@@ -28,20 +31,37 @@ public class AmpereControl {
     private CRServo AWR = null;
     private Servo AFL = null;
     private Servo AFR = null;
+
+    private EnumMap<Setpoints, Double> MapLeftValues = new EnumMap<Setpoints, Double>(Setpoints.class);
+    private EnumMap<Setpoints, Double> MapRightValues = new EnumMap<Setpoints, Double>(Setpoints.class);
+    private Setpoints LeftSetpoint = Setpoints.CLOSE;
+    private Setpoints RightSetpoint = Setpoints.CLOSE;
+
+
+    /* Declare public class objects */
     public ColorSensor ColorLeft = null;
     public ColorSensor ColorRight = null;
 
-    /* open full, closed full, partial open */
-    private double[] AMPERE_FLICKER_LEFT = {0.0, 0.6, 1.0};
-    private double[] AMPERE_FLICKER_RIGHT = {0.0, 0.6, 1.0};
+    public enum Setpoints implements EnumWrap<Setpoints> {CLOSE, PARTIAL, OPEN;}
 
-    private int LeftIndex = 0;
-    private int RightIndex = 0;
-
-    /* Declare public class objects */
 
     /* getter methods
      * */
+    public double getLeftFlipper() {
+        return AFL.getPosition();
+    }
+
+    public double getRightFlipper() {
+        return AFR.getPosition();
+    }
+
+    public Setpoints getLeftFlipperSetpoint() {
+        return LeftSetpoint;
+    }
+
+    public Setpoints getRightFlipperSetpoint() {
+        return RightSetpoint;
+    }
 
     /* Subassembly constructor */
     public AmpereControl() {
@@ -54,6 +74,16 @@ public class AmpereControl {
         hardwareMap = opMode.hardwareMap;
 
         telemetry.addLine(name + " initialize");
+
+        /* Assign setpoint values
+         */
+        MapLeftValues.put(Setpoints.CLOSE, 0.0);
+        MapLeftValues.put(Setpoints.PARTIAL, 0.6);
+        MapLeftValues.put(Setpoints.OPEN, 1.0);
+
+        MapRightValues.put(Setpoints.CLOSE, 0.0);
+        MapRightValues.put(Setpoints.PARTIAL, 0.6);
+        MapRightValues.put(Setpoints.OPEN, 1.0);
 
         /* Map hardware devices */
         // Side servos
@@ -71,8 +101,8 @@ public class AmpereControl {
         // reverse those motors
         AFR.setDirection(Servo.Direction.REVERSE);
         // set initial positions
-        AFL.setPosition(AMPERE_FLICKER_LEFT[LeftIndex]);
-        AFR.setPosition(AMPERE_FLICKER_RIGHT[RightIndex]);
+        AFL.setPosition(MapLeftValues.get(LeftSetpoint));
+        AFR.setPosition(MapRightValues.get(RightSetpoint));
 
         // Define and Initialize color sensors
         ColorLeft = hardwareMap.colorSensor.get("left_ampere");
@@ -87,87 +117,94 @@ public class AmpereControl {
         telemetry.addLine(name + " cleanup");
     }
 
-    public void ExtendLeft(double power) {
-        /* make sure power is within [0,1] */
-        power = Math.min(Math.abs(power), 1.0);
+    /* positive power extends, negative power retracts */
+    public void moveLeftWinch(double power) {
+        /* make sure power is within [-1,1] */
+        power = (power > 1.0) ? 1.0 : ((power < -1.0) ? -1.0 : power);
         AWL.setPower(power);
     }
 
-    public void ExtendRight(double power) {
-        /* make sure power is within [0,1] */
-        power = Math.min(Math.abs(power), 1.0);
+    /* positive power extends, negative power retracts */
+    public void moveRightWinch(double power) {
+        /* make sure power is within [-1,1] */
+        power = (power > 1.0) ? 1.0 : ((power < -1.0) ? -1.0 : power);
         AWR.setPower(power);
     }
 
-    public void Extend(double power) {
-        /* make sure power is within [0,1] */
-        power = Math.min(Math.abs(power), 1.0);
-        AWL.setPower(power);
-        AWR.setPower(power);
+    /* positive power extends, negative power retracts */
+    public void moveWinches(double power) {
+        moveLeftWinch(power);
+        moveRightWinch(power);
     }
 
-    public void RetractLeft(double power) {
-        /* make sure power is within [-1,0] */
-        power = -Math.min(Math.abs(power), 1.0);
-        AWL.setPower(power);
+    public void nextLeftFlipper() {
+        LeftSetpoint = LeftSetpoint.getNext();
+        AFL.setPosition(MapLeftValues.get(LeftSetpoint));
     }
 
-    public void RetractRight(double power) {
-        /* make sure power is within [-1,0] */
-        power = -Math.min(Math.abs(power), 1.0);
-        AWR.setPower(power);
+    public void nextRightFlipper() {
+        RightSetpoint = RightSetpoint.getNext();
+        AFR.setPosition(MapRightValues.get(RightSetpoint));
     }
 
-    public void Retract(double power) {
-        /* make sure power is within [-1,0] */
-        power = -Math.min(Math.abs(power), 1.0);
-        AWL.setPower(power);
-        AWR.setPower(power);
+    public void prevLeftFlipper() {
+        LeftSetpoint = LeftSetpoint.getPrev();
+        AFL.setPosition(MapLeftValues.get(LeftSetpoint));
     }
 
-    public void IncrementLeft() {
-        LeftIndex = (LeftIndex < AMPERE_FLICKER_LEFT.length - 1) ? LeftIndex + 1 : 0;
-        AFL.setPosition(AMPERE_FLICKER_LEFT[LeftIndex]);
+    public void prevRightFlipper() {
+        RightSetpoint = RightSetpoint.getPrev();
+        AFR.setPosition(MapRightValues.get(RightSetpoint));
     }
 
-    public void IncrementRight() {
-        RightIndex = (RightIndex < AMPERE_FLICKER_RIGHT.length - 1) ? RightIndex + 1 : 0;
-        AFR.setPosition(AMPERE_FLICKER_RIGHT[RightIndex]);
+    public void nextFlippers() {
+        nextLeftFlipper();
+        nextRightFlipper();
     }
 
-    public void DecrementLeft() {
-        LeftIndex = (LeftIndex > 0) ? LeftIndex - 1 : 0;
-        AFL.setPosition(AMPERE_FLICKER_LEFT[LeftIndex]);
+    public void prevFlippers() {
+        prevLeftFlipper();
+        prevRightFlipper();
     }
 
-    public void DecrementRight() {
-        RightIndex = (RightIndex > 0) ? RightIndex - 1 : 0;
-        AFR.setPosition(AMPERE_FLICKER_RIGHT[RightIndex]);
+    public void setLeftFlipper(Setpoints setpt) {
+        LeftSetpoint = setpt;
+        AFL.setPosition(MapLeftValues.get(LeftSetpoint));
     }
 
-    public void SetPositionLeft(int index) {
-        if (index < 0) index = 0;
-        if (index > AMPERE_FLICKER_LEFT.length - 1) index = AMPERE_FLICKER_LEFT.length - 1;
-
-        LeftIndex = index;
-        AFL.setPosition(AMPERE_FLICKER_LEFT[LeftIndex]);
+    public void setRightFlipper(Setpoints setpt) {
+        RightSetpoint = setpt;
+        AFR.setPosition(MapRightValues.get(RightSetpoint));
     }
 
-    public void SetPositionRight(int index) {
-        if (index < 0) index = 0;
-        if (index > AMPERE_FLICKER_RIGHT.length - 1) index = AMPERE_FLICKER_RIGHT.length - 1;
-
-        RightIndex = index;
-        AFR.setPosition(AMPERE_FLICKER_RIGHT[RightIndex]);
+    public void setFlippers(Setpoints setpt) {
+        setLeftFlipper(setpt);
+        setRightFlipper(setpt);
     }
 
-    public void SetPosition(int index) {
-        if (index < 0) index = 0;
-        if (index > AMPERE_FLICKER_LEFT.length - 1) index = AMPERE_FLICKER_LEFT.length - 1;
+    public void setLeftFlipper(double position) {
+        AFL.setPosition(position);
+    }
 
-        LeftIndex = index;
-        RightIndex = index;
-        AFL.setPosition(AMPERE_FLICKER_LEFT[LeftIndex]);
-        AFR.setPosition(AMPERE_FLICKER_RIGHT[RightIndex]);
+    public void setRightFlipper(double position) {
+        AFR.setPosition(position);
+    }
+
+    public void setFlippers(double position) {
+        setLeftFlipper(position);
+        setRightFlipper(position);
+    }
+
+    public void incrementLeftFlipper(double increment) {
+        AFL.setPosition(AFL.getPosition() + increment);
+    }
+
+    public void incrementRightFlipper(double increment) {
+        AFR.setPosition(AFR.getPosition() + increment);
+    }
+
+    public void incrementFlippers(double increment) {
+        incrementLeftFlipper(increment);
+        incrementRightFlipper(increment);
     }
 }

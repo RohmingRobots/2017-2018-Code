@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.GamepadEdge;
+import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
 
 
 //naming the teleop thing
@@ -79,71 +79,44 @@ public class AmpereTest extends LinearOpMode {
             // side arms
             if (egamepad1.dpad_down.pressed) {
                 // retract
-                Ampere.Retract(AMPERE_POWER);
+                Ampere.moveWinches(-AMPERE_POWER);
             } else if (egamepad1.dpad_down.released){
                 // stop
-                Ampere.Extend(0.0);
+                Ampere.moveWinches(0.0);
             }
             if (egamepad1.dpad_up.pressed) {
                 // extend
-                Ampere.Extend(AMPERE_POWER);
+                Ampere.moveWinches(AMPERE_POWER);
             } else if (egamepad1.dpad_up.released){
                 // stop
-                Ampere.Extend(0.0);
+                Ampere.moveWinches(0.0);
             }
 
             // flippers
-/*            if (egamepad1.x.released) {
-                Ampere.IncrementLeft();
+            if (egamepad1.x.released) {
+                Ampere.nextLeftFlipper();
             }
             if (egamepad1.left_stick_button.released) {
-                robot.AFL.setPosition(robot.AFL.getPosition()+increment);
+                Ampere.incrementLeftFlipper(increment);
             }
             if (egamepad1.left_bumper.released) {
-                robot.AFL.setPosition(robot.AFL.getPosition()-increment);
+                Ampere.incrementLeftFlipper(-increment);
             }
             if (egamepad1.b.released) {
-                Ampere.IncrementRight();
+                Ampere.nextRightFlipper();
             }
             if (egamepad1.right_stick_button.released) {
-                robot.AFR.setPosition(robot.AFR.getPosition()+increment);
+                Ampere.incrementRightFlipper(increment);
             }
             if (egamepad1.right_bumper.released) {
-                robot.AFR.setPosition(robot.AFR.getPosition()-increment);
-            }
-*/
-
-            if (egamepad1.dpad_left.released) {
-                //calibrates to light of open air
-                leftamperered = Ampere.ColorLeft.red();
-                leftampereblue = Ampere.ColorLeft.blue();
-                rightamperered = Ampere.ColorRight.red();
-                rightampereblue = Ampere.ColorRight.blue();
+                Ampere.incrementRightFlipper(-increment);
             }
 
-            /* checks if both color sensors detect a difference in the change of values and
-               returns true if the side is red and the side is blue */
-            leftampere = false;
-            rightampere = false;
-            if ( ((Ampere.ColorLeft.red() - leftamperered) > 10 + (Ampere.ColorRight.red() - rightamperered)) &&
-                 ((Ampere.ColorRight.blue() - rightampereblue) > 10 + (Ampere.ColorLeft.blue() - leftampereblue)) ) {
-                leftampere = true;
-            }
-            if (  ((Ampere.ColorRight.red() - rightamperered) > 10 + (Ampere.ColorLeft.red() - leftamperered)) &&
-                  ((Ampere.ColorLeft.blue() - leftampereblue) > 10 + (Ampere.ColorRight.blue() - rightampereblue)) ) {
-                rightampere = true;
-            }
-
-            telemetry.addData("leftamperered", leftamperered);
-            telemetry.addData("leftampereblue", leftampereblue);
-            telemetry.addData("rightamperered", rightamperered);
-            telemetry.addData("rightampereblue", rightampereblue);
-            telemetry.addData("left_color red", Ampere.ColorLeft.red());
-            telemetry.addData("left_color blue", Ampere.ColorLeft.blue());
-            telemetry.addData("right_color red", Ampere.ColorRight.red());
-            telemetry.addData("right_color blue", Ampere.ColorRight.blue());
-            telemetry.addData("leftampere", leftampere);
-            telemetry.addData("rightampere", rightampere);
+            telemetry.addData("Flipper Positions","%.1f %.1f",Ampere.getLeftFlipper(),Ampere.getRightFlipper());
+            telemetry.addData("Flipper Positions","%s %s",Ampere.getLeftFlipperSetpoint(),Ampere.getRightFlipperSetpoint());
+            telemetry.addLine("Color Sensors (red/blue)");
+            telemetry.addData("  ampere left ","%3d %3d", Ampere.ColorLeft.red(),Ampere.ColorLeft.blue());
+            telemetry.addData("  ampere right","%3d %3d", Ampere.ColorRight.red(),Ampere.ColorRight.blue());
             telemetry.update();
 
             //let the robot have a little rest, sleep is healthy

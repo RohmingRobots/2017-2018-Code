@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
+import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
 
 //naming the teleop thing
 @TeleOp(name = "TeleOp", group = "Drive")
