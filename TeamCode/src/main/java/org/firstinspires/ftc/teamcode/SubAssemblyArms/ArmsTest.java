@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
 
 //naming the teleop thing
-@TeleOp(name="Arms Test", group="Test")
+@TeleOp(name = "Arms Test", group = "Test")
 public class ArmsTest extends LinearOpMode {
 
     /* Sub Assemblies
@@ -48,30 +48,20 @@ public class ArmsTest extends LinearOpMode {
             egamepad2.UpdateEdge();
 
             /********** Arm code **********/
-            /* Only call MoveToPosition method once per move */
             if (egamepad2.dpad_up.pressed) {
-                if (gamepad2.a) {
-                    /* allow full extension */
-                    Arms.IncrementPositionExtended();
-                } else {
-                    Arms.IncrementPosition();
-                }
+                Arms.nextSetpoint();
             }
             if (egamepad2.dpad_down.pressed) {
-                Arms.DecrementPosition();
+                Arms.prevSetpoint();
             }
             if (egamepad2.dpad_left.pressed) {
-                if (Arms.getDualIndex()>3) {
-                    Arms.SetPosition(3);
-                } else {
-                    Arms.SetPosition(0);
-                }
+                Arms.setSetpoint(DualArmControl.Setpoints.ROW1);
             }
 
             Arms.Update(true);
 
-            telemetry.addData("Lower ", "%.2f %.2f", Arms.LowerArm.getCurrentPosition(),Arms.LowerArm.getPower());
-            telemetry.addData("Upper ", "%.2f %.2f", Arms.UpperArm.getCurrentPosition(),Arms.UpperArm.getPower());
+            telemetry.addData("Lower ", "%.2f %.2f", Arms.LowerArm.getCurrentPosition(), Arms.LowerArm.getPower());
+            telemetry.addData("Upper ", "%.2f %.2f", Arms.UpperArm.getCurrentPosition(), Arms.UpperArm.getPower());
             telemetry.update();
 
             //let the robot have a little rest, sleep is healthy

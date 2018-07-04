@@ -163,7 +163,7 @@ public class teleop extends LinearOpMode {
 
             /********** Arm code **********/
             if (egamepad2.dpad_up.pressed) {
-                Arms.IncrementPosition();
+                Arms.nextSetpoint();
                 close_guides = 1;
             }
             //closing guides when arm is up/
@@ -173,18 +173,11 @@ public class teleop extends LinearOpMode {
                 Grabber.RightGuideServo.setSetpoint(GrabberControl.GuideSetpoints.RETRACT);
             }
             if (egamepad2.dpad_down.pressed) {
-                Arms.DecrementPosition();
+                Arms.prevSetpoint();
             }
             if (egamepad2.dpad_left.pressed) {
-                Arms.SetPosition(0);
+                Arms.setSetpoint(DualArmControl.Setpoints.ROW1);
             }
-/*            if (gamepad1.y) {
-                robot.ANTIREDNEK.setPosition(1);
-            }
-            if (gamepad1.b) {
-                robot.ANTIREDNEK.setPosition(0.3);
-            }
-*/
 
             /* update sub assemblies */
             Arms.Update(true);

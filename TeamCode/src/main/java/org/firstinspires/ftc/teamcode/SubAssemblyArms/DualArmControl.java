@@ -4,6 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Utilities.EnumWrapper;
+
+import java.util.EnumMap;
 
 
 /* Sub Assembly Class
@@ -14,21 +17,22 @@ public class DualArmControl {
     private HardwareMap hardwareMap = null;     /* local copy of HardwareMap object from opmode class */
     private String name = "Dual Arm Control";
 
-    /************************* 0-3 glyph positions, 4-6 relic positions */
-    private int DualIndex = 0;
-    private double[] LOWERARM = {0.0, 0.0, 0.09, 0.3, 1.0, 1.5, 2.0};
-    private double[] UPPERARM = {0.0, 0.2, 0.5, 0.73, 1.0, 1.5, 2.0};
-    private double[] MOVETIME = {0.5, 0.5, 0.5, 0.5, 2.0, 2.0, 2.0};
+    private EnumMap<Setpoints, Double> MapLowerArm = new EnumMap<Setpoints, Double>(Setpoints.class);
+    private EnumMap<Setpoints, Double> MapUpperArm = new EnumMap<Setpoints, Double>(Setpoints.class);
+    private EnumMap<Setpoints, Double> MapMoveTime = new EnumMap<Setpoints, Double>(Setpoints.class);
+
+    private Setpoints Setpoint = Setpoints.ROW1;
 
     /* Declare public class objects */
     public SingleArmControl LowerArm = new SingleArmControl();
     public SingleArmControl UpperArm = new SingleArmControl();
 
+    public enum Setpoints implements EnumWrapper<Setpoints> {ROW1, ROW2, ROW3, ROW4;}
+
+
     /* getter methods
      * */
-    public int getDualIndex() {
-        return DualIndex;
-    }
+
 
     /* Subassembly constructor */
     public DualArmControl() {
@@ -45,6 +49,23 @@ public class DualArmControl {
         /* Map hardware devices */
         LowerArm.Initialize(opMode, false);
         UpperArm.Initialize(opMode, true);
+
+        /* Assign setpoint values
+         */
+        MapLowerArm.put(Setpoints.ROW1, 0.0);
+        MapLowerArm.put(Setpoints.ROW2, 0.0);
+        MapLowerArm.put(Setpoints.ROW3, 0.09);
+        MapLowerArm.put(Setpoints.ROW4, 0.3);
+
+        MapUpperArm.put(Setpoints.ROW1, 0.0);
+        MapUpperArm.put(Setpoints.ROW2, 0.2);
+        MapUpperArm.put(Setpoints.ROW3, 0.5);
+        MapUpperArm.put(Setpoints.ROW4, 0.73);
+
+        MapMoveTime.put(Setpoints.ROW1, 0.5);
+        MapMoveTime.put(Setpoints.ROW2, 0.5);
+        MapMoveTime.put(Setpoints.ROW3, 0.5);
+        MapMoveTime.put(Setpoints.ROW4, 0.5);
     }
 
     /* Cleanup method - to be called when done with subassembly to 'turn off' everything */
@@ -52,31 +73,22 @@ public class DualArmControl {
         telemetry.addLine(name + " cleanup");
     }
 
-    public void IncrementPositionExtended() {
-        DualIndex = (DualIndex < LOWERARM.length - 1) ? DualIndex + 1 : LOWERARM.length - 1;
-        LowerArm.MoveToPosition(LOWERARM[DualIndex], MOVETIME[DualIndex]);
-        UpperArm.MoveToPosition(UPPERARM[DualIndex], MOVETIME[DualIndex]);
+    public void nextSetpoint() {
+        Setpoint = Setpoint.getNext();
+        LowerArm.MoveToPosition(MapLowerArm.get(Setpoint), MapMoveTime.get(Setpoint));
+        UpperArm.MoveToPosition(MapUpperArm.get(Setpoint), MapMoveTime.get(Setpoint));
     }
 
-    public void IncrementPosition() {
-        DualIndex = (DualIndex < 3) ? DualIndex + 1 : 3;
-        LowerArm.MoveToPosition(LOWERARM[DualIndex], MOVETIME[DualIndex]);
-        UpperArm.MoveToPosition(UPPERARM[DualIndex], MOVETIME[DualIndex]);
+    public void prevSetpoint() {
+        Setpoint = Setpoint.getPrev();
+        LowerArm.MoveToPosition(MapLowerArm.get(Setpoint), MapMoveTime.get(Setpoint));
+        UpperArm.MoveToPosition(MapUpperArm.get(Setpoint), MapMoveTime.get(Setpoint));
     }
 
-    public void DecrementPosition() {
-        DualIndex = (DualIndex > 0) ? DualIndex - 1 : 0;
-        LowerArm.MoveToPosition(LOWERARM[DualIndex], MOVETIME[DualIndex]);
-        UpperArm.MoveToPosition(UPPERARM[DualIndex], MOVETIME[DualIndex]);
-    }
-
-    public void SetPosition(int index) {
-        if (index<0) index = 0;
-        if (index>3) index = 3;
-
-        DualIndex = index;
-        LowerArm.MoveToPosition(LOWERARM[DualIndex], MOVETIME[DualIndex]);
-        UpperArm.MoveToPosition(UPPERARM[DualIndex], MOVETIME[DualIndex]);
+    public void setSetpoint(Setpoints setpt) {
+        Setpoint = setpt;
+        LowerArm.MoveToPosition(MapLowerArm.get(Setpoint), MapMoveTime.get(Setpoint));
+        UpperArm.MoveToPosition(MapUpperArm.get(Setpoint), MapMoveTime.get(Setpoint));
     }
 
     /* Call this method when you want to update the arm control (must be done on a periodic basis */
