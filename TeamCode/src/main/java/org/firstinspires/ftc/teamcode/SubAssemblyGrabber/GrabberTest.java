@@ -55,32 +55,43 @@ public class GrabberTest extends LinearOpMode {
             egamepad1.UpdateEdge();
             egamepad2.UpdateEdge();
 
-            /* display information */
-            telemetry.update();
-
-
             /********** Grabber code **********/
             if (egamepad2.left_bumper.pressed) {
-                Grabber.IncrementLeft();
+                Grabber.LeftGripServo.nextSetpoint();
             }
             if (egamepad2.right_bumper.pressed) {
-                Grabber.IncrementRight();
+                Grabber.RightGripServo.nextSetpoint();
             }
             if (egamepad2.b.pressed) {
-                Grabber.SetPosition(2);
+                Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.PARTIAL);
+                Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.PARTIAL);
             }
             if (egamepad2.x.pressed) {
-                Grabber.SetPosition(1);
+                Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
+                Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
             }
 
             //*******Guides**********/
             if (egamepad2.dpad_right.pressed) {
-                Grabber.ToggleGuides();
+                Grabber.LeftGuideServo.nextSetpoint();
+                Grabber.RightGuideServo.nextSetpoint();
             }
 
             if (egamepad2.a.released) {
-                Grabber.ToggleClaw();
+                Grabber.ClawServo.nextSetpoint();
             }
+
+            /* display information */
+            telemetry.addLine("Grips (left/right)");
+            telemetry.addData("  positions","%.1f %.1f",Grabber.LeftGripServo.getPosition(),Grabber.RightGripServo.getPosition());
+            telemetry.addData("  setpoints","%s %s",Grabber.LeftGripServo.getSetpoint(),Grabber.RightGripServo.getSetpoint());
+            telemetry.addLine("Claw");
+            telemetry.addData("  positions","%.1f",Grabber.ClawServo.getPosition());
+            telemetry.addData("  setpoints","%s",Grabber.ClawServo.getSetpoint());
+            telemetry.addLine("Guides (left/right)");
+            telemetry.addData("  positions","%.1f %.1f",Grabber.LeftGuideServo.getPosition(),Grabber.RightGuideServo.getPosition());
+            telemetry.addData("  setpoints","%s %s",Grabber.LeftGuideServo.getSetpoint(),Grabber.RightGuideServo.getSetpoint());
+            telemetry.update();
 
             //let the robot have a little rest, sleep is healthy
             sleep(40);

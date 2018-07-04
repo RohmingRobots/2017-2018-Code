@@ -94,27 +94,27 @@ public class AmpereTest extends LinearOpMode {
 
             // flippers
             if (egamepad1.x.released) {
-                Ampere.nextLeftFlipper();
+                Ampere.LeftFlipperServo.nextSetpoint();
             }
             if (egamepad1.left_stick_button.released) {
-                Ampere.incrementLeftFlipper(increment);
+                Ampere.LeftFlipperServo.incrementPosition(increment);
             }
             if (egamepad1.left_bumper.released) {
-                Ampere.incrementLeftFlipper(-increment);
+                Ampere.LeftFlipperServo.incrementPosition(-increment);
             }
             if (egamepad1.b.released) {
-                Ampere.nextRightFlipper();
+                Ampere.RightFlipperServo.nextSetpoint();
             }
             if (egamepad1.right_stick_button.released) {
-                Ampere.incrementRightFlipper(increment);
+                Ampere.RightFlipperServo.incrementPosition(increment);
             }
             if (egamepad1.right_bumper.released) {
-                Ampere.incrementRightFlipper(-increment);
+                Ampere.RightFlipperServo.incrementPosition(-increment);
             }
 
             telemetry.addLine("Flippers (left/right)");
-            telemetry.addData("  positions","%.1f %.1f",Ampere.getLeftFlipper(),Ampere.getRightFlipper());
-            telemetry.addData("  setpoints","%s %s",Ampere.getLeftFlipperSetpoint(),Ampere.getRightFlipperSetpoint());
+            telemetry.addData("  positions","%.1f %.1f",Ampere.LeftFlipperServo.getPosition(),Ampere.RightFlipperServo.getPosition());
+            telemetry.addData("  setpoints","%s %s",Ampere.LeftFlipperServo.getSetpoint(),Ampere.RightFlipperServo.getSetpoint());
             telemetry.addLine("Color Sensors (red/blue)");
             telemetry.addData("  ampere left ","%3d %3d", Ampere.ColorLeft.red(),Ampere.ColorLeft.blue());
             telemetry.addData("  ampere right","%3d %3d", Ampere.ColorRight.red(),Ampere.ColorRight.blue());

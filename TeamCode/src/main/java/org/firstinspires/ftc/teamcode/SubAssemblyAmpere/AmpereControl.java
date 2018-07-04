@@ -7,7 +7,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Utilities.EnumWrap;
+import org.firstinspires.ftc.teamcode.Utilities.EnumWrapper;
+import org.firstinspires.ftc.teamcode.Utilities.ServoControl;
 
 import java.util.EnumMap;
 
@@ -32,40 +33,22 @@ public class AmpereControl {
     private Servo AFL = null;
     private Servo AFR = null;
 
-    private EnumMap<Setpoints, Double> MapLeftValues = new EnumMap<Setpoints, Double>(Setpoints.class);
-    private EnumMap<Setpoints, Double> MapRightValues = new EnumMap<Setpoints, Double>(Setpoints.class);
-    private Setpoints LeftSetpoint = Setpoints.CLOSE;
-    private Setpoints RightSetpoint = Setpoints.CLOSE;
+    private EnumMap<Setpoints, Double> MapLeftFlipper = new EnumMap<Setpoints, Double>(Setpoints.class);
+    private EnumMap<Setpoints, Double> MapRightFlipper = new EnumMap<Setpoints, Double>(Setpoints.class);
+    public ServoControl<Setpoints, EnumMap<Setpoints, Double>> LeftFlipperServo = new ServoControl(AFL,MapLeftFlipper);
+    public ServoControl<Setpoints, EnumMap<Setpoints, Double>> RightFlipperServo = new ServoControl(AFR,MapRightFlipper);
 
 
     /* Declare public class objects */
     public ColorSensor ColorLeft = null;
     public ColorSensor ColorRight = null;
 
-    public enum Setpoints implements EnumWrap<Setpoints> {CLOSE, PARTIAL, OPEN;}
+    public enum Setpoints implements EnumWrapper<Setpoints> {CLOSE, PARTIAL, OPEN;}
 
 
     /* getter methods
      * */
-    public double getLeftFlipper() {
-        return AFL.getPosition();
-    }
 
-    public double getRightFlipper() {
-        return AFR.getPosition();
-    }
-
-    public Setpoints getLeftFlipperSetpoint() {
-        if (AFL.getPosition() != MapLeftValues.get(LeftSetpoint))
-            return null;
-        return LeftSetpoint;
-    }
-
-    public Setpoints getRightFlipperSetpoint() {
-        if (AFR.getPosition() != MapRightValues.get(RightSetpoint))
-            return null;
-        return RightSetpoint;
-    }
 
     /* Subassembly constructor */
     public AmpereControl() {
@@ -81,13 +64,13 @@ public class AmpereControl {
 
         /* Assign setpoint values
          */
-        MapLeftValues.put(Setpoints.CLOSE, 0.0);
-        MapLeftValues.put(Setpoints.PARTIAL, 0.6);
-        MapLeftValues.put(Setpoints.OPEN, 1.0);
+        MapLeftFlipper.put(Setpoints.CLOSE, 0.0);
+        MapLeftFlipper.put(Setpoints.PARTIAL, 0.6);
+        MapLeftFlipper.put(Setpoints.OPEN, 1.0);
 
-        MapRightValues.put(Setpoints.CLOSE, 0.0);
-        MapRightValues.put(Setpoints.PARTIAL, 0.6);
-        MapRightValues.put(Setpoints.OPEN, 1.0);
+        MapRightFlipper.put(Setpoints.CLOSE, 0.0);
+        MapRightFlipper.put(Setpoints.PARTIAL, 0.6);
+        MapRightFlipper.put(Setpoints.OPEN, 1.0);
 
         /* Map hardware devices */
         // Side servos
@@ -105,8 +88,8 @@ public class AmpereControl {
         // reverse those motors
         AFR.setDirection(Servo.Direction.REVERSE);
         // set initial positions
-        AFL.setPosition(MapLeftValues.get(LeftSetpoint));
-        AFR.setPosition(MapRightValues.get(RightSetpoint));
+        LeftFlipperServo.setSetpoint(Setpoints.CLOSE);
+        RightFlipperServo.setSetpoint(Setpoints.CLOSE);
 
         // Define and Initialize color sensors
         ColorLeft = hardwareMap.colorSensor.get("left_ampere");
@@ -139,76 +122,5 @@ public class AmpereControl {
     public void moveWinches(double power) {
         moveLeftWinch(power);
         moveRightWinch(power);
-    }
-
-    public void nextLeftFlipper() {
-        LeftSetpoint = LeftSetpoint.getNext();
-        AFL.setPosition(MapLeftValues.get(LeftSetpoint));
-    }
-
-    public void nextRightFlipper() {
-        RightSetpoint = RightSetpoint.getNext();
-        AFR.setPosition(MapRightValues.get(RightSetpoint));
-    }
-
-    public void prevLeftFlipper() {
-        LeftSetpoint = LeftSetpoint.getPrev();
-        AFL.setPosition(MapLeftValues.get(LeftSetpoint));
-    }
-
-    public void prevRightFlipper() {
-        RightSetpoint = RightSetpoint.getPrev();
-        AFR.setPosition(MapRightValues.get(RightSetpoint));
-    }
-
-    public void nextFlippers() {
-        nextLeftFlipper();
-        nextRightFlipper();
-    }
-
-    public void prevFlippers() {
-        prevLeftFlipper();
-        prevRightFlipper();
-    }
-
-    public void setLeftFlipper(Setpoints setpt) {
-        LeftSetpoint = setpt;
-        AFL.setPosition(MapLeftValues.get(LeftSetpoint));
-    }
-
-    public void setRightFlipper(Setpoints setpt) {
-        RightSetpoint = setpt;
-        AFR.setPosition(MapRightValues.get(RightSetpoint));
-    }
-
-    public void setFlippers(Setpoints setpt) {
-        setLeftFlipper(setpt);
-        setRightFlipper(setpt);
-    }
-
-    public void setLeftFlipper(double position) {
-        AFL.setPosition(position);
-    }
-
-    public void setRightFlipper(double position) {
-        AFR.setPosition(position);
-    }
-
-    public void setFlippers(double position) {
-        setLeftFlipper(position);
-        setRightFlipper(position);
-    }
-
-    public void incrementLeftFlipper(double increment) {
-        AFL.setPosition(AFL.getPosition() + increment);
-    }
-
-    public void incrementRightFlipper(double increment) {
-        AFR.setPosition(AFR.getPosition() + increment);
-    }
-
-    public void incrementFlippers(double increment) {
-        incrementLeftFlipper(increment);
-        incrementRightFlipper(increment);
     }
 }

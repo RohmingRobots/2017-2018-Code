@@ -394,7 +394,8 @@ public class AllAuto extends LinearOpMode {
                     /* vuMark detection */
                     if (step == 0) {
                         //closes grabbers
-                        Grabber.SetPosition(1);
+                        Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
+                        Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
 
                         if (now > 0.2) {
                             //turns ampere LEDs om
@@ -459,7 +460,8 @@ public class AllAuto extends LinearOpMode {
                         //waits 4 seconds
                         if (now > 3.0) {
                             //extends flickers
-                            Ampere.setFlippers(AmpereControl.Setpoints.OPEN);
+                            Ampere.LeftFlipperServo.setSetpoint(AmpereControl.Setpoints.OPEN);
+                            Ampere.RightFlipperServo.setSetpoint(AmpereControl.Setpoints.OPEN);
 
                             //if it hasn't calibrated yet. this makes sure it only runs this bit once
                             if (leftamperered==0) {
@@ -505,15 +507,15 @@ public class AllAuto extends LinearOpMode {
                            so it will move on without scoring the wrong jewel */
                             if (leftampere) {
                                 if (redteam) {
-                                    Ampere.setRightFlipper(AmpereControl.Setpoints.CLOSE);
+                                    Ampere.RightFlipperServo.setSetpoint(AmpereControl.Setpoints.CLOSE);
                                 } else {
-                                    Ampere.setLeftFlipper(AmpereControl.Setpoints.CLOSE);
+                                    Ampere.LeftFlipperServo.setSetpoint(AmpereControl.Setpoints.CLOSE);
                                 }
                             } else if (rightampere) {
                                 if (redteam) {
-                                    Ampere.setLeftFlipper(AmpereControl.Setpoints.CLOSE);
+                                    Ampere.LeftFlipperServo.setSetpoint(AmpereControl.Setpoints.CLOSE);
                                 } else {
-                                    Ampere.setRightFlipper(AmpereControl.Setpoints.CLOSE);
+                                    Ampere.RightFlipperServo.setSetpoint(AmpereControl.Setpoints.CLOSE);
                                 }
                             }
 
@@ -541,7 +543,8 @@ public class AllAuto extends LinearOpMode {
                         if (now > 2.2) {
                             //folds in the servos
                             telemetry.addLine("Fold in");
-                            Ampere.setFlippers(AmpereControl.Setpoints.CLOSE);
+                            Ampere.LeftFlipperServo.setSetpoint(AmpereControl.Setpoints.CLOSE);
+                            Ampere.RightFlipperServo.setSetpoint(AmpereControl.Setpoints.CLOSE);
                         }
 
                         //gives time for jewel servos to fold in
@@ -882,7 +885,8 @@ public class AllAuto extends LinearOpMode {
                     Drive.ColorRight.enableLed(false);
 
                     //opens grabbers
-                    Grabber.SetPosition(0);
+                    Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.OPEN);
+                    Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.OPEN);
 
                     //moves forward for a set time
                     Drive.MoveForward(MOVE_SPEED * 0.8);

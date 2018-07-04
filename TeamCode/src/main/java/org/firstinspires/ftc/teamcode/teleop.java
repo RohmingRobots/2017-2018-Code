@@ -135,26 +135,30 @@ public class teleop extends LinearOpMode {
 
             /********** Grabber code **********/
             if (egamepad2.left_bumper.pressed) {
-                Grabber.IncrementLeft();
+                Grabber.LeftGripServo.nextSetpoint();
             }
             if (egamepad2.right_bumper.pressed) {
-                Grabber.IncrementRight();
+                Grabber.RightGripServo.nextSetpoint();
             }
             if (egamepad2.b.pressed) {
-                Grabber.SetPosition(2);
+                Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.PARTIAL);
+                Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.PARTIAL);
             }
             if (egamepad2.x.pressed) {
-                Grabber.SetPosition(1);
+                Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
+                Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
             }
-            if (egamepad2.a.pressed) {
-                Grabber.ToggleClaw();
-            }
-
 
             //*******Guides**********/
             if (egamepad2.dpad_right.pressed) {
-                Grabber.ToggleGuides();
+                Grabber.LeftGuideServo.nextSetpoint();
+                Grabber.RightGuideServo.nextSetpoint();
             }
+
+            if (egamepad2.a.released) {
+                Grabber.ClawServo.nextSetpoint();
+            }
+
 
 
             /********** Arm code **********/
@@ -165,7 +169,8 @@ public class teleop extends LinearOpMode {
             //closing guides when arm is up/
             if ((close_guides == 1) && (Arms.UpperArm.getCurrentPosition() > .1)) {
                 close_guides = 0;
-                Grabber.CloseGuides();
+                Grabber.LeftGuideServo.setSetpoint(GrabberControl.GuideSetpoints.RETRACT);
+                Grabber.RightGuideServo.setSetpoint(GrabberControl.GuideSetpoints.RETRACT);
             }
             if (egamepad2.dpad_down.pressed) {
                 Arms.DecrementPosition();

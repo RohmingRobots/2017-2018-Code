@@ -373,7 +373,8 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Glyph Release");
         telemetry.update();
-        Grabber.SetPosition(0);
+        Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.OPEN);
+        Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.OPEN);
         AutoDelaySec(time_sec);
         Drive.MoveStop();
     }
@@ -382,7 +383,8 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Glyph Grab");
         telemetry.update();
-        Grabber.SetPosition(1);
+        Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
+        Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
         AutoDelaySec(time_sec);
     }
 
@@ -437,7 +439,8 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Flipper Extend");
         telemetry.update();
-        Ampere.setFlippers(AmpereControl.Setpoints.OPEN);
+        Ampere.LeftFlipperServo.setSetpoint(AmpereControl.Setpoints.OPEN);
+        Ampere.RightFlipperServo.setSetpoint(AmpereControl.Setpoints.OPEN);
         AutoDelaySec(time_sec);
     }
 
@@ -445,7 +448,8 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Flipper Retract");
         telemetry.update();
-        Ampere.setFlippers(AmpereControl.Setpoints.CLOSE);
+        Ampere.LeftFlipperServo.setSetpoint(AmpereControl.Setpoints.CLOSE);
+        Ampere.RightFlipperServo.setSetpoint(AmpereControl.Setpoints.CLOSE);
         AutoDelaySec(time_sec);
     }
 
@@ -496,14 +500,14 @@ public class AutoTest extends LinearOpMode {
 
         if ( (left_blue>0) && (right_red>0) ) {
             if (red)
-                Ampere.setLeftFlipper(AmpereControl.Setpoints.PARTIAL);
+                Ampere.LeftFlipperServo.setSetpoint(AmpereControl.Setpoints.PARTIAL);
             else
-                Ampere.setRightFlipper(AmpereControl.Setpoints.PARTIAL);
+                Ampere.RightFlipperServo.setSetpoint(AmpereControl.Setpoints.PARTIAL);
         } else if ( (left_red>0) && (right_blue>0) ) {
             if (red)
-                Ampere.setLeftFlipper(AmpereControl.Setpoints.PARTIAL);
+                Ampere.LeftFlipperServo.setSetpoint(AmpereControl.Setpoints.PARTIAL);
             else
-                Ampere.setRightFlipper(AmpereControl.Setpoints.PARTIAL);
+                Ampere.RightFlipperServo.setSetpoint(AmpereControl.Setpoints.PARTIAL);
         }
         AutoDelaySec(time_sec);
     }

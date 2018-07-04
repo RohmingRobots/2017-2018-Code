@@ -5,6 +5,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Utilities.EnumWrapper;
+import org.firstinspires.ftc.teamcode.Utilities.ServoControl;
+
+import java.util.EnumMap;
 
 
 /* Sub Assembly Class
@@ -27,22 +31,29 @@ public class GrabberControl {
     private Servo RG = null;
     private Servo LG = null;
 
-    /* open full, closed full, partial open */
-    private double[] GRABBER_LEFT = {0.745, .255, .375};
-    private double[] GRABBER_RIGHT = {0.44, .89, .765};
-    private double[] CLAW = {0.7, 0.0};
-    private double[] GUIDESLEFT = {1, 0.2};
-    private double[] GUIDESRIGHT = {0.94, 0.14};
+    private EnumMap<GripSetpoints, Double> MapLeftGrip = new EnumMap<GripSetpoints, Double>(GripSetpoints.class);
+    private EnumMap<GripSetpoints, Double> MapRightGrip = new EnumMap<GripSetpoints, Double>(GripSetpoints.class);
+    public ServoControl<GripSetpoints, EnumMap<GripSetpoints, Double>> LeftGripServo = new ServoControl(GGL,MapLeftGrip);
+    public ServoControl<GripSetpoints, EnumMap<GripSetpoints, Double>> RightGripServo = new ServoControl(GGR,MapRightGrip);
 
-    private int GuideIndex = 0;
-    private int ClawIndex = 0;
-    private int LeftIndex = 0;
-    private int RightIndex = 0;
+    private EnumMap<ClawSetpoints, Double> MapClaw = new EnumMap<ClawSetpoints, Double>(ClawSetpoints.class);
+    public ServoControl<ClawSetpoints, EnumMap<ClawSetpoints, Double>> ClawServo = new ServoControl(Claw,MapClaw);
+
+    private EnumMap<GuideSetpoints, Double> MapLeftGuide = new EnumMap<GuideSetpoints, Double>(GuideSetpoints.class);
+    private EnumMap<GuideSetpoints, Double> MapRightGuide = new EnumMap<GuideSetpoints, Double>(GuideSetpoints.class);
+    public ServoControl<GuideSetpoints, EnumMap<GuideSetpoints, Double>> LeftGuideServo = new ServoControl(LG,MapLeftGuide);
+    public ServoControl<GuideSetpoints, EnumMap<GuideSetpoints, Double>> RightGuideServo = new ServoControl(RG,MapRightGuide);
+
 
     /* Declare public class objects */
+    public enum GripSetpoints implements EnumWrapper<GripSetpoints> {OPEN, CLOSE, PARTIAL;}
+    public enum ClawSetpoints implements EnumWrapper<ClawSetpoints> {OPEN, CLOSE;}
+    public enum GuideSetpoints implements EnumWrapper<GuideSetpoints> {RETRACT, EXTEND;}
+
 
     /* getter methods
      * */
+
 
     /* Subassembly constructor */
     public GrabberControl() {
@@ -56,6 +67,25 @@ public class GrabberControl {
 
         telemetry.addLine(name + " initialize");
 
+        /* Assign setpoint values
+         */
+        MapLeftGrip.put(GripSetpoints.OPEN, 0.745);
+        MapLeftGrip.put(GripSetpoints.CLOSE, 0.255);
+        MapLeftGrip.put(GripSetpoints.PARTIAL, 0.375);
+
+        MapRightGrip.put(GripSetpoints.OPEN, 0.44);
+        MapRightGrip.put(GripSetpoints.CLOSE, 0.89);
+        MapRightGrip.put(GripSetpoints.PARTIAL, 0.765);
+
+        MapClaw.put(ClawSetpoints.OPEN, 0.70);
+        MapClaw.put(ClawSetpoints.CLOSE, 0.0);
+
+        MapLeftGuide.put(GuideSetpoints.RETRACT, 1.0);
+        MapLeftGuide.put(GuideSetpoints.EXTEND, 0.2);
+
+        MapRightGuide.put(GuideSetpoints.RETRACT, 0.94);
+        MapRightGuide.put(GuideSetpoints.EXTEND, 0.14);
+
         /* Map hardware devices */
         GGR = hardwareMap.servo.get("GGR");
         GGL = hardwareMap.servo.get("GGL");
@@ -65,11 +95,12 @@ public class GrabberControl {
         // reverse those motors
         LG.setDirection(Servo.Direction.REVERSE);
         // set initial positions
-        GGL.setPosition(GRABBER_LEFT[LeftIndex]);
-        GGR.setPosition(GRABBER_RIGHT[RightIndex]);
-        // don't initialize position, let it set on arm        Claw.setPosition(CLAW[0]);
-        LG.setPosition(GUIDESLEFT[GuideIndex]);
-        RG.setPosition(GUIDESRIGHT[GuideIndex]);
+        LeftGripServo.setSetpoint(GripSetpoints.OPEN);
+        RightGripServo.setSetpoint(GripSetpoints.OPEN);
+        // don't initialize position, let it set on arm
+        //ClawServo.setSetpoint(ClawSetpoints.OPEN);
+        LeftGuideServo.setSetpoint(GuideSetpoints.RETRACT);
+        RightGuideServo.setSetpoint(GuideSetpoints.RETRACT);
     }
 
     /* Cleanup method - to be called when done with subassembly to 'turn off' everything */
@@ -77,57 +108,4 @@ public class GrabberControl {
         telemetry.addLine(name + " cleanup");
     }
 
-    public void ToggleGuides() {
-        GuideIndex = (GuideIndex < GUIDESLEFT.length - 1) ? GuideIndex + 1 : 0;
-        LG.setPosition(GUIDESLEFT[GuideIndex]);
-        RG.setPosition(GUIDESRIGHT[GuideIndex]);
-    }
-
-    public void CloseGuides() {
-        GuideIndex = 0;
-        LG.setPosition(GUIDESLEFT[GuideIndex]);
-        RG.setPosition(GUIDESRIGHT[GuideIndex]);
-    }
-
-    public void OpenGuides() {
-        GuideIndex = 1;
-        LG.setPosition(GUIDESLEFT[GuideIndex]);
-        RG.setPosition(GUIDESRIGHT[GuideIndex]);
-    }
-
-
-    public void IncrementLeft() {
-        LeftIndex = (LeftIndex < GRABBER_LEFT.length - 1) ? LeftIndex + 1 : 0;
-        GGL.setPosition(GRABBER_LEFT[LeftIndex]);
-    }
-
-    public void IncrementRight() {
-        RightIndex = (RightIndex < GRABBER_RIGHT.length - 1) ? RightIndex + 1 : 0;
-        GGR.setPosition(GRABBER_RIGHT[RightIndex]);
-    }
-
-    public void DecrementLeft() {
-        LeftIndex = (LeftIndex > 0) ? LeftIndex - 1 : 0;
-        GGL.setPosition(GRABBER_LEFT[LeftIndex]);
-    }
-
-    public void DecrementRight() {
-        RightIndex = (RightIndex > 0) ? RightIndex - 1 : 0;
-        GGR.setPosition(GRABBER_RIGHT[RightIndex]);
-    }
-
-    public void SetPosition(int index) {
-        if (index < 0) index = 0;
-        if (index > GRABBER_RIGHT.length - 1) index = GRABBER_RIGHT.length - 1;
-
-        LeftIndex = index;
-        RightIndex = index;
-        GGL.setPosition(GRABBER_LEFT[LeftIndex]);
-        GGR.setPosition(GRABBER_RIGHT[RightIndex]);
-    }
-
-    public void ToggleClaw() {
-        ClawIndex = (ClawIndex < CLAW.length - 1) ? ClawIndex + 1 : 0;
-        Claw.setPosition(CLAW[ClawIndex]);
-    }
 }
