@@ -75,20 +75,20 @@ public class DualArmControl {
 
     public void nextSetpoint() {
         Setpoint = Setpoint.getNext();
-        LowerArm.MoveToPosition(MapLowerArm.get(Setpoint), MapMoveTime.get(Setpoint));
-        UpperArm.MoveToPosition(MapUpperArm.get(Setpoint), MapMoveTime.get(Setpoint));
+        LowerArm.moveToPosition(MapLowerArm.get(Setpoint), MapMoveTime.get(Setpoint));
+        UpperArm.moveToPosition(MapUpperArm.get(Setpoint), MapMoveTime.get(Setpoint));
     }
 
     public void prevSetpoint() {
         Setpoint = Setpoint.getPrev();
-        LowerArm.MoveToPosition(MapLowerArm.get(Setpoint), MapMoveTime.get(Setpoint));
-        UpperArm.MoveToPosition(MapUpperArm.get(Setpoint), MapMoveTime.get(Setpoint));
+        LowerArm.moveToPosition(MapLowerArm.get(Setpoint), MapMoveTime.get(Setpoint));
+        UpperArm.moveToPosition(MapUpperArm.get(Setpoint), MapMoveTime.get(Setpoint));
     }
 
     public void setSetpoint(Setpoints setpt) {
         Setpoint = setpt;
-        LowerArm.MoveToPosition(MapLowerArm.get(Setpoint), MapMoveTime.get(Setpoint));
-        UpperArm.MoveToPosition(MapUpperArm.get(Setpoint), MapMoveTime.get(Setpoint));
+        LowerArm.moveToPosition(MapLowerArm.get(Setpoint), MapMoveTime.get(Setpoint));
+        UpperArm.moveToPosition(MapUpperArm.get(Setpoint), MapMoveTime.get(Setpoint));
     }
 
     /* Call this method when you want to update the arm control (must be done on a periodic basis */

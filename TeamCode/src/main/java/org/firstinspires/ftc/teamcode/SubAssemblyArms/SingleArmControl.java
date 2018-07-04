@@ -149,36 +149,36 @@ public class SingleArmControl {
         telemetry.addLine(name + " cleanup");
     }
 
-    public void MoveUp() {
+    public void moveUp() {
         FinalTarget += 0.01;
         if (FinalTarget > MAX_POSITION) FinalTarget = MAX_POSITION;
         FinalTime = 0.0;
     }
 
-    public void MoveDown() {
+    public void moveDown() {
         FinalTarget -= 0.01;
         if (FinalTarget < 0.0) FinalTarget = 0.0;
         FinalTime = 0.0;
     }
 
-    public void MoveHome() {
-        MoveToPosition(0.0);
+    public void moveHome() {
+        moveToPosition(0.0);
     }
 
-    public void MoveHome(double time) {
-        MoveToPosition(0.0, time);
+    public void moveHome(double time) {
+        moveToPosition(0.0, time);
     }
 
-    public void HoldCurrentPosition() {
+    public void holdCurrentPosition() {
         FinalTarget = CurrentPosition;
         FinalTime = 0.0;
     }
 
-    public void MoveToPosition(double target) {
-        MoveToPosition(target, 0.0);
+    public void moveToPosition(double target) {
+        moveToPosition(target, 0.0);
     }
 
-    public void MoveToPosition(double target, double time) {
+    public void moveToPosition(double target, double time) {
         FinalTarget = target;
         if (FinalTarget > MAX_POSITION) FinalTarget = MAX_POSITION;
         if (FinalTarget < 0.0) FinalTarget = 0.0;
@@ -298,7 +298,7 @@ public class SingleArmControl {
         telemetry.addData("Power Error Angle", "%.2f %.2f %5.0f", Power, error, Angle);
     }
 
-    public void SetPower(double power) {
+    public void setPower(double power) {
         RightMotor.setPower(power);
         LeftMotor.setPower(power);
     }

@@ -88,7 +88,7 @@ public class DriveControl {
         telemetry.addLine(name + " cleanup");
     }
 
-    public void MoveCombination(double speed_forward_back, double speed_left_right, double speed_rotate_left_right) {
+    public void moveCombination(double speed_forward_back, double speed_left_right, double speed_rotate_left_right) {
         double front_right = speed_forward_back + speed_left_right + speed_rotate_left_right;
         double front_left = speed_forward_back - speed_left_right - speed_rotate_left_right;
         double back_left = speed_forward_back + speed_left_right - speed_rotate_left_right;
@@ -101,7 +101,7 @@ public class DriveControl {
     }
 
     /* forward is positive speed, backward is negative speed */
-    public void MoveForwardBackward(double speed) {
+    public void moveForwardBackward(double speed) {
         FR.setPower(speed);
         FL.setPower(speed);
         BL.setPower(speed);
@@ -109,7 +109,7 @@ public class DriveControl {
     }
 
     /* left is positive speed, right is negative speed */
-    public void MoveLeftRight(double speed) {
+    public void moveLeftRight(double speed) {
         FR.setPower(speed);
         FL.setPower(-speed);
         BL.setPower(speed);
@@ -117,7 +117,7 @@ public class DriveControl {
     }
 
     /* rotate left is positive speed, rotate right is negative speed */
-    public void RotateLeftRight(double speed) {
+    public void rotateLeftRight(double speed) {
         FR.setPower(speed);
         FL.setPower(-speed);
         BL.setPower(-speed);
@@ -125,32 +125,32 @@ public class DriveControl {
     }
 
     /* Short hand movement methods */
-    public void MoveStop() {
-        MoveForwardBackward(0.0);
+    public void moveStop() {
+        moveForwardBackward(0.0);
     }
 
-    public void MoveForward(double speed) {
-        MoveForwardBackward(Math.abs(speed));
+    public void moveForward(double speed) {
+        moveForwardBackward(Math.abs(speed));
     }
 
-    public void MoveBackward(double speed) {
-        MoveForwardBackward(-Math.abs(speed));
+    public void moveBackward(double speed) {
+        moveForwardBackward(-Math.abs(speed));
     }
 
-    public void MoveLeft(double speed) {
-        MoveLeftRight(Math.abs(speed));
+    public void moveLeft(double speed) {
+        moveLeftRight(Math.abs(speed));
     }
 
-    public void MoveRight(double speed) {
-        MoveLeftRight(-Math.abs(speed));
+    public void moveRight(double speed) {
+        moveLeftRight(-Math.abs(speed));
     }
 
-    public void RotateLeft(double speed) {
-        RotateLeftRight(Math.abs(speed));
+    public void rotateLeft(double speed) {
+        rotateLeftRight(Math.abs(speed));
     }
 
-    public void RotateRight(double speed) {
-        RotateLeftRight(-Math.abs(speed));
+    public void rotateRight(double speed) {
+        rotateLeftRight(-Math.abs(speed));
     }
 
 }

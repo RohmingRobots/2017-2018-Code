@@ -171,80 +171,80 @@ public class AutoTest extends LinearOpMode {
         telemetry.update();
 
         if (do_motion) {
-            AutoFindVuMark(1.0);
+            autoFindVuMark(1.0);
         }
 
         if (do_glyph && do_jewels) {
-            AutoGlyphGrab(0.0);
-            AutoDelaySec(1.0);
-            AutoArmLift(0.4, 0.0);
+            autoGlyphGrab(0.0);
+            autoDelaySec(1.0);
+            autoArmLift(0.4, 0.0);
 
-            AutoFlippersColorEnable(true);
-            AutoAmpereExtend(0.0);
-            AutoDelaySec(4.0);
-            AutoFlippersExtend(0.0);
-            AutoFlippersColorRecord();
-            AutoDelaySec(4.0);
-            AutoAmpereStop(0.0);
+            autoFlippersColorEnable(true);
+            autoAmpereExtend(0.0);
+            autoDelaySec(4.0);
+            autoFlippersExtend(0.0);
+            autoFlippersColorRecord();
+            autoDelaySec(4.0);
+            autoAmpereStop(0.0);
 
-            AutoFlippersColorFlick(redteam, 0.0);
+            autoFlippersColorFlick(redteam, 0.0);
 
-            AutoFlippersColorEnable(false);
-            AutoAmpereRetract(0.0);
-            AutoDelaySec(3.0);
-            AutoFlippersRetract(0.0);
-            AutoDelaySec(2.0);
-            AutoArmHome(0.0);
-            AutoDelaySec(3.0);
-            AutoAmpereStop(0.0);
+            autoFlippersColorEnable(false);
+            autoAmpereRetract(0.0);
+            autoDelaySec(3.0);
+            autoFlippersRetract(0.0);
+            autoDelaySec(2.0);
+            autoArmHome(0.0);
+            autoDelaySec(3.0);
+            autoAmpereStop(0.0);
 
         } else if (do_glyph) {
-            AutoGlyphGrab(1.0);
-            AutoArmLift(0.4, 3.0);
-            AutoArmHome(2.0);
+            autoGlyphGrab(1.0);
+            autoArmLift(0.4, 3.0);
+            autoArmHome(2.0);
 
         } else if (do_jewels) {
 
-            AutoGlyphGrab(0.0);
+            autoGlyphGrab(0.0);
 
-            AutoFlippersColorEnable(true);
-            AutoAmpereExtend(0.0);
-            AutoDelaySec(4.0);
-            AutoFlippersExtend(0.0);
-            AutoFlippersColorRecord();
-            AutoDelaySec(4.0);
-            AutoAmpereStop(0.0);
+            autoFlippersColorEnable(true);
+            autoAmpereExtend(0.0);
+            autoDelaySec(4.0);
+            autoFlippersExtend(0.0);
+            autoFlippersColorRecord();
+            autoDelaySec(4.0);
+            autoAmpereStop(0.0);
 
-            AutoFlippersColorFlick(redteam, 0.0);
+            autoFlippersColorFlick(redteam, 0.0);
 
-            AutoFlippersColorEnable(false);
-            AutoAmpereRetract(0.0);
-            AutoDelaySec(3.0);
-            AutoFlippersRetract(0.0);
-            AutoDelaySec(5.0);
-            AutoAmpereStop(0.0);
+            autoFlippersColorEnable(false);
+            autoAmpereRetract(0.0);
+            autoDelaySec(3.0);
+            autoFlippersRetract(0.0);
+            autoDelaySec(5.0);
+            autoAmpereStop(0.0);
         }
 
         if (do_motion) {
-            AutoMoveBackward(MOVE_SPEED,0.75);
-            AutoRotateAngle(ROTATE_SPEED,-45);
-            AutoMoveForward(MOVE_SPEED,1.30);
-            AutoRotateAngle(ROTATE_SPEED,45);
+            autoMoveBackward(MOVE_SPEED,0.75);
+            autoRotateAngle(ROTATE_SPEED,-45);
+            autoMoveForward(MOVE_SPEED,1.30);
+            autoRotateAngle(ROTATE_SPEED,45);
             if (vuMark == RelicRecoveryVuMark.LEFT){
-                AutoRotateAngle(ROTATE_SPEED,-25);
-                AutoMoveForward(MOVE_SPEED,1.5);
+                autoRotateAngle(ROTATE_SPEED,-25);
+                autoMoveForward(MOVE_SPEED,1.5);
             } else if (vuMark == RelicRecoveryVuMark.RIGHT){
-                AutoRotateAngle(ROTATE_SPEED,25);
-                AutoMoveForward(MOVE_SPEED,1.5);
+                autoRotateAngle(ROTATE_SPEED,25);
+                autoMoveForward(MOVE_SPEED,1.5);
             } else {
-                AutoMoveForward(0.75*MOVE_SPEED,0.75);
+                autoMoveForward(0.75*MOVE_SPEED,0.75);
             }
-            AutoGlyphRelease(0.0);
-            AutoMoveBackward(MOVE_SPEED,0.20);
+            autoGlyphRelease(0.0);
+            autoMoveBackward(MOVE_SPEED,0.20);
         }
     }
 
-    void AutoFindVuMark(double time_sec) {
+    void autoFindVuMark(double time_sec) {
         if ( !opModeIsActive() ) return;
 
         vuMark = RelicRecoveryVuMark.from(relicTemplate);
@@ -255,7 +255,7 @@ public class AutoTest extends LinearOpMode {
         do {
             telemetry.addData("Searching","%.1f",timeNow);
             telemetry.update();
-            AutoUpdate();
+            autoUpdate();
             timeNow = runtime.seconds() - timeStart;
         } while ( (timeNow<time_sec) && opModeIsActive() && (vuMark==RelicRecoveryVuMark.UNKNOWN));
 
@@ -275,7 +275,7 @@ public class AutoTest extends LinearOpMode {
     }
 
     /*!!!! make absolute rotation option (from initial start angle) */
-    void AutoRotateAngle(double speed, double target) {
+    void autoRotateAngle(double speed, double target) {
         if ( !opModeIsActive() ) return;
 
         telemetry.addLine("Rotate Angle");
@@ -289,9 +289,9 @@ public class AutoTest extends LinearOpMode {
         startAngle = angles.firstAngle;
 
         if (target>0) {
-            Drive.RotateRight(speed);
+            Drive.rotateRight(speed);
             do {
-                AutoUpdate();
+                autoUpdate();
                 angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
                 turnAngle = -(angles.firstAngle-startAngle);
                 if (turnAngle>180) turnAngle -= 360;
@@ -301,9 +301,9 @@ public class AutoTest extends LinearOpMode {
             } while ( (turnAngle < target) && opModeIsActive() );
         }
         if (target<0) {
-            Drive.RotateLeft(speed);
+            Drive.rotateLeft(speed);
             do {
-                AutoUpdate();
+                autoUpdate();
                 angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
                 turnAngle = -(angles.firstAngle-startAngle);
                 if (turnAngle>180) turnAngle -= 360;
@@ -312,154 +312,154 @@ public class AutoTest extends LinearOpMode {
                 telemetry.update();
             } while ( (turnAngle > target) && opModeIsActive() );
         }
-        Drive.MoveStop();
+        Drive.moveStop();
     }
 
-    void AutoRotateRight(double speed, double time_sec) {
+    void autoRotateRight(double speed, double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Rotate Right");
         telemetry.update();
-        Drive.RotateRight(speed);
-        AutoDelaySec(time_sec);
-        Drive.MoveStop();
+        Drive.rotateRight(speed);
+        autoDelaySec(time_sec);
+        Drive.moveStop();
     }
 
-    void AutoRotateLeft(double speed, double time_sec) {
+    void autoRotateLeft(double speed, double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Rotate Left");
         telemetry.update();
-        Drive.RotateLeft(speed);
-        AutoDelaySec(time_sec);
-        Drive.MoveStop();
+        Drive.rotateLeft(speed);
+        autoDelaySec(time_sec);
+        Drive.moveStop();
     }
 
-    void AutoMoveForward(double speed, double time_sec) {
+    void autoMoveForward(double speed, double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Move Forward");
         telemetry.update();
-        Drive.MoveForward(speed);
-        AutoDelaySec(time_sec);
-        Drive.MoveStop();
+        Drive.moveForward(speed);
+        autoDelaySec(time_sec);
+        Drive.moveStop();
     }
 
-    void AutoMoveBackward(double speed, double time_sec) {
+    void autoMoveBackward(double speed, double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Move Backward");
         telemetry.update();
-        Drive.MoveBackward(speed);
-        AutoDelaySec(time_sec);
-        Drive.MoveStop();
+        Drive.moveBackward(speed);
+        autoDelaySec(time_sec);
+        Drive.moveStop();
     }
 
-    void AutoMoveLeft(double speed, double time_sec) {
+    void autoMoveLeft(double speed, double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Move Left");
         telemetry.update();
-        Drive.MoveLeft(speed);
-        AutoDelaySec(time_sec);
-        Drive.MoveStop();
+        Drive.moveLeft(speed);
+        autoDelaySec(time_sec);
+        Drive.moveStop();
     }
 
-    void AutoMoveRight(double speed, double time_sec) {
+    void autoMoveRight(double speed, double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Move Right");
         telemetry.update();
-        Drive.MoveRight(speed);
-        AutoDelaySec(time_sec);
-        Drive.MoveStop();
+        Drive.moveRight(speed);
+        autoDelaySec(time_sec);
+        Drive.moveStop();
     }
 
-    void AutoGlyphRelease(double time_sec) {
+    void autoGlyphRelease(double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Glyph Release");
         telemetry.update();
         Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.OPEN);
         Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.OPEN);
-        AutoDelaySec(time_sec);
-        Drive.MoveStop();
+        autoDelaySec(time_sec);
+        Drive.moveStop();
     }
 
-    void AutoGlyphGrab(double time_sec) {
+    void autoGlyphGrab(double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Glyph Grab");
         telemetry.update();
         Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
         Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
-        AutoDelaySec(time_sec);
+        autoDelaySec(time_sec);
     }
 
-    void AutoArmLift(double position, double time_sec) {
+    void autoArmLift(double position, double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Arm Lift");
         telemetry.update();
-        Arms.UpperArm.MoveToPosition(position);
-        AutoDelaySec(time_sec);
+        Arms.UpperArm.moveToPosition(position);
+        autoDelaySec(time_sec);
     }
 
-    void AutoArmHome(double time_sec) {
+    void autoArmHome(double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Arm Home");
         telemetry.update();
-        Arms.UpperArm.MoveHome();
+        Arms.UpperArm.moveHome();
 
         double timeStart = 0;
         double timeNow = 0;
         timeStart = runtime.seconds();
         do {
-            AutoUpdate();
+            autoUpdate();
             timeNow = runtime.seconds() - timeStart;
         } while ( (timeNow<time_sec) && opModeIsActive() && (Arms.UpperArm.Limit.getState()==true));
     }
 
-    void AutoAmpereExtend(double time_sec) {
+    void autoAmpereExtend(double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Ampere Extend");
         telemetry.update();
         Ampere.moveWinches(AMPERE_POWER);
-        AutoDelaySec(time_sec);
+        autoDelaySec(time_sec);
     }
 
-    void AutoAmpereRetract(double time_sec) {
+    void autoAmpereRetract(double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Ampere Retract");
         telemetry.update();
         Ampere.moveWinches(-AMPERE_POWER);
-        AutoDelaySec(time_sec);
+        autoDelaySec(time_sec);
     }
 
-    void AutoAmpereStop(double time_sec) {
+    void autoAmpereStop(double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Ampere Stop");
         telemetry.update();
         Ampere.moveWinches(0.0);
-        AutoDelaySec(time_sec);
+        autoDelaySec(time_sec);
     }
 
-    void AutoFlippersExtend(double time_sec) {
+    void autoFlippersExtend(double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Flipper Extend");
         telemetry.update();
         Ampere.LeftFlipperServo.setSetpoint(AmpereControl.Setpoints.OPEN);
         Ampere.RightFlipperServo.setSetpoint(AmpereControl.Setpoints.OPEN);
-        AutoDelaySec(time_sec);
+        autoDelaySec(time_sec);
     }
 
-    void AutoFlippersRetract(double time_sec) {
+    void autoFlippersRetract(double time_sec) {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Flipper Retract");
         telemetry.update();
         Ampere.LeftFlipperServo.setSetpoint(AmpereControl.Setpoints.CLOSE);
         Ampere.RightFlipperServo.setSetpoint(AmpereControl.Setpoints.CLOSE);
-        AutoDelaySec(time_sec);
+        autoDelaySec(time_sec);
     }
 
-    void AutoFlippersColorEnable(boolean enable) {
+    void autoFlippersColorEnable(boolean enable) {
         if ( !opModeIsActive() ) return;
         Ampere.ColorLeft.enableLed(enable);
         Ampere.ColorRight.enableLed(enable);
     }
 
-    void AutoFlippersColorRecord() {
+    void autoFlippersColorRecord() {
         if ( !opModeIsActive() ) return;
         left_blue = Ampere.ColorLeft.blue();
         right_blue = Ampere.ColorRight.blue();
@@ -467,7 +467,7 @@ public class AutoTest extends LinearOpMode {
         right_red = Ampere.ColorRight.red();
     }
 
-    void AutoFlippersColorFlick(boolean red, double time_sec) {
+    void autoFlippersColorFlick(boolean red, double time_sec) {
         if (!opModeIsActive()) return;
         telemetry.addLine("Flipper Flick");
 
@@ -509,22 +509,22 @@ public class AutoTest extends LinearOpMode {
             else
                 Ampere.RightFlipperServo.setSetpoint(AmpereControl.Setpoints.PARTIAL);
         }
-        AutoDelaySec(time_sec);
+        autoDelaySec(time_sec);
     }
 
-    void AutoDelaySec(double time_sec) {
+    void autoDelaySec(double time_sec) {
         if ( !opModeIsActive() ) return;
 
         double timeStart = 0;
         double timeNow = 0;
         timeStart = runtime.seconds();
         do {
-            AutoUpdate();
+            autoUpdate();
             timeNow = runtime.seconds() - timeStart;
         } while ( (timeNow<time_sec) && opModeIsActive() );
     }
 
-    void AutoUpdate() {
+    void autoUpdate() {
         if ( !opModeIsActive() ) return;
 
         Arms.Update(true);

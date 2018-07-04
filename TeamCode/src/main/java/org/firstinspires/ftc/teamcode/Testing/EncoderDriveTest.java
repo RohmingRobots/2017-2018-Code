@@ -100,7 +100,7 @@ public class EncoderDriveTest extends LinearOpMode {
 
                 default:
                     telemetry.addLine("All done");
-                    Drive.MoveStop();
+                    Drive.moveStop();
                     break;
 
                 /* wait one second */
@@ -109,18 +109,18 @@ public class EncoderDriveTest extends LinearOpMode {
                         mode++;
                         resetClock();
                         resetEncoders();
-                        Drive.MoveStop();
+                        Drive.moveStop();
                     }
                     break;
 
                 /* move forward 12 inches */
                 case 1:
-                    Drive.MoveForward(MOVE_SPEED);
+                    Drive.moveForward(MOVE_SPEED);
                     if (currentDistance > 12-6) {
                         mode++;
                         resetClock();
                         //resetEncoders();
-                        Drive.MoveStop();
+                        Drive.moveStop();
                     }
                     break;
 
@@ -129,17 +129,17 @@ public class EncoderDriveTest extends LinearOpMode {
                         mode++;
                         resetClock();
                         resetEncoders();
-                        Drive.MoveStop();
+                        Drive.moveStop();
                     }
                     break;
 
                 case 3:
-                    Drive.MoveForward(MOVE_SPEED);
+                    Drive.moveForward(MOVE_SPEED);
                     if (currentDistance > 30-6) {
                         mode++;
                         resetClock();
                         //resetEncoders();
-                        Drive.MoveStop();
+                        Drive.moveStop();
                     }
                     break;
 

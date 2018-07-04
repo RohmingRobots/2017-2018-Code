@@ -103,19 +103,19 @@ public class DriveTest extends LinearOpMode {
         */
 
             if (gamepad1.dpad_left) {
-                Drive.MoveLeft(speed);
+                Drive.moveLeft(speed);
             } else if (gamepad1.dpad_right) {
-                Drive.MoveRight(speed);
+                Drive.moveRight(speed);
             } else if (gamepad1.dpad_up) {
-                Drive.MoveForward(speed);
+                Drive.moveForward(speed);
             } else if (gamepad1.dpad_down) {
-                Drive.MoveBackward(speed);
+                Drive.moveBackward(speed);
             } else if (gamepad1.x) {
-                Drive.RotateLeft(speed);
+                Drive.rotateLeft(speed);
             } else if (gamepad1.b) {
-                Drive.RotateRight(speed);
+                Drive.rotateRight(speed);
             } else {
-                Drive.MoveCombination(speed_forward_back, speed_left_right, speed_rotate_left_right);
+                Drive.moveCombination(speed_forward_back, speed_left_right, speed_rotate_left_right);
             }
 
             //let the robot have a little rest, sleep is healthy
@@ -124,7 +124,3 @@ public class DriveTest extends LinearOpMode {
     }
 
 }
-
-
-
-
