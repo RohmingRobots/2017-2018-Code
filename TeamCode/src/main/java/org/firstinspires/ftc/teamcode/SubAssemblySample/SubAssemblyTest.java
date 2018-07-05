@@ -18,8 +18,8 @@ public class SubAssemblyTest extends LinearOpMode {
 
         telemetry.addLine("SubAssembly Test OpMode");
 
-        /* Initialize sub-assemblies */
-        SubAssembly.Initialize(this);
+        /* initialize sub-assemblies */
+        SubAssembly.initialize(this);
         telemetry.update();
 
         //waits for that giant PLAY button to be pressed on RC
@@ -28,7 +28,7 @@ public class SubAssemblyTest extends LinearOpMode {
         //telling the code to run until you press that giant STOP button on RC
         while (opModeIsActive()) {
 
-            SubAssembly.Test();
+            SubAssembly.test();
             telemetry.update();
 
             //let the robot have a little rest, sleep is healthy
@@ -36,7 +36,7 @@ public class SubAssemblyTest extends LinearOpMode {
         }
 
         /* Clean up sub-assemblies */
-        SubAssembly.Cleanup();
+        SubAssembly.cleanup();
         telemetry.update();
     }
 }

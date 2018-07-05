@@ -35,10 +35,6 @@ public class vuforia extends LinearOpMode {
     VuforiaLocalizer vuforia;
     /********** ^^ copy this ^^ **********/
 
-    /* Declare extended gamepad */
-    GamepadEdge egamepad1;
-    GamepadEdge egamepad2;
-
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -127,63 +123,3 @@ public class vuforia extends LinearOpMode {
     }
     /********** ^^ copy this ^^ **********/
 }
-
-
-
-    // Movement code
-    /*private void Move(DpadDirection buttonDirection, double speed) {
-        switch (buttonDirection) {
-            case Up:
-                robot.FR.setPower(speed);
-                robot.FL.setPower(speed);
-                robot.BL.setPower(speed);
-                robot.BR.setPower(speed);
-                break;
-            case Down:
-                robot.FR.setPower(-speed);
-                robot.FL.setPower(-speed);
-                robot.BL.setPower(-speed);
-                robot.BR.setPower(-speed);
-                break;
-            case Left:
-                robot.FR.setPower(speed);
-                robot.FL.setPower(-speed);
-                robot.BL.setPower(speed);
-                robot.BR.setPower(-speed);
-                break;
-            case Right:
-                robot.FR.setPower(-speed);
-                robot.FL.setPower(speed);
-                robot.BL.setPower(-speed);
-                robot.BR.setPower(speed);
-                break;
-            case None:
-                // do nothing
-                break;
-        }
-    }
-
-    private DpadDirection GetDpadDirection(Gamepad gamepad) {
-        if (gamepad.dpad_up) {
-            return DpadDirection.Up;
-        } else if (gamepad.dpad_down) {
-            return DpadDirection.Down;
-        } else if (gamepad.dpad_left) {
-            return DpadDirection.Left;
-        } else if (gamepad.dpad_right) {
-            return DpadDirection.Right;
-        } else {
-            return DpadDirection.None;
-        }
-    }
-
-    private enum DpadDirection {
-        None,
-        Up,
-        Down,
-        Left,
-        Right
-    }
-} */
-
-

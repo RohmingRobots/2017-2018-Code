@@ -44,7 +44,6 @@ public class GrabberControl {
     public ServoControl<GuideSetpoints, EnumMap<GuideSetpoints, Double>> LeftGuideServo = new ServoControl(LG,MapLeftGuide);
     public ServoControl<GuideSetpoints, EnumMap<GuideSetpoints, Double>> RightGuideServo = new ServoControl(RG,MapRightGuide);
 
-
     /* Declare public class objects */
     public enum GripSetpoints implements EnumWrapper<GripSetpoints> {OPEN, CLOSE, PARTIAL;}
     public enum ClawSetpoints implements EnumWrapper<ClawSetpoints> {OPEN, CLOSE;}
@@ -60,7 +59,7 @@ public class GrabberControl {
     }
 
     /* Initialization method - to be called before any other methods are used */
-    public void Initialize(LinearOpMode opMode) {
+    public void initialize(LinearOpMode opMode) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -103,8 +102,8 @@ public class GrabberControl {
         RightGuideServo.setSetpoint(GuideSetpoints.RETRACT);
     }
 
-    /* Cleanup method - to be called when done with subassembly to 'turn off' everything */
-    public void Cleanup() {
+    /* cleanup method - to be called when done with subassembly to 'turn off' everything */
+    public void cleanup() {
         telemetry.addLine(name + " cleanup");
     }
 

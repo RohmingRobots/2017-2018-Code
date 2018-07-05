@@ -70,7 +70,7 @@ public class SingleArmControl {
     }
 
     /* Initialization method - to be called before any other methods are used */
-    public void Initialize(LinearOpMode opMode, boolean upper_lower) {
+    public void initialize(LinearOpMode opMode, boolean upper_lower) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -81,7 +81,7 @@ public class SingleArmControl {
         UpperLower = upper_lower;
         if (UpperLower) {
             //UPPER
-            // Define and Initialize Motors
+            // Define and initialize Motors
             LeftMotor = hardwareMap.dcMotor.get("UL");
             RightMotor = hardwareMap.dcMotor.get("UR");
             // reverse those motors
@@ -105,7 +105,7 @@ public class SingleArmControl {
             POSITION_TO_ANGLE = 90.0;
         } else {
             //LOWER
-            // Define and Initialize Motors
+            // Define and initialize Motors
             LeftMotor = hardwareMap.dcMotor.get("LL");
             RightMotor = hardwareMap.dcMotor.get("LR");
             // reverse those motors
@@ -144,8 +144,8 @@ public class SingleArmControl {
         ErrorSum = 0.0;     // zero integral
     }
 
-    /* Cleanup method - to be called when done with subassembly to 'turn off' everything */
-    public void Cleanup() {
+    /* cleanup method - to be called when done with subassembly to 'turn off' everything */
+    public void cleanup() {
         telemetry.addLine(name + " cleanup");
     }
 

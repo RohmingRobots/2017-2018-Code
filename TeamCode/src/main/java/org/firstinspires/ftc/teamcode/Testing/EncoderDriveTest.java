@@ -52,9 +52,9 @@ public class EncoderDriveTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        /* Initialize sub assemblies
+        /* initialize sub assemblies
          */
-        Drive.Initialize(this);
+        Drive.initialize(this);
 
         double voltage = Drive.Battery.getVoltage();
         telemetry.addData("Voltage", voltage);
@@ -145,9 +145,9 @@ public class EncoderDriveTest extends LinearOpMode {
 
             }  // end of switch
         }
-    }
 
-    String format(OpenGLMatrix transformationMatrix) {
-        return (transformationMatrix != null) ? transformationMatrix.formatAsTransform() : "null";
+        /* Clean up sub-assemblies */
+        Drive.cleanup();
+        telemetry.update();
     }
 }

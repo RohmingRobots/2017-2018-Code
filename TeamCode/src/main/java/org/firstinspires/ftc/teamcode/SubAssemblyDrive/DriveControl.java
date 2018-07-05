@@ -45,7 +45,7 @@ public class DriveControl {
     }
 
     /* Initialization method - to be called before any other methods are used */
-    public void Initialize(LinearOpMode opMode) {
+    public void initialize(LinearOpMode opMode) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -55,7 +55,7 @@ public class DriveControl {
         /* Map hardware devices */
         Battery = hardwareMap.voltageSensor.get("Lower hub 3");
 
-        // Define and Initialize Motors
+        // Define and initialize Motors
         FL = hardwareMap.dcMotor.get("FL");
         FR = hardwareMap.dcMotor.get("FR");
         BL = hardwareMap.dcMotor.get("BL");
@@ -75,7 +75,7 @@ public class DriveControl {
         BL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // **** Color sensors ****
-        // Define and Initialize color sensors
+        // Define and initialize color sensors
         ColorLeft = hardwareMap.colorSensor.get("left_color");
         ColorRight = hardwareMap.colorSensor.get("right_color");
         //turns all LEDs off
@@ -83,8 +83,8 @@ public class DriveControl {
         ColorRight.enableLed(false);
     }
 
-    /* Cleanup method - to be called when done with subassembly to 'turn off' everything */
-    public void Cleanup() {
+    /* cleanup method - to be called when done with subassembly to 'turn off' everything */
+    public void cleanup() {
         telemetry.addLine(name + " cleanup");
     }
 

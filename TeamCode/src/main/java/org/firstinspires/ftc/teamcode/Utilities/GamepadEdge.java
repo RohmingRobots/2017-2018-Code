@@ -18,7 +18,7 @@ public class GamepadEdge {
         public boolean released = false;
 
         /* Call this method when you want to update the detection of the button edges pressed/released */
-        public void UpdateEdge(boolean new_state) {
+        public void updateEdge(boolean new_state) {
             /* check if button has just been pressed */
             if (new_state && !state)        pressed = true;
             else                            pressed = false;
@@ -55,22 +55,22 @@ public class GamepadEdge {
     }
 
     /* Call this method when you want to update the detection of the button edges pressed/released */
-    public void UpdateEdge() {
+    public void updateEdge() {
 
-        dpad_up.UpdateEdge(mygamepad.dpad_up);
-        dpad_down.UpdateEdge(mygamepad.dpad_down);
-        dpad_left.UpdateEdge(mygamepad.dpad_left);
-        dpad_right.UpdateEdge(mygamepad.dpad_right);
-        a.UpdateEdge(mygamepad.a);
-        b.UpdateEdge(mygamepad.b);
-        x.UpdateEdge(mygamepad.x);
-        y.UpdateEdge(mygamepad.y);
-        guide.UpdateEdge(mygamepad.guide);
-        start.UpdateEdge(mygamepad.start);
-        back.UpdateEdge(mygamepad.back);
-        left_bumper.UpdateEdge(mygamepad.left_bumper);
-        right_bumper.UpdateEdge(mygamepad.right_bumper);
-        left_stick_button.UpdateEdge(mygamepad.left_stick_button);
-        right_stick_button.UpdateEdge(mygamepad.right_stick_button);
+        dpad_up.updateEdge(mygamepad.dpad_up);
+        dpad_down.updateEdge(mygamepad.dpad_down);
+        dpad_left.updateEdge(mygamepad.dpad_left);
+        dpad_right.updateEdge(mygamepad.dpad_right);
+        a.updateEdge(mygamepad.a);
+        b.updateEdge(mygamepad.b);
+        x.updateEdge(mygamepad.x);
+        y.updateEdge(mygamepad.y);
+        guide.updateEdge(mygamepad.guide);
+        start.updateEdge(mygamepad.start);
+        back.updateEdge(mygamepad.back);
+        left_bumper.updateEdge(mygamepad.left_bumper);
+        right_bumper.updateEdge(mygamepad.right_bumper);
+        left_stick_button.updateEdge(mygamepad.left_stick_button);
+        right_stick_button.updateEdge(mygamepad.right_stick_button);
     }
 }

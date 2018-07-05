@@ -55,7 +55,7 @@ public class AmpereControl {
     }
 
     /* Initialization method - to be called before any other methods are used */
-    public void Initialize(LinearOpMode opMode) {
+    public void initialize(LinearOpMode opMode) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -91,7 +91,7 @@ public class AmpereControl {
         LeftFlipperServo.setSetpoint(Setpoints.CLOSE);
         RightFlipperServo.setSetpoint(Setpoints.CLOSE);
 
-        // Define and Initialize color sensors
+        // Define and initialize color sensors
         ColorLeft = hardwareMap.colorSensor.get("left_ampere");
         ColorRight = hardwareMap.colorSensor.get("right_ampere");
         //turns all LEDs off
@@ -99,8 +99,8 @@ public class AmpereControl {
         ColorRight.enableLed(false);
     }
 
-    /* Cleanup method - to be called when done with subassembly to 'turn off' everything */
-    public void Cleanup() {
+    /* cleanup method - to be called when done with subassembly to 'turn off' everything */
+    public void cleanup() {
         telemetry.addLine(name + " cleanup");
     }
 

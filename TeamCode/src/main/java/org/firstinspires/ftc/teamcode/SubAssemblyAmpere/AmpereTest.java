@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
 
 
 //naming the teleop thing
-@TeleOp(name="Ampere Test", group="Test")
+@TeleOp(name = "Ampere Test", group = "Test")
 public class AmpereTest extends LinearOpMode {
 
     /* Sub Assemblies
@@ -33,39 +33,39 @@ public class AmpereTest extends LinearOpMode {
     boolean leftampere = false;
     boolean rightampere = false;
 
+    public void displayHelp() {
+        telemetry.addLine("Gamepad 1");
+        telemetry.addLine("  Flippers");
+        telemetry.addLine("    next/prev   bumper/trigger");
+        telemetry.addLine("    +inc/-dec   dpad [L]up/down [R]left/right ");
+        telemetry.addLine("  Arms (both)");
+        telemetry.addLine("    extend/retract   y / a");
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
         ElapsedTime OurTime = new ElapsedTime();
         double AMPERE_POWER = 0.8;
-        double increment;
+        double increment = 0.5;
 
         telemetry.addLine("Ampere Test");
-        telemetry.addLine("gamepad 1");
-        telemetry.addLine("d-up   - extend side arms");
-        telemetry.addLine("d-down - retract side arms");
-        telemetry.addLine("x      - cycle through left flipper");
-        telemetry.addLine("b      - cycle through right flipper");
-        telemetry.addLine("stick button  - increment flipper");
-        telemetry.addLine("bumper button - decrement flipper");
-        telemetry.addLine("y      - autonomous test");
 
-        /* Initialize sub assemblies
+        /* initialize sub assemblies
          */
-        Ampere.Initialize(this);
-
-        /* Instantiate extended gamepad */
-        egamepad1 = new GamepadEdge(gamepad1);
-        egamepad2 = new GamepadEdge(gamepad2);
-
-        increment = 0.05;
+        Ampere.initialize(this);
 
         //turns ampere LEDs om
         Ampere.ColorLeft.enableLed(true);
         Ampere.ColorRight.enableLed(true);
 
-        //waits for that giant PLAY button to be pressed on RC
+        /* Instantiate extended gamepad */
+        egamepad1 = new GamepadEdge(gamepad1);
+        egamepad2 = new GamepadEdge(gamepad2);
+
+        displayHelp();
         telemetry.update();
 
+        //waits for that giant PLAY button to be pressed on RC
         waitForStart();
 
         OurTime.reset();
@@ -73,55 +73,70 @@ public class AmpereTest extends LinearOpMode {
         //telling the code to run until you press that giant STOP button on RC
         while (opModeIsActive()) {
             /* update extended gamepad */
-            egamepad1.UpdateEdge();
-            egamepad2.UpdateEdge();
+            egamepad1.updateEdge();
+            egamepad2.updateEdge();
 
-            // side arms
-            if (egamepad1.dpad_down.pressed) {
-                // retract
-                Ampere.moveWinches(-AMPERE_POWER);
-            } else if (egamepad1.dpad_down.released){
-                // stop
-                Ampere.moveWinches(0.0);
-            }
-            if (egamepad1.dpad_up.pressed) {
+            /* Test side arms */
+            if (egamepad1.y.pressed) {
                 // extend
                 Ampere.moveWinches(AMPERE_POWER);
-            } else if (egamepad1.dpad_up.released){
+            } else if (egamepad1.y.released) {
+                // stop
+                Ampere.moveWinches(0.0);
+            }
+            if (egamepad1.a.pressed) {
+                // retract
+                Ampere.moveWinches(-AMPERE_POWER);
+            } else if (egamepad1.a.released) {
                 // stop
                 Ampere.moveWinches(0.0);
             }
 
-            // flippers
-            if (egamepad1.x.released) {
-                Ampere.LeftFlipperServo.nextSetpoint();
+            /* Test flippers - gamepad1 dpad, bumpers, stick_buttons */
+            if (egamepad1.left_bumper.pressed) {
+                Ampere.LeftFlipperServo.nextSetpoint(true);
             }
-            if (egamepad1.left_stick_button.released) {
+            if (egamepad1.left_stick_button.pressed) {
+                Ampere.LeftFlipperServo.prevSetpoint(true);
+            }
+            if (egamepad1.right_bumper.pressed) {
+                Ampere.RightFlipperServo.nextSetpoint(true);
+            }
+            if (egamepad1.right_stick_button.pressed) {
+                Ampere.RightFlipperServo.prevSetpoint(true);
+            }
+            if (egamepad1.dpad_up.pressed) {
                 Ampere.LeftFlipperServo.incrementPosition(increment);
             }
-            if (egamepad1.left_bumper.released) {
+            if (egamepad1.dpad_down.pressed) {
                 Ampere.LeftFlipperServo.incrementPosition(-increment);
             }
-            if (egamepad1.b.released) {
-                Ampere.RightFlipperServo.nextSetpoint();
-            }
-            if (egamepad1.right_stick_button.released) {
+            if (egamepad1.dpad_left.pressed) {
                 Ampere.RightFlipperServo.incrementPosition(increment);
             }
-            if (egamepad1.right_bumper.released) {
+            if (egamepad1.dpad_right.pressed) {
                 Ampere.RightFlipperServo.incrementPosition(-increment);
             }
 
-            telemetry.addLine("Flippers (left/right)");
-            telemetry.addData("  positions","%.1f %.1f",Ampere.LeftFlipperServo.getPosition(),Ampere.RightFlipperServo.getPosition());
-            telemetry.addData("  setpoints","%s %s",Ampere.LeftFlipperServo.getSetpoint(),Ampere.RightFlipperServo.getSetpoint());
-            telemetry.addLine("Color Sensors (red/blue)");
-            telemetry.addData("  ampere left ","%3d %3d", Ampere.ColorLeft.red(),Ampere.ColorLeft.blue());
-            telemetry.addData("  ampere right","%3d %3d", Ampere.ColorRight.red(),Ampere.ColorRight.blue());
+            /* display information */
+            if (egamepad1.guide.state) {
+                displayHelp();
+            } else {
+                telemetry.addLine("Flippers (left/right)");
+                telemetry.addData("  positions", "%.1f %.1f", Ampere.LeftFlipperServo.getPosition(), Ampere.RightFlipperServo.getPosition());
+                telemetry.addData("  setpoints", "%s %s", Ampere.LeftFlipperServo.getSetpoint(), Ampere.RightFlipperServo.getSetpoint());
+                telemetry.addLine("Color Sensors (red/blue)");
+                telemetry.addData("  ampere left ", "%3d %3d", Ampere.ColorLeft.red(), Ampere.ColorLeft.blue());
+                telemetry.addData("  ampere right", "%3d %3d", Ampere.ColorRight.red(), Ampere.ColorRight.blue());
+            }
             telemetry.update();
 
             //let the robot have a little rest, sleep is healthy
             sleep(40);
         }
+
+        /* Clean up sub-assemblies */
+        Ampere.cleanup();
+        telemetry.update();
     }
 }

@@ -39,7 +39,7 @@ public class DualArmControl {
     }
 
     /* Initialization method - to be called before any other methods are used */
-    public void Initialize(LinearOpMode opMode) {
+    public void initialize(LinearOpMode opMode) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -47,8 +47,8 @@ public class DualArmControl {
         telemetry.addLine(name + " initialize");
 
         /* Map hardware devices */
-        LowerArm.Initialize(opMode, false);
-        UpperArm.Initialize(opMode, true);
+        LowerArm.initialize(opMode, false);
+        UpperArm.initialize(opMode, true);
 
         /* Assign setpoint values
          */
@@ -68,9 +68,14 @@ public class DualArmControl {
         MapMoveTime.put(Setpoints.ROW4, 0.5);
     }
 
-    /* Cleanup method - to be called when done with subassembly to 'turn off' everything */
-    public void Cleanup() {
+    /* cleanup method - to be called when done with subassembly to 'turn off' everything */
+    public void cleanup() {
         telemetry.addLine(name + " cleanup");
+
+        /* Clean up sub-assemblies */
+        LowerArm.cleanup();
+        UpperArm.cleanup();
+        telemetry.update();
     }
 
     public void nextSetpoint() {

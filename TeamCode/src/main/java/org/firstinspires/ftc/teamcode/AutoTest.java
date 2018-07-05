@@ -70,12 +70,12 @@ public class AutoTest extends LinearOpMode {
 
         telemetry.addLine("Auto Test");
 
-        /* Initialize sub assemblies
+        /* initialize sub assemblies
          */
-        Arms.Initialize(this);
-        Grabber.Initialize(this);
-        Ampere.Initialize(this);
-        Drive.Initialize(this);
+        Arms.initialize(this);
+        Grabber.initialize(this);
+        Ampere.initialize(this);
+        Drive.initialize(this);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
@@ -94,7 +94,7 @@ public class AutoTest extends LinearOpMode {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(imu_parameters);
 
-        telemetry.addData("Initialize","VuForia");
+        telemetry.addData("initialize","VuForia");
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters vuforia_parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         vuforia_parameters.vuforiaLicenseKey = "AQepDXf/////AAAAGcvzfI2nd0MHnzIGZ7JtquJk3Yx64l7jwu6XImRkNmBkhjVdVcI47QZ7xQq0PvugAb3+ppJxL4n+pNcnt1+PYpQHVETBEPk5WkofitFuYL8zzXEbs7uLY0dMUepnOiJcLSiVISKWWDyc8BJkKcK3a/KmB2sHaE1Lp2LJ+skW43+pYeqtgJE8o8xStowxPJB0OaSFXXw5dGUurK+ykmPam5oE+t+6hi9o/pO1EOHZFoqKl6tj/wsdu9+3I4lqGMsRutKH6s1rKLfip8s3MdlxqnlRKFmMDFewprELOwm+zpjmrJ1cqdlzzWQ6i/EMOzhcOzrPmH3JiH4CocA/Kcck12IuqvN4l6iAIjntb8b0G8zL";
@@ -109,39 +109,39 @@ public class AutoTest extends LinearOpMode {
         telemetry.addData("Input: ", "Select Team Color");
         telemetry.update();
         do {
-            egamepad1.UpdateEdge();
+            egamepad1.updateEdge();
         } while (!egamepad1.x.pressed && !egamepad1.b.pressed);
         if (egamepad1.x.pressed)
             redteam = false;
-        egamepad1.UpdateEdge();
+        egamepad1.updateEdge();
 
         /* Input options */
         telemetry.addData("Input: ", "Do Glyph?");
         telemetry.update();
         do {
-            egamepad1.UpdateEdge();
+            egamepad1.updateEdge();
         } while (!egamepad1.x.pressed && !egamepad1.y.pressed);
         if (egamepad1.y.pressed)
             do_glyph = true;
-        egamepad1.UpdateEdge();
+        egamepad1.updateEdge();
 
         telemetry.addData("Input: ", "Do Jewel?");
         telemetry.update();
         do {
-            egamepad1.UpdateEdge();
+            egamepad1.updateEdge();
         } while (!egamepad1.x.pressed && !egamepad1.y.pressed);
         if (egamepad1.y.pressed)
             do_jewels = true;
-        egamepad1.UpdateEdge();
+        egamepad1.updateEdge();
 
         telemetry.addData("Input: ", "Do Motion?");
         telemetry.update();
         do {
-            egamepad1.UpdateEdge();
+            egamepad1.updateEdge();
         } while (!egamepad1.x.pressed && !egamepad1.y.pressed);
         if (egamepad1.y.pressed)
             do_motion = true;
-        egamepad1.UpdateEdge();
+        egamepad1.updateEdge();
 
         double voltage = Drive.Battery.getVoltage();
         telemetry.addData("Voltage", voltage);
@@ -242,6 +242,13 @@ public class AutoTest extends LinearOpMode {
             autoGlyphRelease(0.0);
             autoMoveBackward(MOVE_SPEED,0.20);
         }
+
+        /* Clean up sub-assemblies */
+        Arms.cleanup();
+        Grabber.cleanup();
+        Ampere.cleanup();
+        Drive.cleanup();
+        telemetry.update();
     }
 
     void autoFindVuMark(double time_sec) {

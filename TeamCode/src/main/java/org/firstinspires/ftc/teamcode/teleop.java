@@ -41,11 +41,11 @@ public class teleop extends LinearOpMode {
         boolean leftcolor = false;
         boolean rightcolor = false;
 
-        /* Initialize sub assemblies
+        /* initialize sub assemblies
          */
-        Arms.Initialize(this);
-        Grabber.Initialize(this);
-        Drive.Initialize(this);
+        Arms.initialize(this);
+        Grabber.initialize(this);
+        Drive.initialize(this);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
@@ -64,8 +64,8 @@ public class teleop extends LinearOpMode {
             //and now, the fun stuff
 
             /* Update extended gamepad */
-            egamepad1.UpdateEdge();
-            egamepad2.UpdateEdge();
+            egamepad1.updateEdge();
+            egamepad2.updateEdge();
 
             /******Telemetry*****/
             //adds a lil' version thing to the telemetry so you know you're using the right version
@@ -186,5 +186,11 @@ public class teleop extends LinearOpMode {
             //let the robot have a little rest, sleep is healthy
             sleep(40);
         }
+
+        /* Clean up sub-assemblies */
+        Arms.cleanup();
+        Grabber.cleanup();
+        Drive.cleanup();
+        telemetry.update();
     }
 }

@@ -34,11 +34,11 @@ public class SensorTest extends LinearOpMode {
 
         telemetry.addLine("Sensor Test");
 
-        /* Initialize sub assemblies
+        /* initialize sub assemblies
          */
-        Arms.Initialize(this);
-        Ampere.Initialize(this);
-        Drive.Initialize(this);
+        Arms.initialize(this);
+        Ampere.initialize(this);
+        Drive.initialize(this);
 
         /* turn on color sensor LEDs */
         Drive.ColorLeft.enableLed(true);
@@ -59,8 +59,8 @@ public class SensorTest extends LinearOpMode {
         while (opModeIsActive()) {
 
             /* Update extended gamepad */
-            egamepad1.UpdateEdge();
-            egamepad2.UpdateEdge();
+            egamepad1.updateEdge();
+            egamepad2.updateEdge();
 
             /* Display battery sensors */
             telemetry.addData("Battery: ", "%.2f", Drive.Battery.getVoltage());
@@ -86,5 +86,11 @@ public class SensorTest extends LinearOpMode {
             //let the robot have a little rest, sleep is healthy
             sleep(40);
         }
+
+        /* Clean up sub-assemblies */
+        Arms.cleanup();
+        Ampere.cleanup();
+        Drive.cleanup();
+        telemetry.update();
     }
 }

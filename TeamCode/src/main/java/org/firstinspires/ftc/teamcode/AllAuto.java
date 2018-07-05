@@ -255,12 +255,12 @@ public class AllAuto extends LinearOpMode {
 
         telemetry.addLine("All Auto");
 
-        /* Initialize sub assemblies
+        /* initialize sub assemblies
          */
-        Arms.Initialize(this);
-        Grabber.Initialize(this);
-        Ampere.Initialize(this);
-        Drive.Initialize(this);
+        Arms.initialize(this);
+        Grabber.initialize(this);
+        Ampere.initialize(this);
+        Drive.initialize(this);
 
         double voltage = Drive.Battery.getVoltage();
         telemetry.addData("Voltage", voltage);
@@ -960,6 +960,13 @@ public class AllAuto extends LinearOpMode {
 //            telemetry.update();
             sleep(40);
         }
+
+        /* Clean up sub-assemblies */
+        Arms.cleanup();
+        Grabber.cleanup();
+        Ampere.cleanup();
+        Drive.cleanup();
+        telemetry.update();
     }
 
     //important thing that makes Vuforia do its job
