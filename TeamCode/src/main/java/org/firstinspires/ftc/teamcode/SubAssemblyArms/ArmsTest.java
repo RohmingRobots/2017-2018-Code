@@ -61,7 +61,7 @@ public class ArmsTest extends LinearOpMode {
                 Arms.setSetpoint(DualArmControl.Setpoints.ROW1);
             }
 
-            Arms.Update(true);
+            Arms.Update();
 
             if (egamepad1.guide.state) {
                 displayHelp();

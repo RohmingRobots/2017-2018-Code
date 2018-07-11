@@ -22,32 +22,22 @@ public class GrabberControl {
     /* GGR - gripper grabber right servo motor
      * GGL - gripper grabber right servo motor
      * Claw - top grabber
-     * RG - right glyph guide
-     * LG - left glyph guide
      */
     private Servo GGR = null;
     private Servo GGL = null;
     private Servo Claw = null;
-    private Servo RG = null;
-    private Servo LG = null;
 
     private EnumMap<GripSetpoints, Double> MapLeftGrip = new EnumMap<GripSetpoints, Double>(GripSetpoints.class);
     private EnumMap<GripSetpoints, Double> MapRightGrip = new EnumMap<GripSetpoints, Double>(GripSetpoints.class);
-    public ServoControl<GripSetpoints, EnumMap<GripSetpoints, Double>> LeftGripServo = new ServoControl(GGL,MapLeftGrip);
-    public ServoControl<GripSetpoints, EnumMap<GripSetpoints, Double>> RightGripServo = new ServoControl(GGR,MapRightGrip);
+    public ServoControl<GripSetpoints, EnumMap<GripSetpoints, Double>> LeftServo = new ServoControl(GGL,MapLeftGrip);
+    public ServoControl<GripSetpoints, EnumMap<GripSetpoints, Double>> RightServo = new ServoControl(GGR,MapRightGrip);
 
     private EnumMap<ClawSetpoints, Double> MapClaw = new EnumMap<ClawSetpoints, Double>(ClawSetpoints.class);
     public ServoControl<ClawSetpoints, EnumMap<ClawSetpoints, Double>> ClawServo = new ServoControl(Claw,MapClaw);
 
-    private EnumMap<GuideSetpoints, Double> MapLeftGuide = new EnumMap<GuideSetpoints, Double>(GuideSetpoints.class);
-    private EnumMap<GuideSetpoints, Double> MapRightGuide = new EnumMap<GuideSetpoints, Double>(GuideSetpoints.class);
-    public ServoControl<GuideSetpoints, EnumMap<GuideSetpoints, Double>> LeftGuideServo = new ServoControl(LG,MapLeftGuide);
-    public ServoControl<GuideSetpoints, EnumMap<GuideSetpoints, Double>> RightGuideServo = new ServoControl(RG,MapRightGuide);
-
     /* Declare public class objects */
     public enum GripSetpoints implements EnumWrapper<GripSetpoints> {OPEN, CLOSE, PARTIAL;}
     public enum ClawSetpoints implements EnumWrapper<ClawSetpoints> {OPEN, CLOSE;}
-    public enum GuideSetpoints implements EnumWrapper<GuideSetpoints> {RETRACT, EXTEND;}
 
 
     /* getter methods
@@ -58,8 +48,13 @@ public class GrabberControl {
     public GrabberControl() {
     }
 
-    /* Initialization method - to be called before any other methods are used */
+    /* default initialize is to set servos to initial setpoint */
     public void initialize(LinearOpMode opMode) {
+        initialize(opMode, true);
+    }
+
+    /* Initialization method - to be called before any other methods are used */
+    public void initialize(LinearOpMode opMode, boolean init_servos) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -79,27 +74,17 @@ public class GrabberControl {
         MapClaw.put(ClawSetpoints.OPEN, 0.70);
         MapClaw.put(ClawSetpoints.CLOSE, 0.0);
 
-        MapLeftGuide.put(GuideSetpoints.RETRACT, 1.0);
-        MapLeftGuide.put(GuideSetpoints.EXTEND, 0.2);
-
-        MapRightGuide.put(GuideSetpoints.RETRACT, 0.94);
-        MapRightGuide.put(GuideSetpoints.EXTEND, 0.14);
-
         /* Map hardware devices */
         GGR = hardwareMap.servo.get("GGR");
         GGL = hardwareMap.servo.get("GGL");
         Claw = hardwareMap.servo.get("Claw");
-        LG = hardwareMap.servo.get("LG");
-        RG = hardwareMap.servo.get("RG");
-        // reverse those motors
-        LG.setDirection(Servo.Direction.REVERSE);
         // set initial positions
-        LeftGripServo.setSetpoint(GripSetpoints.OPEN);
-        RightGripServo.setSetpoint(GripSetpoints.OPEN);
-        // don't initialize position, let it set on arm
-        //ClawServo.setSetpoint(ClawSetpoints.OPEN);
-        LeftGuideServo.setSetpoint(GuideSetpoints.RETRACT);
-        RightGuideServo.setSetpoint(GuideSetpoints.RETRACT);
+        if (init_servos) {
+            LeftServo.setSetpoint(GripSetpoints.OPEN);
+            RightServo.setSetpoint(GripSetpoints.OPEN);
+            // don't initialize position, let it set on arm
+            //ClawServo.setSetpoint(ClawSetpoints.OPEN);
+        }
     }
 
     /* cleanup method - to be called when done with subassembly to 'turn off' everything */

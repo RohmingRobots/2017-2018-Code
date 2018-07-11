@@ -96,7 +96,11 @@ public class DualArmControl {
         UpperArm.moveToPosition(MapUpperArm.get(Setpoint), MapMoveTime.get(Setpoint));
     }
 
-    /* Call this method when you want to update the arm control (must be done on a periodic basis */
+    /* default update is with active control */
+    public void Update() {
+        Update(true);
+    }
+    /* Call this method when you want to update the arm control (must be done on a periodic basis) */
     public void Update(boolean active) {
         LowerArm.Update(0.0, active);
         UpperArm.Update(-LowerArm.getAngle(), active);

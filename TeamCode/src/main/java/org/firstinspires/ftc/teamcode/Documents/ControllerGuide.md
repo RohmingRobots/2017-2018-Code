@@ -11,8 +11,8 @@ All programs should be compatible with this guide
     Right Trigger = Decrease Speed
     Right Button = Increase Speed
     D-Pad = Perfect Forward/Backward/Left/Right movement
-    Left Stick = Does the same as the D-Pad, but can go diagonal as well (Imperfect)
-    Right Stick = Rotation
+    Left Stick = Forward/backward and left/right rotation - combination
+    Right Stick = Left/right strafing
     X Button = N/A
     Y Buton = N/A
     B Button = N/A

@@ -380,8 +380,8 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Glyph Release");
         telemetry.update();
-        Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.OPEN);
-        Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.OPEN);
+        Grabber.LeftServo.setSetpoint(GrabberControl.GripSetpoints.OPEN);
+        Grabber.RightServo.setSetpoint(GrabberControl.GripSetpoints.OPEN);
         autoDelaySec(time_sec);
         Drive.moveStop();
     }
@@ -390,8 +390,8 @@ public class AutoTest extends LinearOpMode {
         if ( !opModeIsActive() ) return;
         telemetry.addLine("Glyph Grab");
         telemetry.update();
-        Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
-        Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
+        Grabber.LeftServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
+        Grabber.RightServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
         autoDelaySec(time_sec);
     }
 
@@ -534,7 +534,7 @@ public class AutoTest extends LinearOpMode {
     void autoUpdate() {
         if ( !opModeIsActive() ) return;
 
-        Arms.Update(true);
+        Arms.Update();
         sleep(40);
     }
 }

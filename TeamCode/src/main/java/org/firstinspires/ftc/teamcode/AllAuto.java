@@ -394,8 +394,8 @@ public class AllAuto extends LinearOpMode {
                     /* vuMark detection */
                     if (step == 0) {
                         //closes grabbers
-                        Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
-                        Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
+                        Grabber.LeftServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
+                        Grabber.RightServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
 
                         if (now > 0.2) {
                             //turns ampere LEDs om
@@ -885,8 +885,8 @@ public class AllAuto extends LinearOpMode {
                     Drive.ColorRight.enableLed(false);
 
                     //opens grabbers
-                    Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.OPEN);
-                    Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.OPEN);
+                    Grabber.LeftServo.setSetpoint(GrabberControl.GripSetpoints.OPEN);
+                    Grabber.RightServo.setSetpoint(GrabberControl.GripSetpoints.OPEN);
 
                     //moves forward for a set time
                     Drive.moveForward(MOVE_SPEED * 0.8);
@@ -955,7 +955,7 @@ public class AllAuto extends LinearOpMode {
             }  // end of switch
 
             //updates the arms
-            Arms.Update(true);
+            Arms.Update();
 
 //            telemetry.update();
             sleep(40);

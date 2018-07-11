@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.SubAssemblyGrabber;
+package org.firstinspires.ftc.teamcode.SubAssemblyGuides;
 /* version history 2.0
      -10/21/17 (1.0) working and good
      -10/23/17 (1.3) adding speed changing by lbumper/ltrigger
@@ -9,16 +9,17 @@ package org.firstinspires.ftc.teamcode.SubAssemblyGrabber;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
 import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
 
 
 //naming the teleop thing
-@TeleOp(name = "Grabber Test", group = "Test")
-public class GrabberTest extends LinearOpMode {
+@TeleOp(name = "Guide Test", group = "Test")
+public class GuideTest extends LinearOpMode {
 
     /* Sub Assemblies
      */
-    GrabberControl Grabber = new GrabberControl();
+    GuideControl Guide = new GuideControl();
 
     /* Declare extended gamepad */
     GamepadEdge egamepad1;
@@ -26,23 +27,20 @@ public class GrabberTest extends LinearOpMode {
 
     public void displayHelp() {
         telemetry.addLine("Gamepad 1");
-        telemetry.addLine("  Grips");
+        telemetry.addLine("  Guides");
         telemetry.addLine("    next/prev   bumper/trigger");
         telemetry.addLine("    +inc/-dec   dpad [L]up/down [R]left/right ");
-        telemetry.addLine("  Claw");
-        telemetry.addLine("    next/prev   a / y");
-        telemetry.addLine("    +inc/-dec   x / b");
     }
 
     @Override
     public void runOpMode() throws InterruptedException {
         double increment = 0.05;
 
-        telemetry.addLine("Grabber Test");
+        telemetry.addLine("Guide Test");
 
         /* initialize sub assemblies
          */
-        Grabber.initialize(this);
+        Guide.initialize(this);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
@@ -60,56 +58,39 @@ public class GrabberTest extends LinearOpMode {
             egamepad1.updateEdge();
             egamepad2.updateEdge();
 
-            /* Test claw */
-            if (egamepad1.y.pressed) {
-                Grabber.ClawServo.prevSetpoint(true);
-            }
-            if (egamepad1.a.pressed) {
-                Grabber.ClawServo.nextSetpoint(true);
-            }
-            if (egamepad1.x.pressed) {
-                Grabber.ClawServo.incrementPosition(increment);
-            }
-            if (egamepad1.b.pressed) {
-                Grabber.ClawServo.incrementPosition(-increment);
-            }
-
-            /* Test grips */
+            /* Test guides - gamepad1 dpad, bumpers, stick_buttons */
             if (egamepad1.left_bumper.pressed) {
-                Grabber.LeftServo.nextSetpoint(true);
+                Guide.LeftServo.nextSetpoint(true);
             }
             if (egamepad1.left_stick_button.pressed) {
-                Grabber.LeftServo.prevSetpoint(true);
+                Guide.LeftServo.prevSetpoint(true);
             }
             if (egamepad1.right_bumper.pressed) {
-                Grabber.RightServo.nextSetpoint(true);
+                Guide.RightServo.nextSetpoint(true);
             }
             if (egamepad1.right_stick_button.pressed) {
-                Grabber.RightServo.prevSetpoint(true);
+                Guide.RightServo.prevSetpoint(true);
             }
             if (egamepad1.dpad_up.pressed) {
-                Grabber.LeftServo.incrementPosition(increment);
+                Guide.LeftServo.incrementPosition(increment);
             }
             if (egamepad1.dpad_down.pressed) {
-                Grabber.LeftServo.incrementPosition(-increment);
+                Guide.LeftServo.incrementPosition(-increment);
             }
             if (egamepad1.dpad_left.pressed) {
-                Grabber.RightServo.incrementPosition(increment);
+                Guide.RightServo.incrementPosition(increment);
             }
             if (egamepad1.dpad_right.pressed) {
-                Grabber.RightServo.incrementPosition(-increment);
+                Guide.RightServo.incrementPosition(-increment);
             }
 
             /* display information */
             if (egamepad1.guide.state) {
                 displayHelp();
             } else {
-                telemetry.addLine("Grips (left/right)");
-                telemetry.addData("  positions", "%.1f %.1f", Grabber.LeftServo.getPosition(), Grabber.RightServo.getPosition());
-                telemetry.addData("  setpoints", "%s %s", Grabber.LeftServo.getSetpoint(), Grabber.RightServo.getSetpoint());
-                telemetry.addLine("Claw");
-                telemetry.addData("  positions", "%.1f", Grabber.ClawServo.getPosition());
-                telemetry.addData("  setpoints", "%s", Grabber.ClawServo.getSetpoint());
+                telemetry.addLine("Guides (left/right)");
+                telemetry.addData("  positions", "%.1f %.1f", Guide.LeftServo.getPosition(), Guide.RightServo.getPosition());
+                telemetry.addData("  setpoints", "%s %s", Guide.LeftServo.getSetpoint(), Guide.RightServo.getSetpoint());
             }
             telemetry.update();
 
@@ -118,7 +99,7 @@ public class GrabberTest extends LinearOpMode {
         }
 
         /* Clean up sub-assemblies */
-        Grabber.cleanup();
+        Guide.cleanup();
         telemetry.update();
     }
 }

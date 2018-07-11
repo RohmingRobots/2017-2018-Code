@@ -54,8 +54,13 @@ public class AmpereControl {
     public AmpereControl() {
     }
 
-    /* Initialization method - to be called before any other methods are used */
+    /* default initialize is to set servos to initial setpoint */
     public void initialize(LinearOpMode opMode) {
+        initialize(opMode, true);
+    }
+
+    /* Initialization method - to be called before any other methods are used */
+    public void initialize(LinearOpMode opMode, boolean init_servos) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -88,8 +93,10 @@ public class AmpereControl {
         // reverse those motors
         AFR.setDirection(Servo.Direction.REVERSE);
         // set initial positions
-        LeftFlipperServo.setSetpoint(Setpoints.CLOSE);
-        RightFlipperServo.setSetpoint(Setpoints.CLOSE);
+        if (init_servos) {
+            LeftFlipperServo.setSetpoint(Setpoints.CLOSE);
+            RightFlipperServo.setSetpoint(Setpoints.CLOSE);
+        }
 
         // Define and initialize color sensors
         ColorLeft = hardwareMap.colorSensor.get("left_ampere");

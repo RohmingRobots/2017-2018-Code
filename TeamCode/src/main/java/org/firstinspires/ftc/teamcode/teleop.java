@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
+import org.firstinspires.ftc.teamcode.SubAssemblyGuides.GuideControl;
 import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
 
 //naming the teleop thing
@@ -22,6 +23,7 @@ public class teleop extends LinearOpMode {
      */
     DualArmControl Arms = new DualArmControl();
     GrabberControl Grabber = new GrabberControl();
+    GuideControl Guide = new GuideControl();
     DriveControl Drive = new DriveControl();
 
     /* Declare extended gamepad */
@@ -35,7 +37,7 @@ public class teleop extends LinearOpMode {
         double speed = 2.5;
         double reverse = 1.0;
 
-        int close_guides;
+        boolean close_guides = false;
 
         //navigation color sensor variables
         boolean leftcolor = false;
@@ -45,13 +47,12 @@ public class teleop extends LinearOpMode {
          */
         Arms.initialize(this);
         Grabber.initialize(this);
+        Guide.initialize(this);
         Drive.initialize(this);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
         egamepad2 = new GamepadEdge(gamepad2);
-
-        close_guides = 0;
 
         telemetry.addData("Version", "Worlds 4-13-2018");
         telemetry.update();
@@ -72,7 +73,6 @@ public class teleop extends LinearOpMode {
             telemetry.addData("leftcolor", leftcolor);
             telemetry.addData("rightcolor", rightcolor);
             telemetry.addData("Speed", speed);
-//            telemetry.addData("HOOF", robot.ANTIREDNEK.getPosition());
             telemetry.update();
 
             /**------------------------------------------------------------------------**/
@@ -102,13 +102,12 @@ public class teleop extends LinearOpMode {
             }
 
             /******Joystick Drive*****/
-            // using the right joystick's x axis to rotate left and right
+            // using the right joystick's x axis to strafe left and right
             speed_left_right = -gamepad1.right_stick_x * 2;
 
             // using the left joystick's y axis to move forward and backwards
+            // using the left joystick's x axis to rotate left and right
             speed_forward_back = -gamepad1.left_stick_y;
-
-            // using the left joystick's x axis to strafe left and right
             speed_rotate_left_right = -gamepad1.left_stick_x * 2;
 
             //takes all those values, divides
@@ -135,42 +134,40 @@ public class teleop extends LinearOpMode {
 
             /********** Grabber code **********/
             if (egamepad2.left_bumper.pressed) {
-                Grabber.LeftGripServo.nextSetpoint();
+                Grabber.LeftServo.nextSetpoint();
             }
             if (egamepad2.right_bumper.pressed) {
-                Grabber.RightGripServo.nextSetpoint();
+                Grabber.RightServo.nextSetpoint();
             }
             if (egamepad2.b.pressed) {
-                Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.PARTIAL);
-                Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.PARTIAL);
+                Grabber.LeftServo.setSetpoint(GrabberControl.GripSetpoints.PARTIAL);
+                Grabber.RightServo.setSetpoint(GrabberControl.GripSetpoints.PARTIAL);
             }
             if (egamepad2.x.pressed) {
-                Grabber.LeftGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
-                Grabber.RightGripServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
+                Grabber.LeftServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
+                Grabber.RightServo.setSetpoint(GrabberControl.GripSetpoints.CLOSE);
             }
-
-            //*******Guides**********/
-            if (egamepad2.dpad_right.pressed) {
-                Grabber.LeftGuideServo.nextSetpoint();
-                Grabber.RightGuideServo.nextSetpoint();
-            }
-
             if (egamepad2.a.released) {
                 Grabber.ClawServo.nextSetpoint();
             }
 
+            //*******Guides**********/
+            if (egamepad2.dpad_right.pressed) {
+                Guide.LeftServo.nextSetpoint();
+                Guide.RightServo.nextSetpoint();
+            }
 
 
             /********** Arm code **********/
             if (egamepad2.dpad_up.pressed) {
                 Arms.nextSetpoint();
-                close_guides = 1;
+                close_guides = true;
             }
             //closing guides when arm is up/
-            if ((close_guides == 1) && (Arms.UpperArm.getCurrentPosition() > .1)) {
-                close_guides = 0;
-                Grabber.LeftGuideServo.setSetpoint(GrabberControl.GuideSetpoints.RETRACT);
-                Grabber.RightGuideServo.setSetpoint(GrabberControl.GuideSetpoints.RETRACT);
+            if ((close_guides) && (Arms.UpperArm.getCurrentPosition() > .1)) {
+                close_guides = false;
+                Guide.LeftServo.setSetpoint(GuideControl.GuideSetpoints.RETRACT);
+                Guide.RightServo.setSetpoint(GuideControl.GuideSetpoints.RETRACT);
             }
             if (egamepad2.dpad_down.pressed) {
                 Arms.prevSetpoint();
@@ -180,8 +177,7 @@ public class teleop extends LinearOpMode {
             }
 
             /* update sub assemblies */
-            Arms.Update(true);
-
+            Arms.Update();
 
             //let the robot have a little rest, sleep is healthy
             sleep(40);
@@ -190,6 +186,7 @@ public class teleop extends LinearOpMode {
         /* Clean up sub-assemblies */
         Arms.cleanup();
         Grabber.cleanup();
+        Guide.cleanup();
         Drive.cleanup();
         telemetry.update();
     }

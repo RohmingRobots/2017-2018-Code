@@ -185,7 +185,12 @@ public class SingleArmControl {
         FinalTime = time;
     }
 
-    /* Call this method when you want to update the arm control (must be done on a periodic basis */
+    /* default update is with active control */
+    public void Update(double offset) {
+        Update(offset, true);
+    }
+
+    /* Call this method when you want to update the arm control (must be done on a periodic basis) */
     public void Update(double offset, boolean active) {
         double error;
         double max_power;

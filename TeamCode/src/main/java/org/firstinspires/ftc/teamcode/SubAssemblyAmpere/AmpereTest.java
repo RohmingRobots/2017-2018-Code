@@ -92,7 +92,7 @@ public class AmpereTest extends LinearOpMode {
                 Ampere.moveWinches(0.0);
             }
 
-            /* Test flippers - gamepad1 dpad, bumpers, stick_buttons */
+            /* Test flippers */
             if (egamepad1.left_bumper.pressed) {
                 Ampere.LeftFlipperServo.nextSetpoint(true);
             }

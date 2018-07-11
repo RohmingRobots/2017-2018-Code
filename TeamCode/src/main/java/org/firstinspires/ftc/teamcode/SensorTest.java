@@ -37,7 +37,7 @@ public class SensorTest extends LinearOpMode {
         /* initialize sub assemblies
          */
         Arms.initialize(this);
-        Ampere.initialize(this);
+        Ampere.initialize(this, false);
         Drive.initialize(this);
 
         /* turn on color sensor LEDs */
