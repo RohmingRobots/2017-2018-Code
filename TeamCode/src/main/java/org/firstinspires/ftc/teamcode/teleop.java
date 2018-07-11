@@ -102,13 +102,13 @@ public class teleop extends LinearOpMode {
             }
 
             /******Joystick Drive*****/
-            // using the right joystick's x axis to strafe left and right
-            speed_left_right = -gamepad1.right_stick_x * 2;
+            // using the right joystick's x axis to rotate left and right
+            speed_rotate_left_right = -gamepad1.right_stick_x * 2;
 
             // using the left joystick's y axis to move forward and backwards
-            // using the left joystick's x axis to rotate left and right
+            // using the left joystick's x axis to strafe left and right
             speed_forward_back = -gamepad1.left_stick_y;
-            speed_rotate_left_right = -gamepad1.left_stick_x * 2;
+            speed_left_right = -gamepad1.left_stick_x * 2;
 
             //takes all those values, divides
             speed_left_right = speed_left_right / 3.414 * speed * reverse;
