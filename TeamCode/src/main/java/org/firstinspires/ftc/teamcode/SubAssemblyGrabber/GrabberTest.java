@@ -62,11 +62,9 @@ public class GrabberTest extends LinearOpMode {
 
             /* Test claw */
             if (egamepad1.y.pressed) {
-                //AJB crashes
                 Grabber.ClawServo.prevSetpoint(true);
             }
             if (egamepad1.a.pressed) {
-                //AJB crashes
                 Grabber.ClawServo.nextSetpoint(true);
             }
             if (egamepad1.x.pressed) {
@@ -80,15 +78,13 @@ public class GrabberTest extends LinearOpMode {
             if (egamepad1.left_bumper.pressed) {
                 Grabber.LeftServo.nextSetpoint(true);
             }
-            if (egamepad1.left_stick_button.pressed) {
-                //AJB not working
+            if (egamepad1.left_trigger.pressed) {
                 Grabber.LeftServo.prevSetpoint(true);
             }
             if (egamepad1.right_bumper.pressed) {
                 Grabber.RightServo.nextSetpoint(true);
             }
-            if (egamepad1.right_stick_button.pressed) {
-                //AJB not working
+            if (egamepad1.right_trigger.pressed) {
                 Grabber.RightServo.prevSetpoint(true);
             }
             if (egamepad1.dpad_up.pressed) {
@@ -105,8 +101,7 @@ public class GrabberTest extends LinearOpMode {
             }
 
             /* display information */
-            if (egamepad1.guide.state) {
-                //AJB not working
+            if (egamepad1.start.state) {
                 displayHelp();
             } else {
                 telemetry.addLine("Grips (left/right)");
@@ -115,7 +110,6 @@ public class GrabberTest extends LinearOpMode {
                 telemetry.addLine("Claw");
                 telemetry.addData("  positions", "%.3f", Grabber.ClawServo.getPosition());
                 telemetry.addData("  setpoints", "%s", Grabber.ClawServo.getSetpoint());
-                //AJB get setpoints not working
             }
             telemetry.update();
 

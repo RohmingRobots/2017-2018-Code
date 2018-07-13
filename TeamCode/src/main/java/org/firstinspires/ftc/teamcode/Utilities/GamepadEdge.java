@@ -4,9 +4,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 /**
  * Created by ablauch on 11/3/2017.
- *
+ * <p>
  * this class detects the button press and release
- *
+ * <p>
  * call the update method when you want to check for new press/release
  */
 
@@ -20,12 +20,12 @@ public class GamepadEdge {
         /* Call this method when you want to update the detection of the button edges pressed/released */
         public void updateEdge(boolean new_state) {
             /* check if button has just been pressed */
-            if (new_state && !state)        pressed = true;
-            else                            pressed = false;
+            if (new_state && !state) pressed = true;
+            else pressed = false;
 
             /* check if button has just been released */
-            if (!new_state && state)        released = true;
-            else                            released = false;
+            if (!new_state && state) released = true;
+            else released = false;
 
             state = new_state;
         }
@@ -33,6 +33,7 @@ public class GamepadEdge {
 
     private Gamepad mygamepad;
 
+    /* actual boolean buttons */
     public ButtonEdge dpad_up = new ButtonEdge();
     public ButtonEdge dpad_down = new ButtonEdge();
     public ButtonEdge dpad_left = new ButtonEdge();
@@ -48,6 +49,10 @@ public class GamepadEdge {
     public ButtonEdge right_bumper = new ButtonEdge();
     public ButtonEdge left_stick_button = new ButtonEdge();
     public ButtonEdge right_stick_button = new ButtonEdge();
+
+    /* boolean button interpreted from analog signals */
+    public ButtonEdge left_trigger = new ButtonEdge();
+    public ButtonEdge right_trigger = new ButtonEdge();
 
     /* Constructor */
     public GamepadEdge(Gamepad gp) {
@@ -72,5 +77,9 @@ public class GamepadEdge {
         right_bumper.updateEdge(mygamepad.right_bumper);
         left_stick_button.updateEdge(mygamepad.left_stick_button);
         right_stick_button.updateEdge(mygamepad.right_stick_button);
+
+        /* interpreted from analog signals */
+        left_trigger.updateEdge(mygamepad.left_trigger > 0.5);
+        right_trigger.updateEdge(mygamepad.right_trigger > 0.5);
     }
 }
