@@ -35,8 +35,8 @@ public class AmpereControl {
 
     private EnumMap<Setpoints, Double> MapLeftFlipper = new EnumMap<Setpoints, Double>(Setpoints.class);
     private EnumMap<Setpoints, Double> MapRightFlipper = new EnumMap<Setpoints, Double>(Setpoints.class);
-    public ServoControl<Setpoints, EnumMap<Setpoints, Double>> LeftFlipperServo = new ServoControl(AFL,MapLeftFlipper);
-    public ServoControl<Setpoints, EnumMap<Setpoints, Double>> RightFlipperServo = new ServoControl(AFR,MapRightFlipper);
+    public ServoControl<Setpoints, EnumMap<Setpoints, Double>> LeftFlipperServo = new ServoControl(AFL,MapLeftFlipper,Setpoints.CLOSE);
+    public ServoControl<Setpoints, EnumMap<Setpoints, Double>> RightFlipperServo = new ServoControl(AFR,MapRightFlipper,Setpoints.CLOSE);
 
 
     /* Declare public class objects */

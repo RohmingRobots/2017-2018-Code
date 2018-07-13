@@ -28,8 +28,8 @@ public class GuideControl {
 
     private EnumMap<GuideSetpoints, Double> MapLeftGuide = new EnumMap<GuideSetpoints, Double>(GuideSetpoints.class);
     private EnumMap<GuideSetpoints, Double> MapRightGuide = new EnumMap<GuideSetpoints, Double>(GuideSetpoints.class);
-    public ServoControl<GuideSetpoints, EnumMap<GuideSetpoints, Double>> LeftServo = new ServoControl(LG,MapLeftGuide);
-    public ServoControl<GuideSetpoints, EnumMap<GuideSetpoints, Double>> RightServo = new ServoControl(RG,MapRightGuide);
+    public ServoControl<GuideSetpoints, EnumMap<GuideSetpoints, Double>> LeftServo = new ServoControl(LG,MapLeftGuide,GuideSetpoints.RETRACT);
+    public ServoControl<GuideSetpoints, EnumMap<GuideSetpoints, Double>> RightServo = new ServoControl(RG,MapRightGuide,GuideSetpoints.RETRACT);
 
     /* Declare public class objects */
     public enum GuideSetpoints implements EnumWrapper<GuideSetpoints> {RETRACT, EXTEND;}

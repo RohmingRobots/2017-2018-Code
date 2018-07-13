@@ -62,9 +62,11 @@ public class GrabberTest extends LinearOpMode {
 
             /* Test claw */
             if (egamepad1.y.pressed) {
+                //AJB crashes
                 Grabber.ClawServo.prevSetpoint(true);
             }
             if (egamepad1.a.pressed) {
+                //AJB crashes
                 Grabber.ClawServo.nextSetpoint(true);
             }
             if (egamepad1.x.pressed) {
@@ -79,12 +81,14 @@ public class GrabberTest extends LinearOpMode {
                 Grabber.LeftServo.nextSetpoint(true);
             }
             if (egamepad1.left_stick_button.pressed) {
+                //AJB not working
                 Grabber.LeftServo.prevSetpoint(true);
             }
             if (egamepad1.right_bumper.pressed) {
                 Grabber.RightServo.nextSetpoint(true);
             }
             if (egamepad1.right_stick_button.pressed) {
+                //AJB not working
                 Grabber.RightServo.prevSetpoint(true);
             }
             if (egamepad1.dpad_up.pressed) {
@@ -102,14 +106,16 @@ public class GrabberTest extends LinearOpMode {
 
             /* display information */
             if (egamepad1.guide.state) {
+                //AJB not working
                 displayHelp();
             } else {
                 telemetry.addLine("Grips (left/right)");
-                telemetry.addData("  positions", "%.1f %.1f", Grabber.LeftServo.getPosition(), Grabber.RightServo.getPosition());
+                telemetry.addData("  positions", "%.3f %.3f", Grabber.LeftServo.getPosition(), Grabber.RightServo.getPosition());
                 telemetry.addData("  setpoints", "%s %s", Grabber.LeftServo.getSetpoint(), Grabber.RightServo.getSetpoint());
                 telemetry.addLine("Claw");
-                telemetry.addData("  positions", "%.1f", Grabber.ClawServo.getPosition());
+                telemetry.addData("  positions", "%.3f", Grabber.ClawServo.getPosition());
                 telemetry.addData("  setpoints", "%s", Grabber.ClawServo.getSetpoint());
+                //AJB get setpoints not working
             }
             telemetry.update();
 

@@ -6,34 +6,52 @@ import java.util.EnumMap;
 
 /**
  * Created by ablauch on 7/2018.
- *
+ * <p>
  * this class is used to perform basic servo control
- *
+ * <p>
  * Example (w/ setpoints):
- *     private EnumMap<Setpoints, Double> MapSetpoints = new EnumMap<Setpoints, Double>(Setpoints.class);
- *     public ServoControl<Setpoints, EnumMap<Setpoints, Double>> TestServo = new ServoControl(MyServo,MapSetpoints);
- *
+ * private EnumMap<Setpoints, Double> MapSetpoints = new EnumMap<Setpoints, Double>(Setpoints.class);
+ * public ServoControl<Setpoints, EnumMap<Setpoints, Double>> TestServo = new ServoControl(MyServo,MapSetpoints);
+ * <p>
  * Example (w/o setpoints):
- *     public ServoControl TestServo = new ServoControl(MyServo);
+ * public ServoControl TestServo = new ServoControl(MyServo);
  */
 
 public class ServoControl<W extends EnumWrapper, M extends EnumMap> {
 
-    private Servo servo = null;
+    private Servo servo;
     private M map = null;
     private W setpt = null;
 
     /* constructor for use with setpoints
      * pass servo object to control
      * pass enumerated setpoint map
+     * pass initial setpoint
+     * default is to initialize position to passed setpoint
      */
-    public ServoControl(Servo servo, M map) {
+    public ServoControl(Servo servo, M map, W setpt) {
         this.servo = servo;
         this.map = map;
-        this.setpt = null;
+        this.setpt = setpt;
+        setSetpoint(setpt);
     }
 
     /* constructor for use with setpoints
+     * pass servo object to control
+     * pass enumerated setpoint map
+     * pass initial setpoint
+     * pass optiotn to initialize position to passed setpoint
+     */
+    public ServoControl(Servo servo, M map, W setpt, boolean init_pos) {
+        this.servo = servo;
+        this.map = map;
+        this.setpt = setpt;
+        if (init_pos) {
+            setSetpoint(setpt);
+        }
+    }
+
+    /* constructor for use without setpoints
      * pass servo object to control
      */
     public ServoControl(Servo servo) {
@@ -63,9 +81,9 @@ public class ServoControl<W extends EnumWrapper, M extends EnumMap> {
 
     /* returns current setpoint (null if not at setpoint) */
     public W getSetpoint() {
-        if (servo.getPosition() != (Double)map.get(setpt))
-            return null;
-        return setpt;
+        if (Math.abs(servo.getPosition() - (Double) map.get(setpt)) < 0.01)
+            return setpt;
+        return null;
     }
 
     /* moves servo to next setpoint (no wrap around) */
@@ -75,8 +93,8 @@ public class ServoControl<W extends EnumWrapper, M extends EnumMap> {
 
     /* moves servo to next setpoint */
     public void nextSetpoint(boolean wrap_around) {
-        setpt = (W)setpt.getNext(wrap_around);
-        servo.setPosition((Double)map.get(setpt));
+        setpt = (W) setpt.getNext(wrap_around);
+        servo.setPosition((Double) map.get(setpt));
     }
 
     /* moves servo to previous setpoint (no wrap around) */
@@ -86,13 +104,13 @@ public class ServoControl<W extends EnumWrapper, M extends EnumMap> {
 
     /* moves servo to previous setpoint */
     public void prevSetpoint(boolean wrap_around) {
-        setpt = (W)setpt.getPrev(wrap_around);
-        servo.setPosition((Double)map.get(setpt));
+        setpt = (W) setpt.getPrev(wrap_around);
+        servo.setPosition((Double) map.get(setpt));
     }
 
     /* moves servo to specified setpoint */
     public void setSetpoint(W setpt) {
         this.setpt = setpt;
-        servo.setPosition((Double)map.get(setpt));
+        servo.setPosition((Double) this.map.get(setpt));
     }
 }

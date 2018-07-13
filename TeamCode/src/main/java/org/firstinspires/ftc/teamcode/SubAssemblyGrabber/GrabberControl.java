@@ -15,28 +15,31 @@ import java.util.EnumMap;
  */
 public class GrabberControl {
     /* Declare private class object */
-    private Telemetry telemetry = null;         /* local copy of telemetry object from opmode class */
-    private HardwareMap hardwareMap = null;     /* local copy of HardwareMap object from opmode class */
+    private Telemetry telemetry;            /* local copy of telemetry object from opmode class */
+    private HardwareMap hardwareMap;        /* local copy of HardwareMap object from opmode class */
     private String name = "Grabber Control";
 
     /* GGR - gripper grabber right servo motor
      * GGL - gripper grabber right servo motor
      * Claw - top grabber
      */
-    private Servo GGR = null;
-    private Servo GGL = null;
-    private Servo Claw = null;
+    private Servo GGR;
+    private Servo GGL;
+    private Servo Claw;
 
-    private EnumMap<GripSetpoints, Double> MapLeftGrip = new EnumMap<GripSetpoints, Double>(GripSetpoints.class);
-    private EnumMap<GripSetpoints, Double> MapRightGrip = new EnumMap<GripSetpoints, Double>(GripSetpoints.class);
-    public ServoControl<GripSetpoints, EnumMap<GripSetpoints, Double>> LeftServo = new ServoControl(GGL,MapLeftGrip);
-    public ServoControl<GripSetpoints, EnumMap<GripSetpoints, Double>> RightServo = new ServoControl(GGR,MapRightGrip);
+    private EnumMap<GripSetpoints, Double> MapLeftGrip;
+    private EnumMap<GripSetpoints, Double> MapRightGrip;
+    public ServoControl<GripSetpoints, EnumMap<GripSetpoints, Double>> LeftServo;
+    public ServoControl<GripSetpoints, EnumMap<GripSetpoints, Double>> RightServo;
 
-    private EnumMap<ClawSetpoints, Double> MapClaw = new EnumMap<ClawSetpoints, Double>(ClawSetpoints.class);
-    public ServoControl<ClawSetpoints, EnumMap<ClawSetpoints, Double>> ClawServo = new ServoControl(Claw,MapClaw);
+    private EnumMap<ClawSetpoints, Double> MapClaw;
+    public ServoControl<ClawSetpoints, EnumMap<ClawSetpoints, Double>> ClawServo;
 
     /* Declare public class objects */
-    public enum GripSetpoints implements EnumWrapper<GripSetpoints> {OPEN, CLOSE, PARTIAL;}
+    public enum GripSetpoints implements EnumWrapper<GripSetpoints> {
+        OPEN, CLOSE, PARTIAL;
+    }
+
     public enum ClawSetpoints implements EnumWrapper<ClawSetpoints> {OPEN, CLOSE;}
 
 
@@ -61,8 +64,12 @@ public class GrabberControl {
 
         telemetry.addLine(name + " initialize");
 
-        /* Assign setpoint values
-         */
+        /* create setpoint maps */
+        MapLeftGrip = new EnumMap<GripSetpoints, Double>(GripSetpoints.class);
+        MapRightGrip = new EnumMap<GripSetpoints, Double>(GripSetpoints.class);
+        MapClaw = new EnumMap<ClawSetpoints, Double>(ClawSetpoints.class);
+
+        /* Assign setpoint values */
         MapLeftGrip.put(GripSetpoints.OPEN, 0.745);
         MapLeftGrip.put(GripSetpoints.CLOSE, 0.255);
         MapLeftGrip.put(GripSetpoints.PARTIAL, 0.375);
@@ -78,13 +85,12 @@ public class GrabberControl {
         GGR = hardwareMap.servo.get("GGR");
         GGL = hardwareMap.servo.get("GGL");
         Claw = hardwareMap.servo.get("Claw");
-        // set initial positions
-        if (init_servos) {
-            LeftServo.setSetpoint(GripSetpoints.OPEN);
-            RightServo.setSetpoint(GripSetpoints.OPEN);
-            // don't initialize position, let it set on arm
-            //ClawServo.setSetpoint(ClawSetpoints.OPEN);
-        }
+
+        /* Create servo control objects and initialize positions */
+        LeftServo = new ServoControl(GGL, MapLeftGrip, GripSetpoints.OPEN);
+        RightServo = new ServoControl(GGR, MapRightGrip, GripSetpoints.OPEN);
+        // do not initialize claw position, let it set on arm
+        ClawServo = new ServoControl(Claw, MapClaw, ClawSetpoints.OPEN, false);
     }
 
     /* cleanup method - to be called when done with subassembly to 'turn off' everything */

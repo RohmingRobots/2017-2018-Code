@@ -39,4 +39,16 @@ public interface EnumWrapper<E extends Enum<E>> {
         else
             return (this.ordinal() > 0) ? ies[this.ordinal() - 1] : ies[this.ordinal()];
     }
+
+    /* returns first element in enumeration */
+    default E getFirst() {
+        E[] ies = (E[]) this.getClass().getEnumConstants();
+        return ies[0];
+    }
+
+    /* returns last element in enumeration */
+    default E getLast() {
+        E[] ies = (E[]) this.getClass().getEnumConstants();
+        return ies[ies.length - 1];
+    }
 }
