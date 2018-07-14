@@ -1,15 +1,8 @@
 package org.firstinspires.ftc.teamcode.SubAssemblyGuides;
-/* version history 2.0
-     -10/21/17 (1.0) working and good
-     -10/23/17 (1.3) adding speed changing by lbumper/ltrigger
-     -10/30/17 (1.5) dpad control
- */
-
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
 import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
 
 
@@ -25,7 +18,9 @@ public class GuideTest extends LinearOpMode {
     GamepadEdge egamepad1;
     GamepadEdge egamepad2;
 
+    /* displays information to user about gamepad usage */
     public void displayHelp() {
+        telemetry.addLine("Press START for this help");
         telemetry.addLine("Gamepad 1");
         telemetry.addLine("  Guides");
         telemetry.addLine("    next/prev   bumper/trigger");
@@ -40,7 +35,7 @@ public class GuideTest extends LinearOpMode {
 
         /* initialize sub assemblies
          */
-        Guide.initialize(this);
+        Guide.initialize(this, false);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);
@@ -58,17 +53,17 @@ public class GuideTest extends LinearOpMode {
             egamepad1.updateEdge();
             egamepad2.updateEdge();
 
-            /* Test guides - gamepad1 dpad, bumpers, stick_buttons */
+            /* Test guides */
             if (egamepad1.left_bumper.pressed) {
                 Guide.LeftServo.nextSetpoint(true);
             }
-            if (egamepad1.left_stick_button.pressed) {
+            if (egamepad1.left_trigger.pressed) {
                 Guide.LeftServo.prevSetpoint(true);
             }
             if (egamepad1.right_bumper.pressed) {
                 Guide.RightServo.nextSetpoint(true);
             }
-            if (egamepad1.right_stick_button.pressed) {
+            if (egamepad1.right_trigger.pressed) {
                 Guide.RightServo.prevSetpoint(true);
             }
             if (egamepad1.dpad_up.pressed) {
@@ -85,11 +80,11 @@ public class GuideTest extends LinearOpMode {
             }
 
             /* display information */
-            if (egamepad1.guide.state) {
+            if (egamepad1.start.state) {
                 displayHelp();
             } else {
                 telemetry.addLine("Guides (left/right)");
-                telemetry.addData("  positions", "%.1f %.1f", Guide.LeftServo.getPosition(), Guide.RightServo.getPosition());
+                telemetry.addData("  positions", "%.3f %.3f", Guide.LeftServo.getPosition(), Guide.RightServo.getPosition());
                 telemetry.addData("  setpoints", "%s %s", Guide.LeftServo.getSetpoint(), Guide.RightServo.getSetpoint());
             }
             telemetry.update();

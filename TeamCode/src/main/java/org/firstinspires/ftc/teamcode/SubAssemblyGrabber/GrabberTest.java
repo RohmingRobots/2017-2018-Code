@@ -1,10 +1,4 @@
 package org.firstinspires.ftc.teamcode.SubAssemblyGrabber;
-/* version history 2.0
-     -10/21/17 (1.0) working and good
-     -10/23/17 (1.3) adding speed changing by lbumper/ltrigger
-     -10/30/17 (1.5) dpad control
- */
-
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -24,7 +18,9 @@ public class GrabberTest extends LinearOpMode {
     GamepadEdge egamepad1;
     GamepadEdge egamepad2;
 
+    /* displays information to user about gamepad usage */
     public void displayHelp() {
+        telemetry.addLine("Press START for this help");
         telemetry.addLine("Gamepad 1");
         telemetry.addLine("  Grips");
         telemetry.addLine("    next/prev   bumper/trigger");
@@ -42,7 +38,7 @@ public class GrabberTest extends LinearOpMode {
 
         /* initialize sub assemblies
          */
-        Grabber.initialize(this);
+        Grabber.initialize(this, false);
 
         /* Instantiate extended gamepad */
         egamepad1 = new GamepadEdge(gamepad1);

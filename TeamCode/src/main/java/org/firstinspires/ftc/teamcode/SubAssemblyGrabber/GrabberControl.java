@@ -14,12 +14,14 @@ import java.util.EnumMap;
 /* Sub Assembly Class
  */
 public class GrabberControl {
-    /* Declare private class object */
+    /* Declare private class objects
+     */
     private Telemetry telemetry;            /* local copy of telemetry object from opmode class */
     private HardwareMap hardwareMap;        /* local copy of HardwareMap object from opmode class */
     private String name = "Grabber Control";
 
-    /* GGR - gripper grabber right servo motor
+    /* Servos
+     * GGR - gripper grabber right servo motor
      * GGL - gripper grabber right servo motor
      * Claw - top grabber
      */
@@ -27,15 +29,20 @@ public class GrabberControl {
     private Servo GGL;
     private Servo Claw;
 
+    /* Setpoint enumeration maps */
     private EnumMap<GripSetpoints, Double> MapLeftGrip;
     private EnumMap<GripSetpoints, Double> MapRightGrip;
+    private EnumMap<ClawSetpoints, Double> MapClaw;
+
+    /* Servo control for setpoint maps */
     public ServoControl<GripSetpoints, EnumMap<GripSetpoints, Double>> LeftServo;
     public ServoControl<GripSetpoints, EnumMap<GripSetpoints, Double>> RightServo;
-
-    private EnumMap<ClawSetpoints, Double> MapClaw;
     public ServoControl<ClawSetpoints, EnumMap<ClawSetpoints, Double>> ClawServo;
 
-    /* Declare public class objects */
+    /* Declare public class objects
+     */
+
+    /* servo setpoints */
     public enum GripSetpoints implements EnumWrapper<GripSetpoints> {
         OPEN, CLOSE, PARTIAL;
     }
@@ -43,8 +50,8 @@ public class GrabberControl {
     public enum ClawSetpoints implements EnumWrapper<ClawSetpoints> {OPEN, CLOSE;}
 
 
-    /* getter methods
-     * */
+    /* Getter methods
+     */
 
 
     /* Subassembly constructor */
@@ -56,7 +63,8 @@ public class GrabberControl {
         initialize(opMode, true);
     }
 
-    /* Initialization method - to be called before any other methods are used */
+    /* Initialization method - to be called before any other methods are used
+     */
     public void initialize(LinearOpMode opMode, boolean init_servos) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
@@ -64,7 +72,7 @@ public class GrabberControl {
 
         telemetry.addLine(name + " initialize");
 
-        /* create setpoint maps */
+        /* Create setpoint maps */
         MapLeftGrip = new EnumMap<GripSetpoints, Double>(GripSetpoints.class);
         MapRightGrip = new EnumMap<GripSetpoints, Double>(GripSetpoints.class);
         MapClaw = new EnumMap<ClawSetpoints, Double>(ClawSetpoints.class);
@@ -87,8 +95,8 @@ public class GrabberControl {
         Claw = hardwareMap.servo.get("Claw");
 
         /* Create servo control objects and initialize positions */
-        LeftServo = new ServoControl(GGL, MapLeftGrip, GripSetpoints.OPEN);
-        RightServo = new ServoControl(GGR, MapRightGrip, GripSetpoints.OPEN);
+        LeftServo = new ServoControl(GGL, MapLeftGrip, GripSetpoints.OPEN, init_servos);
+        RightServo = new ServoControl(GGR, MapRightGrip, GripSetpoints.OPEN, init_servos);
         // do not initialize claw position, let it set on arm
         ClawServo = new ServoControl(Claw, MapClaw, ClawSetpoints.OPEN, false);
     }
@@ -97,5 +105,4 @@ public class GrabberControl {
     public void cleanup() {
         telemetry.addLine(name + " cleanup");
     }
-
 }

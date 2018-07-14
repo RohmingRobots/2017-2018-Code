@@ -16,38 +16,52 @@ import java.util.EnumMap;
 /* Sub Assembly Class
  */
 public class AmpereControl {
-    /* Declare private class object */
-    private Telemetry telemetry = null;         /* local copy of telemetry object from opmode class */
-    private HardwareMap hardwareMap = null;     /* local copy of HardwareMap object from opmode class */
+    /* Declare private class objects
+     */
+    private Telemetry telemetry;            /* local copy of telemetry object from opmode class */
+    private HardwareMap hardwareMap;        /* local copy of HardwareMap object from opmode class */
     private String name = "Ampere Control";
 
-    /* AWL - continuous servo motor for left arm winch
+    /* Continuous servos
+     * AWL - continuous servo motor for left arm winch
      * AWR - continuous servo motor for right arm winch
+     */
+    private CRServo AWL;
+    private CRServo AWR;
+
+    /* Servos
      * AFL - left arm flipper servo motor
      * AFR - right arm flipper servo motor
+     */
+    private Servo AFL;
+    private Servo AFR;
+
+    /* Setpoint enumeration maps */
+    private EnumMap<Setpoints, Double> MapLeftFlipper;
+    private EnumMap<Setpoints, Double> MapRightFlipper;
+
+    /* Servo control for setpoint maps */
+    public ServoControl<Setpoints, EnumMap<Setpoints, Double>> LeftFlipperServo;
+    public ServoControl<Setpoints, EnumMap<Setpoints, Double>> RightFlipperServo;
+
+    /* Declare public class objects
+     */
+
+    /* Color sensors
      * CSL - color sensor on left side arm
      * CSR - color sensor on right side arm
      */
-    private CRServo AWL = null;
-    private CRServo AWR = null;
-    private Servo AFL = null;
-    private Servo AFR = null;
+    public ColorSensor ColorLeft;
+    public ColorSensor ColorRight;
 
-    private EnumMap<Setpoints, Double> MapLeftFlipper = new EnumMap<Setpoints, Double>(Setpoints.class);
-    private EnumMap<Setpoints, Double> MapRightFlipper = new EnumMap<Setpoints, Double>(Setpoints.class);
-    public ServoControl<Setpoints, EnumMap<Setpoints, Double>> LeftFlipperServo = new ServoControl(AFL,MapLeftFlipper,Setpoints.CLOSE);
-    public ServoControl<Setpoints, EnumMap<Setpoints, Double>> RightFlipperServo = new ServoControl(AFR,MapRightFlipper,Setpoints.CLOSE);
+    /* servo setpoints */
+    public enum Setpoints implements EnumWrapper<Setpoints> {
+        CLOSE, PARTIAL, OPEN;
+    }
 
 
-    /* Declare public class objects */
-    public ColorSensor ColorLeft = null;
-    public ColorSensor ColorRight = null;
-
-    public enum Setpoints implements EnumWrapper<Setpoints> {CLOSE, PARTIAL, OPEN;}
-
-
-    /* getter methods
-     * */
+    /* Getter methods
+     */
 
 
     /* Subassembly constructor */
@@ -67,8 +81,11 @@ public class AmpereControl {
 
         telemetry.addLine(name + " initialize");
 
-        /* Assign setpoint values
-         */
+        /* Create setpoint maps */
+        MapLeftFlipper = new EnumMap<Setpoints, Double>(Setpoints.class);
+        MapRightFlipper = new EnumMap<Setpoints, Double>(Setpoints.class);
+
+        /* Assign setpoint values */
         MapLeftFlipper.put(Setpoints.CLOSE, 0.0);
         MapLeftFlipper.put(Setpoints.PARTIAL, 0.6);
         MapLeftFlipper.put(Setpoints.OPEN, 1.0);
@@ -92,11 +109,10 @@ public class AmpereControl {
         AFR = hardwareMap.servo.get("AFR");
         // reverse those motors
         AFR.setDirection(Servo.Direction.REVERSE);
-        // set initial positions
-        if (init_servos) {
-            LeftFlipperServo.setSetpoint(Setpoints.CLOSE);
-            RightFlipperServo.setSetpoint(Setpoints.CLOSE);
-        }
+
+        /* Create servo control objects and initialize positions */
+        LeftFlipperServo = new ServoControl(AFL, MapLeftFlipper, Setpoints.CLOSE, init_servos);
+        RightFlipperServo = new ServoControl(AFR, MapRightFlipper, Setpoints.CLOSE, init_servos);
 
         // Define and initialize color sensors
         ColorLeft = hardwareMap.colorSensor.get("left_ampere");
