@@ -12,26 +12,34 @@ import java.util.EnumMap;
 /* Sub Assembly Class
  */
 public class DualArmControl {
-    /* Declare private class object */
-    private Telemetry telemetry = null;         /* local copy of telemetry object from opmode class */
-    private HardwareMap hardwareMap = null;     /* local copy of HardwareMap object from opmode class */
+    /* Declare private class objects
+     */
+    private Telemetry telemetry;                /* local copy of telemetry object from opmode class */
+    private HardwareMap hardwareMap;            /* local copy of HardwareMap object from opmode class */
     private String name = "Dual Arm Control";
 
-    private EnumMap<Setpoints, Double> MapLowerArm = new EnumMap<Setpoints, Double>(Setpoints.class);
-    private EnumMap<Setpoints, Double> MapUpperArm = new EnumMap<Setpoints, Double>(Setpoints.class);
-    private EnumMap<Setpoints, Double> MapMoveTime = new EnumMap<Setpoints, Double>(Setpoints.class);
+    /* Setpoint enumeration maps */
+    private EnumMap<Setpoints, Double> MapLowerArm;
+    private EnumMap<Setpoints, Double> MapUpperArm;
+    private EnumMap<Setpoints, Double> MapMoveTime;
 
     private Setpoints Setpoint = Setpoints.ROW1;
 
-    /* Declare public class objects */
+    /* Declare public class objects
+     */
+
+    /* upper and lower arms */
     public SingleArmControl LowerArm = new SingleArmControl();
     public SingleArmControl UpperArm = new SingleArmControl();
 
-    public enum Setpoints implements EnumWrapper<Setpoints> {ROW1, ROW2, ROW3, ROW4;}
+    /* arm setpoints */
+    public enum Setpoints implements EnumWrapper<Setpoints> {
+        ROW1, ROW2, ROW3, ROW4;
+    }
 
 
-    /* getter methods
-     * */
+    /* Getter methods
+     */
 
 
     /* Subassembly constructor */
@@ -46,12 +54,12 @@ public class DualArmControl {
 
         telemetry.addLine(name + " initialize");
 
-        /* Map hardware devices */
-        LowerArm.initialize(opMode, false);
-        UpperArm.initialize(opMode, true);
+        /* Create setpoint maps */
+        MapLowerArm = new EnumMap<Setpoints, Double>(Setpoints.class);
+        MapUpperArm = new EnumMap<Setpoints, Double>(Setpoints.class);
+        MapMoveTime = new EnumMap<Setpoints, Double>(Setpoints.class);
 
-        /* Assign setpoint values
-         */
+        /* Assign setpoint values */
         MapLowerArm.put(Setpoints.ROW1, 0.0);
         MapLowerArm.put(Setpoints.ROW2, 0.0);
         MapLowerArm.put(Setpoints.ROW3, 0.09);
@@ -66,6 +74,10 @@ public class DualArmControl {
         MapMoveTime.put(Setpoints.ROW2, 0.5);
         MapMoveTime.put(Setpoints.ROW3, 0.5);
         MapMoveTime.put(Setpoints.ROW4, 0.5);
+
+        /* Map hardware devices */
+        LowerArm.initialize(opMode, false);
+        UpperArm.initialize(opMode, true);
     }
 
     /* cleanup method - to be called when done with subassembly to 'turn off' everything */
@@ -75,21 +87,23 @@ public class DualArmControl {
         /* Clean up sub-assemblies */
         LowerArm.cleanup();
         UpperArm.cleanup();
-        telemetry.update();
     }
 
+    /* move arms to next setpoint */
     public void nextSetpoint() {
         Setpoint = Setpoint.getNext();
         LowerArm.moveToPosition(MapLowerArm.get(Setpoint), MapMoveTime.get(Setpoint));
         UpperArm.moveToPosition(MapUpperArm.get(Setpoint), MapMoveTime.get(Setpoint));
     }
 
+    /* move arms to previous setpoint */
     public void prevSetpoint() {
         Setpoint = Setpoint.getPrev();
         LowerArm.moveToPosition(MapLowerArm.get(Setpoint), MapMoveTime.get(Setpoint));
         UpperArm.moveToPosition(MapUpperArm.get(Setpoint), MapMoveTime.get(Setpoint));
     }
 
+    /* move arms to specified setpoint (move will not be as controlled) */
     public void setSetpoint(Setpoints setpt) {
         Setpoint = setpt;
         LowerArm.moveToPosition(MapLowerArm.get(Setpoint), MapMoveTime.get(Setpoint));
@@ -100,6 +114,7 @@ public class DualArmControl {
     public void Update() {
         Update(true);
     }
+
     /* Call this method when you want to update the arm control (must be done on a periodic basis) */
     public void Update(boolean active) {
         LowerArm.Update(0.0, active);

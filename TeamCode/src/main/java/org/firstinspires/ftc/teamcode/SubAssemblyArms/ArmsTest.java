@@ -18,7 +18,8 @@ public class ArmsTest extends LinearOpMode {
     GamepadEdge egamepad2;
 
     public void displayHelp() {
-        telemetry.addLine("Gamepad 2");
+        telemetry.addLine("Press START for this help");
+        telemetry.addLine("Gamepad 1");
         telemetry.addLine("  Arms");
         telemetry.addLine("    next/prev   dpad up/down");
         telemetry.addLine("    row 1       dpad left");
@@ -51,19 +52,19 @@ public class ArmsTest extends LinearOpMode {
             egamepad2.updateEdge();
 
             /********** Arm code **********/
-            if (egamepad2.dpad_up.pressed) {
+            if (egamepad1.dpad_up.pressed) {
                 Arms.nextSetpoint();
             }
-            if (egamepad2.dpad_down.pressed) {
+            if (egamepad1.dpad_down.pressed) {
                 Arms.prevSetpoint();
             }
-            if (egamepad2.dpad_left.pressed) {
+            if (egamepad1.dpad_left.pressed) {
                 Arms.setSetpoint(DualArmControl.Setpoints.ROW1);
             }
 
             Arms.Update();
 
-            if (egamepad1.guide.state) {
+            if (egamepad1.start.state) {
                 displayHelp();
             } else {
                 telemetry.addData("Lower ", "%.2f %.2f", Arms.LowerArm.getCurrentPosition(), Arms.LowerArm.getPower());

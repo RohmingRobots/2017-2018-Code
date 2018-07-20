@@ -1,10 +1,4 @@
 package org.firstinspires.ftc.teamcode.SubAssemblyDrive;
-/* version history 2.0
-     -10/21/17 (1.0) working and good
-     -10/23/17 (1.3) adding speed changing by lbumper/ltrigger
-     -10/30/17 (1.5) dpad control
- */
-
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -24,6 +18,7 @@ public class DriveTest extends LinearOpMode {
     GamepadEdge egamepad2;
 
     public void displayHelp() {
+        telemetry.addLine("Press START for this help");
         telemetry.addLine("Gamepad 1");
         telemetry.addLine("  Reverse (combo only)  a");
         telemetry.addLine("  Change speed (+/-)    right/left bumper");
@@ -61,8 +56,6 @@ public class DriveTest extends LinearOpMode {
 
         //telling the code to run until you press that giant STOP button on RC
         while (opModeIsActive()) {
-            //and now, the fun stuff
-
             /* Update extended gamepad */
             egamepad1.updateEdge();
             egamepad2.updateEdge();
@@ -73,11 +66,11 @@ public class DriveTest extends LinearOpMode {
             }
 
             //change that speed by those bumpers
-            if (gamepad1.right_bumper) {
+            if (egamepad1.right_bumper.pressed) {
                 speed += 0.25;
                 if (speed > 3) speed = 3;
             }
-            if (gamepad1.left_bumper) {
+            if (egamepad1.left_bumper.pressed) {
                 speed -= 0.25;
                 if (speed < 0) speed = 0;
             }
@@ -96,6 +89,9 @@ public class DriveTest extends LinearOpMode {
             speed_forward_back = speed_forward_back * speed * reverse;
             speed_rotate_left_right = speed_rotate_left_right * speed * reverse;
 
+            /* If any dpad button is pressed, do that motion
+             * Only do combination move if no dpad button is pressed
+             */
             if (gamepad1.dpad_left) {
                 Drive.moveLeft(speed);
             } else if (gamepad1.dpad_right) {
@@ -113,7 +109,7 @@ public class DriveTest extends LinearOpMode {
             }
 
             /* display information */
-            if (egamepad1.guide.state) {
+            if (egamepad1.start.state) {
                 displayHelp();
             } else {
                 telemetry.addData("Speed: ", speed);

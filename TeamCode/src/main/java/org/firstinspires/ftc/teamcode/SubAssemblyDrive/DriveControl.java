@@ -12,33 +12,40 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 /* Sub Assembly Class
  */
 public class DriveControl {
-    /* Declare private class object */
-    private Telemetry telemetry = null;         /* local copy of telemetry object from opmode class */
-    private HardwareMap hardwareMap = null;     /* local copy of HardwareMap object from opmode class */
+    /* Declare private class objects
+     */
+    private Telemetry telemetry;            /* local copy of telemetry object from opmode class */
+    private HardwareMap hardwareMap;        /* local copy of HardwareMap object from opmode class */
     private String name = "Drive Control";
 
-    /* FL - front left DC motor
+    /* DC motors
+     * FL - front left DC motor
      * FR - front right DC motor
      * BL - back left DC motor
      * BR - back right DC motor
      */
-    private DcMotor FL = null;
-    private DcMotor FR = null;
-    private DcMotor BL = null;
-    private DcMotor BR = null;
+    private DcMotor FL;
+    private DcMotor FR;
+    private DcMotor BL;
+    private DcMotor BR;
 
-    /* Declare public class objects */
+    /* Declare public class objects
+     */
 
-    /* ColorLeft- color sensor on left bottom of robot
+    /* Color sensors
+     * ColorLeft- color sensor on left bottom of robot
      * ColorRight - color sensor on right bottom of robot
      */
     public ColorSensor ColorLeft = null;
     public ColorSensor ColorRight = null;
 
+    /* Voltage (battery) sensor */
     public VoltageSensor Battery = null;
 
-    /* getter methods
-     * */
+
+    /* Getter methods
+     */
+
 
     /* Subassembly constructor */
     public DriveControl() {
@@ -74,7 +81,6 @@ public class DriveControl {
         BR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         BL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        // **** Color sensors ****
         // Define and initialize color sensors
         ColorLeft = hardwareMap.colorSensor.get("left_color");
         ColorRight = hardwareMap.colorSensor.get("right_color");
@@ -88,6 +94,7 @@ public class DriveControl {
         telemetry.addLine(name + " cleanup");
     }
 
+    /* Combination move method */
     public void moveCombination(double speed_forward_back, double speed_left_right, double speed_rotate_left_right) {
         double front_right = speed_forward_back + speed_left_right + speed_rotate_left_right;
         double front_left = speed_forward_back - speed_left_right - speed_rotate_left_right;

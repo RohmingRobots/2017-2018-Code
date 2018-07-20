@@ -4,18 +4,12 @@ package org.firstinspires.ftc.teamcode;
  * Created by Nicholas on 1/17/2018.
  */
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
@@ -25,6 +19,9 @@ import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
 import org.firstinspires.ftc.teamcode.Utilities.AutoTransitioner;
+import org.firstinspires.ftc.teamcode.Utilities.ImuWrapper;
+import org.firstinspires.ftc.teamcode.Utilities.UserInput;
+import org.firstinspires.ftc.teamcode.Utilities.VuforiaWrapper;
 
 
 //naming the teleop thing
@@ -37,72 +34,25 @@ public class AllAuto extends LinearOpMode {
     GrabberControl Grabber = new GrabberControl();
     AmpereControl Ampere = new AmpereControl();
     DriveControl Drive = new DriveControl();
+    ImuWrapper Imu = new ImuWrapper();
+    VuforiaWrapper Vuforia = new VuforiaWrapper();
+    UserInput User = new UserInput();
 
-    OpenGLMatrix lastLocation = null;
-    VuforiaLocalizer vuforia;
 
     private ElapsedTime runtime = new ElapsedTime();
 
-    /* Arrays */
-    public boolean inputTeamColor() {
-        //input the team color
-        telemetry.addData("Input: ", "Select Team Color");
-        telemetry.update();
-
-        //waits for x or b to be pressed
-        while (!gamepad1.x && !gamepad1.b) {
-        }
-
-        //color selection
-        if (gamepad1.x)
-            return false;
-        return true;
-    }
-
     public boolean inputPosition() {
         //input the position
-        telemetry.addData("Input: ", "Select Position");
-        telemetry.update();
+        boolean left;
 
-        //waits for left or right dpad to be pressed
-        while (!gamepad1.dpad_left && !gamepad1.dpad_right) {
-        }
+        left = User.getLeftRight("Select Position");
 
         //position selection
-        if ((gamepad1.dpad_left && redteam) || (gamepad1.dpad_right && !redteam))
+        if ((left && redteam) || (!left && !redteam))
             return true;
         return false;
     }
 
-    public boolean inputJewels() {
-        //ask to do jewels
-        telemetry.addLine("Do Jewels:");
-        telemetry.addLine("Y for yes, X for no");
-        telemetry.update();
-
-        //waits for x or b to be pressed
-        while (!gamepad1.x && !gamepad1.y) {
-        }
-
-        //color selection
-        if (gamepad1.x)
-            return false;
-        return true;
-    }
-
-    //Multiple Modes setter
-    // in case I want to modify it more easily for one position
-    // public void chooseModes() {
-    //  //chooses modes based on inputted color and position
-    //  if (FI && redteam)
-    //      modes = modesRAFI;
-    //  if (!FI && redteam)
-    //      modes = modesRABI;
-    //  if (FI && !redteam)
-    //      modes = modesBAFI;
-    //  if (!FI && !redteam)
-    //      modes = modesBABI;
-    //}
 
     public void displaySelections() {
         //displays the selected color and position
@@ -123,15 +73,9 @@ public class AllAuto extends LinearOpMode {
 
     /* turns to the specified angle */
     public void turn2angle(int angle) {
-        TargetAngle = angle;
-        angle2turn = (TargetAngle - turnAngle);
+        double angle2turn;
 
-        if (angle2turn > 180){
-            angle2turn -= 360;
-        }
-        if (angle2turn < -180){
-            angle2turn += 360;
-        }
+        angle2turn = Imu.getAngleDifference(angle, turnAngle);
 
         //turns until it gets within a certain distance based on how far it has been turning
         if (angle2turn > 15){
@@ -195,11 +139,7 @@ public class AllAuto extends LinearOpMode {
     double AMPERE_POWER = 0.8;
 
     //turning variables
-    double startAngle;
-    double currentAngle;
     double turnAngle;       //actual angle relative to where we started used for turning
-    double angle2turn;
-    double TargetAngle = 0;
 
     //navigation color sensor variables
     int leftcolorblue = 0;
@@ -214,10 +154,6 @@ public class AllAuto extends LinearOpMode {
     int rightampereblue = 0;
     boolean leftampere = false;
     boolean rightampere = false;
-
-    /* IMU objects */
-    BNO055IMU imu;
-    Orientation angles;
 
     /* Mode 'stuff' */
     //modes lists which steps and in what order to accomplish them
@@ -261,6 +197,9 @@ public class AllAuto extends LinearOpMode {
         Grabber.initialize(this);
         Ampere.initialize(this);
         Drive.initialize(this);
+        Imu.initialize(this);
+        Vuforia.initialize(this);
+        User.initialize(this);
 
         double voltage = Drive.Battery.getVoltage();
         telemetry.addData("Voltage", voltage);
@@ -276,39 +215,11 @@ public class AllAuto extends LinearOpMode {
         Ampere.ColorLeft.enableLed(false);
         Ampere.ColorRight.enableLed(false);
 
-        /* initialize IMU */
-        // Send telemetry message to signify robot waiting;
-        telemetry.addLine("Init imu");    //
-        BNO055IMU.Parameters imu_parameters = new BNO055IMU.Parameters();
-        imu_parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        imu_parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        imu_parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        imu_parameters.loggingEnabled = true;
-        imu_parameters.loggingTag = "IMU";
-        imu_parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(imu_parameters);
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
-        /* initialize Vuforia */
-        // Send telemetry message to signify robot waiting;
-        telemetry.addLine("Init VuForia");    //
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters vuforia_parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-        vuforia_parameters.vuforiaLicenseKey = "AQepDXf/////AAAAGcvzfI2nd0MHnzIGZ7JtquJk3Yx64l7jwu6XImRkNmBkhjVdVcI47QZ7xQq0PvugAb3+ppJxL4n+pNcnt1+PYpQHVETBEPk5WkofitFuYL8zzXEbs7uLY0dMUepnOiJcLSiVISKWWDyc8BJkKcK3a/KmB2sHaE1Lp2LJ+skW43+pYeqtgJE8o8xStowxPJB0OaSFXXw5dGUurK+ykmPam5oE+t+6hi9o/pO1EOHZFoqKl6tj/wsdu9+3I4lqGMsRutKH6s1rKLfip8s3MdlxqnlRKFmMDFewprELOwm+zpjmrJ1cqdlzzWQ6i/EMOzhcOzrPmH3JiH4CocA/Kcck12IuqvN4l6iAIjntb8b0G8zL";
-        vuforia_parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK  ;
-        this.vuforia = ClassFactory.createVuforiaLocalizer(vuforia_parameters);
-        VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
-        VuforiaTrackable relicTemplate = relicTrackables.get(0);
-        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
-        relicTrackables.activate();
-        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
-
         /* Runs the arrays to receive the position and color from the drivers, set the variables,
            and tell the drivers what it got set to for confirmation */
-        redteam = inputTeamColor();
+        redteam = User.getRedBlue("Select Team Color");
         FI = inputPosition();
-        do_jewels = inputJewels();
+        do_jewels = User.getYesNo("Do Jewels:");
         displaySelections();
 
         /* in case I want to modify it more easily for one position */
@@ -322,23 +233,15 @@ public class AllAuto extends LinearOpMode {
 
         //resets the clock and sets the start angle once the 30 seconds begins
         resetClock();
-        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        startAngle = angles.firstAngle;
+
+        Imu.setReferenceAngle();
 
         // telling the code to run until you press that giant STOP button on RC
         // include opModeIsActive in all while loops so that STOP button terminates all actions
         while (opModeIsActive() && modes[mode] < 100) {
 
             /* IMU update code */
-            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            currentAngle = angles.firstAngle;
-            turnAngle = startAngle-currentAngle;
-
-            //keeps the angle in a 360 degree range so the is only one number for each direction
-            if (turnAngle > 180)
-                turnAngle -= 360;
-            if (turnAngle < -180)
-                turnAngle += 360;
+            turnAngle = - Imu.getRelativeAngle();
 
             //keeps now up to date
             now = runtime.seconds() - lastReset;
@@ -408,18 +311,18 @@ public class AllAuto extends LinearOpMode {
                         }
 
                         /* VuForia update code */
-                        vuMark = RelicRecoveryVuMark.from(relicTemplate);
+                        Vuforia.findVuMark();
 
-                        if (vuMark == RelicRecoveryVuMark.UNKNOWN) {
+                        if (Vuforia.getVuMark() == RelicRecoveryVuMark.UNKNOWN) {
                             telemetry.addData("VuMark", "not visible");
                         }
-                        if (vuMark == RelicRecoveryVuMark.LEFT) {
+                        if (Vuforia.getVuMark() == RelicRecoveryVuMark.LEFT) {
                             telemetry.addData("VuMark", "left");
                         }
-                        if (vuMark == RelicRecoveryVuMark.RIGHT) {
+                        if (Vuforia.getVuMark() == RelicRecoveryVuMark.RIGHT) {
                             telemetry.addData("VuMark", "right");
                         }
-                        if (vuMark == RelicRecoveryVuMark.CENTER) {
+                        if (Vuforia.getVuMark() == RelicRecoveryVuMark.CENTER) {
                             telemetry.addData("VuMark", "center");
                         }
 
@@ -749,7 +652,7 @@ public class AllAuto extends LinearOpMode {
                         }
                         else{
                             /* 'n strafe */
-                            if (vuMark == RelicRecoveryVuMark.LEFT) {
+                            if (Vuforia.getVuMark() == RelicRecoveryVuMark.LEFT) {
                                 //strafe left until the right sensor gets to the line on the other side
                                 Drive.moveLeft(STRAFFE_SPEED);
 /*                                robot.FR.setPower(STRAFFE_SPEED * 1.05 + turnAngle/200);
@@ -769,7 +672,7 @@ public class AllAuto extends LinearOpMode {
                                     step = 0;
                                 }
                             }
-                            else if (vuMark == RelicRecoveryVuMark.RIGHT){
+                            else if (Vuforia.getVuMark() == RelicRecoveryVuMark.RIGHT){
                                 //strafe right until the left sensor gets to the line on the other side
                                 Drive.moveRight(STRAFFE_SPEED);
 /*                                robot.FR.setPower(-STRAFFE_SPEED * 1.05 + turnAngle/200);
@@ -807,7 +710,7 @@ public class AllAuto extends LinearOpMode {
                         robot.BL.setPower(-STRAFFE_SPEED * 0.95 - (turnAngle + 90)/200);
                         robot.BR.setPower(STRAFFE_SPEED * 0.95 + (turnAngle + 90)/200);
                         */
-                        if (step == 0 && (vuMark == RelicRecoveryVuMark.CENTER || vuMark == RelicRecoveryVuMark.RIGHT)) {
+                        if (step == 0 && (Vuforia.getVuMark() == RelicRecoveryVuMark.CENTER || Vuforia.getVuMark() == RelicRecoveryVuMark.RIGHT)) {
                             //strafe right until the left sensor gets to the line on the other side
                             if (leftcolor) {
                                 step++;
@@ -815,7 +718,7 @@ public class AllAuto extends LinearOpMode {
                                 Drive.moveStop();
                             }
                         }
-                        else if (step == 1 && vuMark == RelicRecoveryVuMark.RIGHT){
+                        else if (step == 1 && Vuforia.getVuMark() == RelicRecoveryVuMark.RIGHT){
                             if (!leftcolor) {
                                 step++;
                                 resetClock();
@@ -846,7 +749,7 @@ public class AllAuto extends LinearOpMode {
                         robot.BL.setPower(STRAFFE_SPEED * 0.95 - (turnAngle - 90)/200);
                         robot.BR.setPower(-STRAFFE_SPEED * 1.05 + (turnAngle - 90)/200);
 */
-                        if (step == 0 && (vuMark == RelicRecoveryVuMark.CENTER || vuMark == RelicRecoveryVuMark.LEFT)) {
+                        if (step == 0 && (Vuforia.getVuMark() == RelicRecoveryVuMark.CENTER || Vuforia.getVuMark() == RelicRecoveryVuMark.LEFT)) {
                             //strafe left until the right sensor gets to the line on the other side
                             if (rightcolor) {
                                 step++;
@@ -854,7 +757,7 @@ public class AllAuto extends LinearOpMode {
                                 Drive.moveStop();
                             }
                         }
-                        else if (step == 1 && vuMark == RelicRecoveryVuMark.LEFT){
+                        else if (step == 1 && Vuforia.getVuMark() == RelicRecoveryVuMark.LEFT){
                             if (!rightcolor) {
                                 step++;
                                 resetClock();
@@ -966,6 +869,9 @@ public class AllAuto extends LinearOpMode {
         Grabber.cleanup();
         Ampere.cleanup();
         Drive.cleanup();
+        Imu.cleanup();
+        Vuforia.cleanup();
+        User.cleanup();
         telemetry.update();
     }
 

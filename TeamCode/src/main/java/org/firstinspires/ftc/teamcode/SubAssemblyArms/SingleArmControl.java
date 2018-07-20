@@ -14,15 +14,15 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  */
 public class SingleArmControl {
     /* Declare private class object
-    * */
-    private Telemetry telemetry = null;         /* local copy of telemetry object from opmode class */
-    private HardwareMap hardwareMap = null;     /* local copy of HardwareMap object from opmode class */
+     * */
+    private Telemetry telemetry;                /* local copy of telemetry object from opmode class */
+    private HardwareMap hardwareMap;            /* local copy of HardwareMap object from opmode class */
     private String name = "Single Arm Control";
 
     private boolean UpperLower = true;      /* which arm to control (true=>upper, false=>lower) */
 
-    private DcMotor RightMotor = null;
-    private DcMotor LeftMotor = null;
+    private DcMotor RightMotor;
+    private DcMotor LeftMotor;
 
     //declaring all my variables in one place for my sake
     private double HomePosition = 0;        /* position value at home */
@@ -48,19 +48,22 @@ public class SingleArmControl {
 
 
     /* Declare public class objects
-    * */
-    /* Arm sensors */
-    public DigitalChannel Limit = null;         /* home switch */
-    public AnalogInput Potentiometer = null;    /* potentiometers */
+     */
 
-    /* getter methods
-     * */
+    /* Arm sensors */
+    public DigitalChannel Limit;            /* home switch */
+    public AnalogInput Potentiometer;       /* potentiometers */
+
+    /* Getter methods
+     */
     public double getCurrentPosition() {
         return CurrentPosition;
     }
+
     public double getPower() {
         return Power;
     }
+
     public double getAngle() {
         return Angle;
     }
@@ -210,7 +213,7 @@ public class SingleArmControl {
         CurrentTime = OurTime.seconds();
         OurTime.reset();
         if (CurrentTime < FinalTime) {
-            CurrentTarget = CurrentTarget + (FinalTarget-CurrentTarget)*CurrentTime/FinalTime;
+            CurrentTarget = CurrentTarget + (FinalTarget - CurrentTarget) * CurrentTime / FinalTime;
             FinalTime = FinalTime - CurrentTime;
         } else {
             CurrentTarget = FinalTarget;
@@ -221,7 +224,7 @@ public class SingleArmControl {
         CurrentPosition = Potentiometer.getVoltage() - HomePosition;
 
         /* determine relative and absolute arm angles */
-        RelativeAngle = POSITION_TO_ANGLE*CurrentPosition + INITIAL_ANGLE;
+        RelativeAngle = POSITION_TO_ANGLE * CurrentPosition + INITIAL_ANGLE;
         Angle = RelativeAngle + offset;
 
         /*********** control code **********/
@@ -231,7 +234,7 @@ public class SingleArmControl {
 
 
         /* update integral */
-        ErrorSum += error*CurrentTime;
+        ErrorSum += error * CurrentTime;
         /* limit integral gain if never homed */
         if (!Homed) {
             if (ErrorSum > 0.5)
@@ -239,9 +242,9 @@ public class SingleArmControl {
         }
 
         /* determine proportional gain */
-        if (error > 0.0 ) {
+        if (error > 0.0) {
             if (Angle < 120.0) {
-                max_power = (LOW_MAX_POWER-HIGH_MAX_POWER)*Angle/120.0 + HIGH_MAX_POWER;
+                max_power = (LOW_MAX_POWER - HIGH_MAX_POWER) * Angle / 120.0 + HIGH_MAX_POWER;
             } else {
                 max_power = LOW_MAX_POWER;
             }
@@ -249,17 +252,17 @@ public class SingleArmControl {
             if (Angle < 60.0) {
                 max_power = LOW_MAX_POWER;
             } else {
-                max_power = (HIGH_MAX_POWER-LOW_MAX_POWER)*(Angle-60.0)/120.0 + LOW_MAX_POWER;
+                max_power = (HIGH_MAX_POWER - LOW_MAX_POWER) * (Angle - 60.0) / 120.0 + LOW_MAX_POWER;
             }
         }
         Power = max_power * 5 * error;
 
         /* determine integral gain */
-        Power += ErrorSum*INTEGRAL_GAIN;
+        Power += ErrorSum * INTEGRAL_GAIN;
 
         /* limit power */
-        if (Power>1.0) Power = 1.0;
-        if (Power<-1.0) Power = -1.0;
+        if (Power > 1.0) Power = 1.0;
+        if (Power < -1.0) Power = -1.0;
 
         /* prevent negative power when...
             at home position or never homed
@@ -276,21 +279,21 @@ public class SingleArmControl {
          * kill power, let braking bring it down
          */
         if (CurrentTarget < 0.01) {
-            if (UpperLower){
+            if (UpperLower) {
                 // upper arm braking is sufficient to bring it down in a controlled manner
-                if (CurrentPosition<0.5) {
+                if (CurrentPosition < 0.5) {
                     ErrorSum = 0.0;     // zero integral
                     Power = 0.0;
                 }
             } else {
                 // braking is very strong on lower arm
                 // need to bring it all the way down before braking otherwise it will not drop
-                if (CurrentPosition<0.02) {
+                if (CurrentPosition < 0.02) {
                     ErrorSum = 0.0;     // zero integral
                     Power = 0.0;
-                } else if (CurrentPosition<0.1) {
+                } else if (CurrentPosition < 0.1) {
                     // reduce power right before home to lesson impact
-                    Power = Power/5.0;
+                    Power = Power / 5.0;
                 }
             }
         }
@@ -307,5 +310,4 @@ public class SingleArmControl {
         RightMotor.setPower(power);
         LeftMotor.setPower(power);
     }
-
 }
