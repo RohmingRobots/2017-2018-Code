@@ -69,11 +69,12 @@ public class SingleArmControl {
     }
 
     /* Subassembly constructor */
-    public SingleArmControl() {
+    public SingleArmControl(LinearOpMode opMode, boolean upper_lower) {
+        initialize(opMode, upper_lower);
     }
 
     /* Initialization method - to be called before any other methods are used */
-    public void initialize(LinearOpMode opMode, boolean upper_lower) {
+    private void initialize(LinearOpMode opMode, boolean upper_lower) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -145,11 +146,6 @@ public class SingleArmControl {
         HomePosition = Potentiometer.getVoltage();
 
         ErrorSum = 0.0;     // zero integral
-    }
-
-    /* cleanup method - to be called when done with subassembly to 'turn off' everything */
-    public void cleanup() {
-        telemetry.addLine(name + " cleanup");
     }
 
     public void moveUp() {

@@ -9,10 +9,9 @@ import org.firstinspires.ftc.teamcode.SubAssemblyAmpere.AmpereControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
-import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
-import org.firstinspires.ftc.teamcode.Utilities.ImuWrapper;
-import org.firstinspires.ftc.teamcode.Utilities.UserInput;
-import org.firstinspires.ftc.teamcode.Utilities.VuforiaWrapper;
+import org.firstinspires.ftc.teamcode.Utilities.ImuControl;
+import org.firstinspires.ftc.teamcode.Utilities.UserControl;
+import org.firstinspires.ftc.teamcode.Utilities.VuforiaControl;
 
 //naming the teleop thing
 @Autonomous(name = "Auto Test", group = "Test")
@@ -20,19 +19,15 @@ public class AutoTest extends LinearOpMode {
 
     /* Sub Assemblies
      */
-    DualArmControl Arms = new DualArmControl();
-    GrabberControl Grabber = new GrabberControl();
-    AmpereControl Ampere = new AmpereControl();
-    DriveControl Drive = new DriveControl();
-    ImuWrapper Imu = new ImuWrapper();
-    VuforiaWrapper Vuforia = new VuforiaWrapper();
-    UserInput User = new UserInput();
+//AJB    DualArmControl Arms = null;
+    GrabberControl Grabber = null;
+    AmpereControl Ampere = null;
+    DriveControl Drive = null;
+    VuforiaControl Vuforia = null;
+    ImuControl Imu = null;
+    UserControl User = null;
 
     ElapsedTime runtime = new ElapsedTime();
-
-    /* Declare extended gamepad */
-    GamepadEdge egamepad1;
-    GamepadEdge egamepad2;
 
     /* constant speed values */
     double MOVE_SPEED = 0.5;            /* adjusted by battery level */
@@ -53,17 +48,13 @@ public class AutoTest extends LinearOpMode {
 
         /* initialize sub assemblies
          */
-        Arms.initialize(this);
-        Grabber.initialize(this);
-        Ampere.initialize(this);
-        Drive.initialize(this);
-        Imu.initialize(this);
-        Vuforia.initialize(this);
-        User.initialize(this);
-
-        /* Instantiate extended gamepad */
-        egamepad1 = new GamepadEdge(gamepad1);
-        egamepad2 = new GamepadEdge(gamepad2);
+//AJB        Arms = new DualArmControl(this);
+        Grabber = new GrabberControl(this);
+        Ampere = new AmpereControl(this);
+        Drive = new DriveControl(this);
+        Vuforia = new VuforiaControl(this);
+        Imu = new ImuControl(this, true);
+        User = new UserControl(this);
 
         /* Input options */
         redteam = User.getRedBlue("Select Team Color");
@@ -85,6 +76,8 @@ public class AutoTest extends LinearOpMode {
             telemetry.addData("Do", "Glyph");
         if (do_jewels)
             telemetry.addData("Do", "Jewels");
+        if (do_motion)
+            telemetry.addData("Do", "Motion");
         if (redteam)
             telemetry.addData("Team Color", "RED");
         else
@@ -98,6 +91,17 @@ public class AutoTest extends LinearOpMode {
 
         telemetry.addData("Go", "...");
         telemetry.update();
+
+        do_glyph = false;
+        do_jewels = false;
+        do_motion = false;
+
+        autoRotateAngle(ROTATE_SPEED, 90.0);
+        telemetry.addData("angle", Imu.getRelativeAngle());
+        User.getYesNo("Continue...");
+        autoRotateAngle(ROTATE_SPEED, -90.0);
+        telemetry.addData("angle", Imu.getRelativeAngle());
+        User.getYesNo("Continue...");
 
         if (do_motion) {
             autoFindVuMark(1.0);
@@ -171,16 +175,6 @@ public class AutoTest extends LinearOpMode {
             autoGlyphRelease(0.0);
             autoMoveBackward(MOVE_SPEED, 0.20);
         }
-
-        /* Clean up sub-assemblies */
-        Arms.cleanup();
-        Grabber.cleanup();
-        Ampere.cleanup();
-        Drive.cleanup();
-        Imu.cleanup();
-        Vuforia.cleanup();
-        User.cleanup();
-        telemetry.update();
     }
 
     /* IMPORTANT
@@ -219,34 +213,36 @@ public class AutoTest extends LinearOpMode {
         telemetry.update();
     }
 
-    /*!!!! make absolute rotation option (from initial start angle) */
+    /* CW from TOP is positive direction */
     void autoRotateAngle(double speed, double target) {
         if (!opModeIsActive()) return;
 
         telemetry.addLine("Rotate Angle");
         telemetry.update();
 
-        double turnAngle;
+        double angleError;
+        double runspeed = speed;
 
         Imu.setReferenceAngle();
 
         if (target > 0) {
-            Drive.rotateRight(speed);
             do {
+                angleError = target - Imu.getRelativeAngle();
+                if (Math.abs(angleError) < 45.0)
+                    runspeed = speed*(1.0*Math.abs(angleError)/45.0 + 0.0);
+                Drive.rotateRight(runspeed);
                 autoUpdate();
-                turnAngle = -Imu.getRelativeAngle();
-                telemetry.addData("turn/target", "%.0f %.0f", turnAngle, target);
-                telemetry.update();
-            } while ((turnAngle < target) && opModeIsActive());
+            } while ((angleError > 5.0) && opModeIsActive());
         }
         if (target < 0) {
             Drive.rotateLeft(speed);
             do {
+                angleError = target - Imu.getRelativeAngle();
+                if (Math.abs(angleError) < 45.0)
+                    runspeed = speed*(1.0*Math.abs(angleError)/45.0 + 0.0);
+                Drive.rotateLeft(runspeed);
                 autoUpdate();
-                turnAngle = -Imu.getRelativeAngle();
-                telemetry.addData("turn/target", "%.0f %.0f", turnAngle, target);
-                telemetry.update();
-            } while ((turnAngle > target) && opModeIsActive());
+            } while ((angleError < -5.0) && opModeIsActive());
         }
         Drive.moveStop();
     }
@@ -337,7 +333,7 @@ public class AutoTest extends LinearOpMode {
         if (!opModeIsActive()) return;
         telemetry.addLine("Arm Lift");
         telemetry.update();
-        Arms.UpperArm.moveToPosition(position);
+//AJB        Arms.UpperArm.moveToPosition(position);
         autoDelaySec(time_sec);
     }
 
@@ -346,7 +342,7 @@ public class AutoTest extends LinearOpMode {
         if (!opModeIsActive()) return;
         telemetry.addLine("Arm Home");
         telemetry.update();
-        Arms.UpperArm.moveHome();
+//AJB        Arms.UpperArm.moveHome();
 
         double timeStart = 0;
         double timeNow = 0;
@@ -355,7 +351,8 @@ public class AutoTest extends LinearOpMode {
             autoUpdate();
             timeNow = runtime.seconds() - timeStart;
         }
-        while ((timeNow < time_sec) && opModeIsActive() && (Arms.UpperArm.Limit.getState() == true));
+        while ((timeNow < time_sec) && opModeIsActive());
+//AJB        while ((timeNow < time_sec) && opModeIsActive() && (Arms.UpperArm.Limit.getState() == true));
     }
 
     /* Start side arms extending and delay specified amount of time */
@@ -484,7 +481,7 @@ public class AutoTest extends LinearOpMode {
     void autoUpdate() {
         if (!opModeIsActive()) return;
 
-        Arms.Update();
+//AJB        Arms.Update();
         sleep(40);
     }
 }

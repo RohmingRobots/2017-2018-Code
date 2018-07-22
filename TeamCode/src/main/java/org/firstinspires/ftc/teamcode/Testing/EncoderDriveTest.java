@@ -13,12 +13,8 @@ import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
 
 
 //naming the teleop thing
-@Autonomous(name="EncoderDriveTest", group ="Test")
+@Autonomous(name = "EncoderDriveTest", group = "Test")
 public class EncoderDriveTest extends LinearOpMode {
-
-    /* Sub Assemblies
-     */
-    DriveControl Drive = new DriveControl();
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -54,15 +50,15 @@ public class EncoderDriveTest extends LinearOpMode {
 
         /* initialize sub assemblies
          */
-        Drive.initialize(this);
+        DriveControl Drive = new DriveControl(this);
 
         double voltage = Drive.Battery.getVoltage();
         telemetry.addData("Voltage", voltage);
 
         //declaring all my variables in one place for my sake
-        final double MOVE_SPEED = 0.5 + ((13.2-voltage)/12);
-        final double STRAFFE_SPEED = 0.75 + ((13.2-voltage)/12);
-        final double ROTATE_SPEED = 0.4 + ((13.2-voltage)/12);
+        final double MOVE_SPEED = 0.5 + ((13.2 - voltage) / 12);
+        final double STRAFFE_SPEED = 0.75 + ((13.2 - voltage) / 12);
+        final double ROTATE_SPEED = 0.4 + ((13.2 - voltage) / 12);
 
 /*        robot.FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -116,7 +112,7 @@ public class EncoderDriveTest extends LinearOpMode {
                 /* move forward 12 inches */
                 case 1:
                     Drive.moveForward(MOVE_SPEED);
-                    if (currentDistance > 12-6) {
+                    if (currentDistance > 12 - 6) {
                         mode++;
                         resetClock();
                         //resetEncoders();
@@ -135,7 +131,7 @@ public class EncoderDriveTest extends LinearOpMode {
 
                 case 3:
                     Drive.moveForward(MOVE_SPEED);
-                    if (currentDistance > 30-6) {
+                    if (currentDistance > 30 - 6) {
                         mode++;
                         resetClock();
                         //resetEncoders();
@@ -145,9 +141,5 @@ public class EncoderDriveTest extends LinearOpMode {
 
             }  // end of switch
         }
-
-        /* Clean up sub-assemblies */
-        Drive.cleanup();
-        telemetry.update();
     }
 }

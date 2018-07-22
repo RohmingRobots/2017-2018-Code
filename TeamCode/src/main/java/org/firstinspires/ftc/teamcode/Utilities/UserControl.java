@@ -4,35 +4,32 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class UserInput {
+public class UserControl {
     /* Declare private class objects
      */
     private Telemetry telemetry;            /* local copy of telemetry object from opmode class */
-    private String name = "User Input";
+    private String name = "User Control";
 
     /* Declare extended gamepad */
-    GamepadEdge egamepad1;
-    GamepadEdge egamepad2;
+    GamepadWrapper egamepad1 = null;
+    GamepadWrapper egamepad2 = null;
 
-    /* Constructor */
-    public UserInput() {
+    /* Declare public class objects
+     */
+    public enum DPAD {
+        UP, RIGHT, DOWN, LEFT;
     }
 
-    /* Initialization method - to be called before any other methods are used */
-    public void initialize(LinearOpMode opMode) {
+    /* Constructor */
+    public UserControl(LinearOpMode opMode) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
 
         telemetry.addLine(name + " initialize");
 
         /* Instantiate extended gamepad */
-        egamepad1 = new GamepadEdge(opMode.gamepad1);
-        egamepad2 = new GamepadEdge(opMode.gamepad2);
-    }
-
-    /* cleanup method - to be called when done with subassembly to 'turn off' everything */
-    public void cleanup() {
-        telemetry.addLine(name + " cleanup");
+        egamepad1 = new GamepadWrapper(opMode.gamepad1);
+        egamepad2 = new GamepadWrapper(opMode.gamepad2);
     }
 
     public boolean getRedBlue(String prompt) {
@@ -78,5 +75,22 @@ public class UserInput {
             isLeft = true;
         egamepad1.updateEdge();
         return isLeft;
+    }
+
+    public DPAD getDPad(String prompt) {
+        DPAD dpad = null;
+
+        telemetry.addLine(prompt);
+        telemetry.addLine("[dpad]");
+        telemetry.update();
+        do {
+            egamepad1.updateEdge();
+            if (egamepad1.dpad_up.pressed) dpad = DPAD.UP;
+            if (egamepad1.dpad_right.pressed) dpad = DPAD.RIGHT;
+            if (egamepad1.dpad_down.pressed) dpad = DPAD.DOWN;
+            if (egamepad1.dpad_left.pressed) dpad = DPAD.LEFT;
+        }
+        while (dpad == null);
+        return dpad;
     }
 }

@@ -18,16 +18,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import java.util.Locale;
 
 
-public class ImuWrapper {
+public class ImuControl {
     /* Declare private class objects
      */
     private Telemetry telemetry;            /* local copy of telemetry object from opmode class */
     private HardwareMap hardwareMap;        /* local copy of HardwareMap object from opmode class */
-    private String name = "IMU Wrapper";
+    private String name = "IMU Control";
 
     private BNO055IMU imu;                  /* IMU Object */
+    private Orientation angles;
 
-    private double refAngle;                /* reference angle */
+    private double inverted = 1.0;          /* imu has inverted orientation? */
+    private double refAngle = 0.0;          /* reference angle */
 
 
     /* Getter methods
@@ -46,27 +48,39 @@ public class ImuWrapper {
 
 
     /* Constructor */
-    public ImuWrapper() {
+    public ImuControl(LinearOpMode opMode) {
+        initialize(opMode, false);
     }
 
-    /* Initialization method - to be called before any other methods are used */
-    public void initialize(LinearOpMode opMode) {
+    public ImuControl(LinearOpMode opMode, boolean isInverted) {
+        initialize(opMode, isInverted);
+    }
+
+    /* Initialization method - to be called before any other methods are used
+     */
+    private void initialize(LinearOpMode opMode, boolean isInverted) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
 
-        telemetry.addLine(name + " initialize");
+        telemetry.addLine(name + " initialize" + (isInverted ? " inverted" : ""));
 
         BNO055IMU.Parameters imuParameters = new BNO055IMU.Parameters();
+        imuParameters.mode = BNO055IMU.SensorMode.IMU;
         imuParameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imuParameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        imuParameters.loggingEnabled = false;
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(imuParameters);
-    }
 
-    /* cleanup method - to be called when done with subassembly to 'turn off' everything */
-    public void cleanup() {
-        telemetry.addLine(name + " cleanup");
+        while (!imu.isGyroCalibrated()) ;
+
+        if (isInverted)
+            inverted = -1.0;
+        else
+            inverted = 1.0;
+
+        setReferenceAngle();
     }
 
     public double getAngleDifference(double angle, double angleref) {
@@ -79,10 +93,8 @@ public class ImuWrapper {
     }
 
     public void setReferenceAngle() {
-        Orientation angles;
-
         angles = getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        refAngle = angles.firstAngle;
+        refAngle = angles.firstAngle * inverted;
     }
 
     public void setReferenceAngle(double angleref) {
@@ -93,12 +105,13 @@ public class ImuWrapper {
         return refAngle;
     }
 
+    /* Positive angles are in the CW direction when looking onto the top of the RevHub
+     */
     public double getRelativeAngle() {
-        Orientation angles;
         double angle;
 
         angles = getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        angle = angles.firstAngle - refAngle;
+        angle = angles.firstAngle * inverted - refAngle;
         if (angle > 180.0) angle = angle - 360.0;
         if (angle < -180.0) angle = angle + 360.0;
 

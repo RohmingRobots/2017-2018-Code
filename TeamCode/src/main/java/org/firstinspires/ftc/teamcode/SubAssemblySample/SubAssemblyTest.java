@@ -8,18 +8,18 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * This TeleOp OpMode is used to test the functionality of the specific sub assembly
  */
 // Assign OpMode type (TeleOp or Autonomous), name, and grouping
-@TeleOp(name="SubAssembly Test", group="Test")
+@TeleOp(name = "SubAssembly Test", group = "Test")
 public class SubAssemblyTest extends LinearOpMode {
-
-    SubAssemblyTemplate SubAssembly = new SubAssemblyTemplate();
 
     @Override
     public void runOpMode() throws InterruptedException {
 
         telemetry.addLine("SubAssembly Test OpMode");
 
-        /* initialize sub-assemblies */
-        SubAssembly.initialize(this);
+        /* initialize sub-assemblies
+         */
+        SubAssemblyTemplate SubAssembly = new SubAssemblyTemplate(this);
+
         telemetry.update();
 
         //waits for that giant PLAY button to be pressed on RC

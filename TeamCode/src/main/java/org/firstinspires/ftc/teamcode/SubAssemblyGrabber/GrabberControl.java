@@ -55,17 +55,17 @@ public class GrabberControl {
 
 
     /* Subassembly constructor */
-    public GrabberControl() {
+    public GrabberControl(LinearOpMode opMode) {
+        initialize(opMode, true);
     }
 
-    /* default initialize is to set servos to initial setpoint */
-    public void initialize(LinearOpMode opMode) {
-        initialize(opMode, true);
+    public GrabberControl(LinearOpMode opMode, boolean init_servos) {
+        initialize(opMode, init_servos);
     }
 
     /* Initialization method - to be called before any other methods are used
      */
-    public void initialize(LinearOpMode opMode, boolean init_servos) {
+    private void initialize(LinearOpMode opMode, boolean init_servos) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -99,10 +99,5 @@ public class GrabberControl {
         RightServo = new ServoControl(GGR, MapRightGrip, GripSetpoints.OPEN, init_servos);
         // do not initialize claw position, let it set on arm
         ClawServo = new ServoControl(Claw, MapClaw, ClawSetpoints.OPEN, false);
-    }
-
-    /* cleanup method - to be called when done with subassembly to 'turn off' everything */
-    public void cleanup() {
-        telemetry.addLine(name + " cleanup");
     }
 }

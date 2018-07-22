@@ -4,13 +4,11 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 /**
  * Created by ablauch on 11/3/2017.
- * <p>
  * this class detects the button press and release
- * <p>
  * call the update method when you want to check for new press/release
  */
 
-public class GamepadEdge {
+public class GamepadWrapper {
 
     public class ButtonEdge {
         public boolean state = false;
@@ -55,7 +53,7 @@ public class GamepadEdge {
     public ButtonEdge right_trigger = new ButtonEdge();
 
     /* Constructor */
-    public GamepadEdge(Gamepad gp) {
+    public GamepadWrapper(Gamepad gp) {
         mygamepad = gp;
     }
 

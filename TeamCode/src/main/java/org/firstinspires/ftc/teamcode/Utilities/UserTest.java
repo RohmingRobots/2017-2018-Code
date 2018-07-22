@@ -1,36 +1,37 @@
-package org.firstinspires.ftc.teamcode;
-/* version history
-     -1/13/18 created file for testing arm control
-     -1/23/18 added potentiometer feedback for upper arm
- */
+package org.firstinspires.ftc.teamcode.Utilities;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.SubAssemblyAmpere.AmpereControl;
-import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
-import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
-import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
-
 /**
- * Created by ablauch on 2/21/2018.
+ * Test opmode for GamepadWrapper and UserControl.
  */
 
-@TeleOp(name="Gamepad Test", group="Test")
-public class GamepadTest extends LinearOpMode {
-
-    /* Declare extended gamepad */
-    GamepadEdge egamepad1;
-    GamepadEdge egamepad2;
+@TeleOp(name="User Test", group="Test")
+public class UserTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        telemetry.addLine("Gamepad Test");
+        telemetry.addLine("User Test");
+
+        /* initialize sub assemblies
+         */
+        UserControl User = new UserControl(this);
 
         /* Instantiate extended gamepad */
-        egamepad1 = new GamepadEdge(gamepad1);
-        egamepad2 = new GamepadEdge(gamepad2);
+        GamepadWrapper egamepad1 = new GamepadWrapper(gamepad1);
+        GamepadWrapper egamepad2 = new GamepadWrapper(gamepad2);
+
+        boolean isred = User.getRedBlue("Test Red/Blue:");
+        boolean isyes = User.getYesNo("Test Yes/No:");
+        boolean isleft = User.getLeftRight("Test Left/Right:");
+        UserControl.DPAD dpad = User.getDPad("Test DPad");
+
+        telemetry.addData("Answer = ", (isred) ? "Red" : "Blue");
+        telemetry.addData("Answer = ", (isyes) ? "Yes" : "No");
+        telemetry.addData("Answer = ", (isleft) ? "Left" : "Right");
+        telemetry.addData("Answer = ", dpad);
 
         telemetry.update();
 

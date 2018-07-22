@@ -13,22 +13,11 @@ import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyGrabber.GrabberControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyGuides.GuideControl;
-import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
+import org.firstinspires.ftc.teamcode.Utilities.GamepadWrapper;
 
 //naming the teleop thing
 @TeleOp(name = "TeleOp", group = "Drive")
 public class teleop extends LinearOpMode {
-
-    /* Sub Assemblies
-     */
-    DualArmControl Arms = new DualArmControl();
-    GrabberControl Grabber = new GrabberControl();
-    GuideControl Guide = new GuideControl();
-    DriveControl Drive = new DriveControl();
-
-    /* Declare extended gamepad */
-    GamepadEdge egamepad1;
-    GamepadEdge egamepad2;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -45,14 +34,14 @@ public class teleop extends LinearOpMode {
 
         /* initialize sub assemblies
          */
-        Arms.initialize(this);
-        Grabber.initialize(this);
-        Guide.initialize(this);
-        Drive.initialize(this);
+        DualArmControl Arms = new DualArmControl(this);
+        GrabberControl Grabber = new GrabberControl(this);
+        GuideControl Guide = new GuideControl(this);
+        DriveControl Drive = new DriveControl(this);
 
         /* Instantiate extended gamepad */
-        egamepad1 = new GamepadEdge(gamepad1);
-        egamepad2 = new GamepadEdge(gamepad2);
+        GamepadWrapper egamepad1 = new GamepadWrapper(gamepad1);
+        GamepadWrapper egamepad2 = new GamepadWrapper(gamepad2);
 
         telemetry.addData("Version", "Worlds 4-13-2018");
         telemetry.update();
@@ -163,7 +152,7 @@ public class teleop extends LinearOpMode {
                 Arms.nextSetpoint();
                 close_guides = true;
             }
-            //closing guides when arm is up/
+            //closing guides when arm is up
             if ((close_guides) && (Arms.UpperArm.getCurrentPosition() > .1)) {
                 close_guides = false;
                 Guide.LeftServo.setSetpoint(GuideControl.GuideSetpoints.RETRACT);
@@ -182,12 +171,5 @@ public class teleop extends LinearOpMode {
             //let the robot have a little rest, sleep is healthy
             sleep(40);
         }
-
-        /* Clean up sub-assemblies */
-        Arms.cleanup();
-        Grabber.cleanup();
-        Guide.cleanup();
-        Drive.cleanup();
-        telemetry.update();
     }
 }

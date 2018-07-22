@@ -3,19 +3,11 @@ package org.firstinspires.ftc.teamcode.SubAssemblyDrive;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
+import org.firstinspires.ftc.teamcode.Utilities.GamepadWrapper;
 
 //naming the teleop thing
-@TeleOp(name = "Mecanum Test", group = "Test")
+@TeleOp(name = "Drive Test", group = "Test")
 public class DriveTest extends LinearOpMode {
-
-    /* Sub Assemblies
-     */
-    DriveControl Drive = new DriveControl();
-
-    /* Declare extended gamepad */
-    GamepadEdge egamepad1;
-    GamepadEdge egamepad2;
 
     public void displayHelp() {
         telemetry.addLine("Press START for this help");
@@ -42,11 +34,11 @@ public class DriveTest extends LinearOpMode {
 
         /* initialize sub assemblies
          */
-        Drive.initialize(this);
+        DriveControl Drive = new DriveControl(this);
 
         /* Instantiate extended gamepad */
-        egamepad1 = new GamepadEdge(gamepad1);
-        egamepad2 = new GamepadEdge(gamepad2);
+        GamepadWrapper egamepad1 = new GamepadWrapper(gamepad1);
+        GamepadWrapper egamepad2 = new GamepadWrapper(gamepad2);
 
         displayHelp();
         telemetry.update();
@@ -113,16 +105,12 @@ public class DriveTest extends LinearOpMode {
                 displayHelp();
             } else {
                 telemetry.addData("Speed: ", speed);
-                telemetry.addData("Direction: ", speed);
+                telemetry.addData("Direction: ", reverse);
             }
             telemetry.update();
 
             //let the robot have a little rest, sleep is healthy
             sleep(40);
         }
-
-        /* Clean up sub-assemblies */
-        Drive.cleanup();
-        telemetry.update();
     }
 }

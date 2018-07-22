@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.SubAssemblyAmpere.AmpereControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyArms.DualArmControl;
 import org.firstinspires.ftc.teamcode.SubAssemblyDrive.DriveControl;
-import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
+import org.firstinspires.ftc.teamcode.Utilities.GamepadWrapper;
 
 /**
  * Created by ablauch on 2/21/2018.
@@ -15,16 +15,6 @@ import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
 @TeleOp(name = "Sensor Test", group = "Test")
 public class SensorTest extends LinearOpMode {
 
-    /* Sub Assemblies
-     */
-    DualArmControl Arms = new DualArmControl();
-    AmpereControl Ampere = new AmpereControl();
-    DriveControl Drive = new DriveControl();
-
-    /* Declare extended gamepad */
-    GamepadEdge egamepad1;
-    GamepadEdge egamepad2;
-
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -32,9 +22,9 @@ public class SensorTest extends LinearOpMode {
 
         /* initialize sub assemblies
          */
-        Arms.initialize(this);
-        Ampere.initialize(this, false);
-        Drive.initialize(this);
+        DualArmControl Arms = new DualArmControl(this);
+        AmpereControl Ampere = new AmpereControl(this, false);
+        DriveControl Drive = new DriveControl(this);
 
         /* turn on color sensor LEDs */
         Drive.ColorLeft.enableLed(true);
@@ -43,8 +33,8 @@ public class SensorTest extends LinearOpMode {
         Ampere.ColorRight.enableLed(true);
 
         /* Instantiate extended gamepad */
-        egamepad1 = new GamepadEdge(gamepad1);
-        egamepad2 = new GamepadEdge(gamepad2);
+        GamepadWrapper egamepad1 = new GamepadWrapper(gamepad1);
+        GamepadWrapper egamepad2 = new GamepadWrapper(gamepad2);
 
         telemetry.update();
 
@@ -79,11 +69,5 @@ public class SensorTest extends LinearOpMode {
             //let the robot have a little rest, sleep is healthy
             sleep(40);
         }
-
-        /* Clean up sub-assemblies */
-        Arms.cleanup();
-        Ampere.cleanup();
-        Drive.cleanup();
-        telemetry.update();
     }
 }

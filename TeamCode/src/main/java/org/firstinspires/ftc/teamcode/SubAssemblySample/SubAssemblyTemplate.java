@@ -16,14 +16,10 @@ public class SubAssemblyTemplate {
     private String name = "SubAssemblyName";
 
     /* Declare public class object */
-    public VoltageSensor BatteryLevel = null;
+    public VoltageSensor Battery = null;
 
     /* Subassembly constructor */
-    public SubAssemblyTemplate() {
-    }
-
-    /* Initialization method - to be called before any other methods are used */
-    public void initialize(LinearOpMode opMode) {
+    public SubAssemblyTemplate(LinearOpMode opMode) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -31,7 +27,7 @@ public class SubAssemblyTemplate {
         telemetry.addLine(name + " initialize");
 
         /* Map hardware devices */
-        BatteryLevel = hardwareMap.voltageSensor.get("Lower hub 3");
+        Battery = hardwareMap.voltageSensor.get("Lower hub 3");
     }
 
     /* cleanup method - to be called when done with subassembly to 'turn off' everything */
@@ -42,7 +38,7 @@ public class SubAssemblyTemplate {
     /* Subassembly methods */
     public void test() {
         telemetry.addLine(name + " test");
-        telemetry.addData("Battery level = %.1f V", BatteryLevel);
+        telemetry.addData("Battery level = ", "%.2f V", Battery.getVoltage());
     }
 
 }

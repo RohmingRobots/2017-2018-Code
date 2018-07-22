@@ -48,11 +48,12 @@ public class DriveControl {
 
 
     /* Subassembly constructor */
-    public DriveControl() {
+    public DriveControl(LinearOpMode opMode) {
+        initialize(opMode);
     }
 
     /* Initialization method - to be called before any other methods are used */
-    public void initialize(LinearOpMode opMode) {
+    private void initialize(LinearOpMode opMode) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -87,11 +88,6 @@ public class DriveControl {
         //turns all LEDs off
         ColorLeft.enableLed(false);
         ColorRight.enableLed(false);
-    }
-
-    /* cleanup method - to be called when done with subassembly to 'turn off' everything */
-    public void cleanup() {
-        telemetry.addLine(name + " cleanup");
     }
 
     /* Combination move method */

@@ -65,16 +65,16 @@ public class AmpereControl {
 
 
     /* Subassembly constructor */
-    public AmpereControl() {
-    }
-
-    /* default initialize is to set servos to initial setpoint */
-    public void initialize(LinearOpMode opMode) {
+    public AmpereControl(LinearOpMode opMode) {
         initialize(opMode, true);
     }
 
+    public AmpereControl(LinearOpMode opMode, boolean init_servos) {
+        initialize(opMode, init_servos);
+    }
+
     /* Initialization method - to be called before any other methods are used */
-    public void initialize(LinearOpMode opMode, boolean init_servos) {
+    private void initialize(LinearOpMode opMode, boolean init_servos) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -120,11 +120,6 @@ public class AmpereControl {
         //turns all LEDs off
         ColorLeft.enableLed(false);
         ColorRight.enableLed(false);
-    }
-
-    /* cleanup method - to be called when done with subassembly to 'turn off' everything */
-    public void cleanup() {
-        telemetry.addLine(name + " cleanup");
     }
 
     /* positive power extends, negative power retracts */

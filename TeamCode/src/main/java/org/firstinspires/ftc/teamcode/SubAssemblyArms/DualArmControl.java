@@ -29,8 +29,8 @@ public class DualArmControl {
      */
 
     /* upper and lower arms */
-    public SingleArmControl LowerArm = new SingleArmControl();
-    public SingleArmControl UpperArm = new SingleArmControl();
+    public SingleArmControl LowerArm = null;
+    public SingleArmControl UpperArm = null;
 
     /* arm setpoints */
     public enum Setpoints implements EnumWrapper<Setpoints> {
@@ -43,11 +43,12 @@ public class DualArmControl {
 
 
     /* Subassembly constructor */
-    public DualArmControl() {
+    public DualArmControl(LinearOpMode opMode) {
+        initialize(opMode);
     }
 
     /* Initialization method - to be called before any other methods are used */
-    public void initialize(LinearOpMode opMode) {
+    private void initialize(LinearOpMode opMode) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -76,17 +77,8 @@ public class DualArmControl {
         MapMoveTime.put(Setpoints.ROW4, 0.5);
 
         /* Map hardware devices */
-        LowerArm.initialize(opMode, false);
-        UpperArm.initialize(opMode, true);
-    }
-
-    /* cleanup method - to be called when done with subassembly to 'turn off' everything */
-    public void cleanup() {
-        telemetry.addLine(name + " cleanup");
-
-        /* Clean up sub-assemblies */
-        LowerArm.cleanup();
-        UpperArm.cleanup();
+        LowerArm = new SingleArmControl(opMode, false);
+        UpperArm = new SingleArmControl(opMode, true);
     }
 
     /* move arms to next setpoint */

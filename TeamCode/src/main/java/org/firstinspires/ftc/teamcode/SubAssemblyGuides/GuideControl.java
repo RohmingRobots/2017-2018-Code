@@ -49,17 +49,17 @@ public class GuideControl {
 
 
     /* Subassembly constructor */
-    public GuideControl() {
+    public GuideControl(LinearOpMode opMode) {
+        initialize(opMode, true);
     }
 
-    /* default initialize is to set servos to initial setpoint */
-    public void initialize(LinearOpMode opMode) {
-        initialize(opMode, true);
+    public GuideControl(LinearOpMode opMode, boolean init_servos) {
+        initialize(opMode, init_servos);
     }
 
     /* Initialization method - to be called before any other methods are used
      */
-    public void initialize(LinearOpMode opMode, boolean init_servos) {
+    private void initialize(LinearOpMode opMode, boolean init_servos) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -86,10 +86,5 @@ public class GuideControl {
         /* Create servo control objects and initialize positions */
         LeftServo = new ServoControl(LG, MapLeftGuide, GuideSetpoints.RETRACT, init_servos);
         RightServo = new ServoControl(RG, MapRightGuide, GuideSetpoints.RETRACT, init_servos);
-    }
-
-    /* cleanup method - to be called when done with subassembly to 'turn off' everything */
-    public void cleanup() {
-        telemetry.addLine(name + " cleanup");
     }
 }

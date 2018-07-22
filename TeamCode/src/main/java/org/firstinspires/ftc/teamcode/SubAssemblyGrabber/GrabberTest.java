@@ -3,20 +3,12 @@ package org.firstinspires.ftc.teamcode.SubAssemblyGrabber;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Utilities.GamepadEdge;
+import org.firstinspires.ftc.teamcode.Utilities.GamepadWrapper;
 
 
 //naming the teleop thing
 @TeleOp(name = "Grabber Test", group = "Test")
 public class GrabberTest extends LinearOpMode {
-
-    /* Sub Assemblies
-     */
-    GrabberControl Grabber = new GrabberControl();
-
-    /* Declare extended gamepad */
-    GamepadEdge egamepad1;
-    GamepadEdge egamepad2;
 
     /* displays information to user about gamepad usage */
     public void displayHelp() {
@@ -38,11 +30,11 @@ public class GrabberTest extends LinearOpMode {
 
         /* initialize sub assemblies
          */
-        Grabber.initialize(this, false);
+        GrabberControl Grabber = new GrabberControl(this, false);
 
         /* Instantiate extended gamepad */
-        egamepad1 = new GamepadEdge(gamepad1);
-        egamepad2 = new GamepadEdge(gamepad2);
+        GamepadWrapper egamepad1 = new GamepadWrapper(gamepad1);
+        GamepadWrapper egamepad2 = new GamepadWrapper(gamepad2);
 
         displayHelp();
         telemetry.update();
@@ -112,9 +104,5 @@ public class GrabberTest extends LinearOpMode {
             //let the robot have a little rest, sleep is healthy
             sleep(40);
         }
-
-        /* Clean up sub-assemblies */
-        Grabber.cleanup();
-        telemetry.update();
     }
 }

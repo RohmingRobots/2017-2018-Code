@@ -10,12 +10,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
-public class VuforiaWrapper {
+public class VuforiaControl {
     /* Declare private class objects
      */
     private Telemetry telemetry;            /* local copy of telemetry object from opmode class */
     private HardwareMap hardwareMap;        /* local copy of HardwareMap object from opmode class */
-    private String name = "Vuforia Wrapper";
+    private String name = "Vuforia Control";
 
     private RelicRecoveryVuMark vuMark;
     private VuforiaTrackable relicTemplate = null;
@@ -26,11 +26,12 @@ public class VuforiaWrapper {
 
 
     /* Constructor */
-    public VuforiaWrapper() {
+    public VuforiaControl(LinearOpMode opMode) {
+        initialize(opMode);
     }
 
     /* Initialization method - to be called before any other methods are used */
-    public void initialize(LinearOpMode opMode) {
+    private void initialize(LinearOpMode opMode) {
         /* Set local copies from opmode class */
         telemetry = opMode.telemetry;
         hardwareMap = opMode.hardwareMap;
@@ -49,11 +50,6 @@ public class VuforiaWrapper {
         relicTemplate = relicTrackables.get(0);
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
         relicTrackables.activate();
-    }
-
-    /* cleanup method - to be called when done with subassembly to 'turn off' everything */
-    public void cleanup() {
-        telemetry.addLine(name + " cleanup");
     }
 
     public RelicRecoveryVuMark findVuMark() {
