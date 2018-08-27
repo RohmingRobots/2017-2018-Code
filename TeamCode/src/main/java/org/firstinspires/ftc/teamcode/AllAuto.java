@@ -547,6 +547,7 @@ public class AllAuto extends LinearOpMode {
                     //robot.AWR.setPower(-AMPERE_POWER);
 
                     //strafes in the direction of the stone, which depends on team color
+                    //moves forward first if on the red team
                     if (now < 0.4 && redteam){
                         robot.MoveForward(MOVE_SPEED * 0.75);
                     }
@@ -591,30 +592,6 @@ public class AllAuto extends LinearOpMode {
                     else /*if (Math.abs(Math.abs(turnAngle) - 90) < 5)*/ {
                         robot.MoveForward(MOVE_SPEED * 0.5);
                     }
-                    /*else {
-                        if (now < 0.5) {
-                            if (redteam) {
-                                robot.MoveLeft(STRAFFE_SPEED);
-                            }
-                            else {
-                                robot.MoveRight(STRAFFE_SPEED);
-                            }
-                        }
-                        else if(now > 0.5) {
-                            if (!redteam && turnAngle - 90 > 5) {
-                                robot.RotateLeft(ROTATE_SPEED * ((turnAngle - 20)/90));
-                            }
-                            else if (!redteam && turnAngle - 90 < -5) {
-                                robot.RotateRight(ROTATE_SPEED * ((160 - turnAngle)/90));
-                            }
-                            else if (redteam && turnAngle + 90 > 5) {
-                                robot.RotateLeft(ROTATE_SPEED * ((160 + turnAngle)/90));
-                            }
-                            else if (redteam && turnAngle + 90 < -5) {
-                                robot.RotateRight(ROTATE_SPEED * ((-20 - turnAngle)/90));
-                            }
-                        }
-                    }*/
 
                     if ((FI && now > 1.1) || (!FI && (leftcolor || rightcolor))) {
                         mode++;
